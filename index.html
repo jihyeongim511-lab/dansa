@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Supabase 방명록</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <h1>간단한 방명록</h1>
+  
+  <input type="text" id="messageInput" placeholder="메시지를 입력하세요">
+  <button onclick="saveMessage()">저장</button>
+
+  <ul id="messageList"></ul>
+
+  <script>
+    // 완성된 키와 URL이 포함되어 있습니다.
+    const SUPABASE_URL = 'https://szqlrwnsflfbmafwefac.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_Ib67bVHkQHq1r2w1yyBFDg_cTj1N5qd';
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function loadMessages() {
+      const { data, error } = await supabase.from('messages').select('*');
+      if (error) {
+        console.error('불러오기 에러:', error);
+        return;
+      }
+      const list = document.getElementById('messageList');
+      list.innerHTML = '';
+      data.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item.content;
+        list.appendChild(li);
+      });
+    }
+
+    async function saveMessage() {
+      const input = document.getElementById('messageInput');
+      const text = input.value;
+      if (!text) return alert('메시지를 입력하세요!');
+
+      const { data, error } = await supabase.from('messages').insert([{ content: text }]);
+      if (error) {
+        console.error('저장 에러:', error);
+      } else {
+        input.value = '';
+        loadMessages();
+      }
+    }
+
+    loadMessages();
+  </script>
+</body>
+</html>
