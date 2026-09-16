@@ -1,4 +1,8 @@
-<div id="root">
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>초등 임용 12일 학습 플랜</title>
 <style>
   :root{
     --ink:#16202B;
@@ -352,7 +356,9 @@
   @media (max-width:420px){.moodgrid{grid-template-columns:1fr}}
 
 </style>
-
+</head>
+<body>
+<div id="root">
 <div class="head">
   <div class="titlerow">
     <h1 id="titleView">초등 임용 12일 학습 플랜</h1>
@@ -464,115 +470,51 @@
 <div class="toast" id="toast"></div>
 </div>
 
-
+<!-- Supabase 라이브러리 및 연동 스토리지 어댑터 -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/* Standalone-file storage compatibility:
-   The original planner expected ChatGPT's window.storage API.
-   When downloaded and opened as a normal HTML file, that API may not exist.
-   This adapter uses IndexedDB (large enough for photos) and falls back to localStorage.
-*/
 (function(){
   if (window.__plannerStorageReady) return;
   window.__plannerStorageReady = true;
 
-  const native = window.storage;
-  const DB_NAME = 'elementary-teacher-plan-storage';
-  const STORE = 'kv';
+  const SUPABASE_URL = 'https://szqlrwnsflfbmafwefac.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_Ib67bVHkQHq1r2w1yyBFDg_cTj1N5qd';
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  function openDB(){
-    return new Promise((resolve,reject)=>{
-      if (!window.indexedDB) return reject(new Error('IndexedDB unavailable'));
-      const req = indexedDB.open(DB_NAME, 1);
-      req.onupgradeneeded = () => {
-        const db = req.result;
-        if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE);
-      };
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error || new Error('IndexedDB open failed'));
-    });
-  }
-
-  async function idbSet(key,value){
-    const db = await openDB();
-    return new Promise((resolve,reject)=>{
-      const tx = db.transaction(STORE,'readwrite');
-      tx.objectStore(STORE).put(String(value), key);
-      tx.oncomplete = () => { db.close(); resolve({ok:true}); };
-      tx.onerror = () => { db.close(); reject(tx.error || new Error('IndexedDB write failed')); };
-    });
-  }
-
-  async function idbGet(key){
-    const db = await openDB();
-    return new Promise((resolve,reject)=>{
-      const tx = db.transaction(STORE,'readonly');
-      const req = tx.objectStore(STORE).get(key);
-      req.onsuccess = () => { db.close(); resolve(req.result === undefined ? null : {value:req.result}); };
-      req.onerror = () => { db.close(); reject(req.error || new Error('IndexedDB read failed')); };
-    });
-  }
-
-  async function idbDelete(key){
-    const db = await openDB();
-    return new Promise((resolve,reject)=>{
-      const tx = db.transaction(STORE,'readwrite');
-      tx.objectStore(STORE).delete(key);
-      tx.oncomplete = () => { db.close(); resolve({ok:true}); };
-      tx.onerror = () => { db.close(); reject(tx.error || new Error('IndexedDB delete failed')); };
-    });
-  }
-
-  function lsSet(key,value){
-    localStorage.setItem('planner:'+key, String(value));
-    return {ok:true};
-  }
-  function lsGet(key){
-    const v = localStorage.getItem('planner:'+key);
-    return v === null ? null : {value:v};
-  }
-  function lsDelete(key){
-    localStorage.removeItem('planner:'+key);
-    return {ok:true};
-  }
-
-  async function set(key,value){
-    if (native && typeof native.set === 'function'){
-      try { return await native.set(key,value); } catch(e){}
+  async function set(key, value){
+    const { error } = await supabaseClient
+      .from('my_planner')
+      .upsert({ key: key, value: String(value) });
+    
+    if (error) {
+      console.error('저장 에러:', error);
+      throw new Error('Supabase 저장 실패');
     }
-    try { return await idbSet(key,value); }
-    catch(e1){
-      try { return lsSet(key,value); }
-      catch(e2){ throw new Error('저장 공간에 접근할 수 없습니다. 브라우저의 사이트 데이터 저장을 허용해 주세요.'); }
-    }
+    return { ok: true };
   }
 
   async function get(key){
-    if (native && typeof native.get === 'function'){
-      try {
-        const r = await native.get(key);
-        if (r != null) return r;
-      } catch(e){}
-    }
-    try {
-      const r = await idbGet(key);
-      if (r != null) return r;
-    } catch(e1){}
-    try { return lsGet(key); }
-    catch(e2){ throw new Error('저장 공간에 접근할 수 없습니다.'); }
+    const { data, error } = await supabaseClient
+      .from('my_planner')
+      .select('value')
+      .eq('key', key)
+      .maybeSingle(); 
+    
+    if (error) console.error('불러오기 에러:', error);
+    if (!data) return null; 
+    return { value: data.value };
   }
 
   async function del(key){
-    if (native && typeof native.delete === 'function'){
-      try { return await native.delete(key); } catch(e){}
-    }
-    try { return await idbDelete(key); }
-    catch(e1){
-      try { return lsDelete(key); }
-      catch(e2){ throw new Error('저장 공간에 접근할 수 없습니다.'); }
-    }
+    const { error } = await supabaseClient
+      .from('my_planner')
+      .delete()
+      .eq('key', key);
+    if (error) console.error('삭제 에러:', error);
+    return { ok: true };
   }
 
-  window.storage = {set, get, delete:del};
+  window.storage = { set, get, delete: del };
 })();
 </script>
 
@@ -640,7 +582,6 @@
     catch(e){ console.error(e); toast('도장 사진을 저장하지 못했습니다'); }
   }
 
-  // ---------- image handling ----------
   function shrink(file,max,quality){
     return new Promise((res,rej)=>{
       const r=new FileReader();
@@ -696,7 +637,6 @@
     });
   }
 
-  // ---------- calendar ----------
   function parse(d){const[y,m,dd]=d.split('-').map(Number);return new Date(y,m-1,dd);}
   function render(){
     $('#titleView').textContent=state.title;
@@ -1062,7 +1002,6 @@
   };
 
 
-  // 같은 일정을 여러 날짜에 한 번에 추가 + 요일 반복 + 종료일
   if($('#multiScheduleBtn')) $('#multiScheduleBtn').onclick=()=>{
     const days=[...state.days].sort((a,b)=>a.date.localeCompare(b.date));
     const minDate=days[0]?.date || '';
@@ -1233,7 +1172,7 @@
     }
   };
 
-$('#addEvBtn').onclick=async()=>{
+  $('#addEvBtn').onclick=async()=>{
       const time=$('#newEvTime').value||'09:00';
       const duration=Math.max(0,Number($('#newEvDuration')?.value)||0);
       const title=$('#newEvTitle').value.trim();
@@ -1307,8 +1246,7 @@ $('#addEvBtn').onclick=async()=>{
       state.days.forEach(dd=>dd.availableMinutes=mins);
       save(); render(); openPanel(); toast('모든 날짜에 적용했습니다');
     };
-    // ---------- checklist actions ----------
-    // Use event delegation so edit/save/delete/toggle keep working after every re-render.
+
     panel.addEventListener('click', function(e){
       const b=e.target.closest('ul.items li [data-act]');
       if(!b || !panel.contains(b)) return;
@@ -1556,7 +1494,6 @@ $('#addEvBtn').onclick=async()=>{
     });
   }
 
-  // ---------- gallery ----------
   let viewMode='day';
   function showLightbox(src){
     const lb=document.createElement('div'); lb.className='lightbox';
@@ -1600,14 +1537,13 @@ $('#addEvBtn').onclick=async()=>{
   }
   $('#galleryBtn').onclick=()=>setView(viewMode==='gallery'?'day':'gallery');
 
-  // ---------- toolbar ----------
   function nextDate(){
     const ds=state.days.map(d=>d.date).sort();
     const base=ds.length?parse(ds[ds.length-1]):new Date();
     base.setDate(base.getDate()+1);
     return `${base.getFullYear()}-${String(base.getMonth()+1).padStart(2,'0')}-${String(base.getDate()).padStart(2,'0')}`;
   }
-  // ---------- title ----------
+
   const titleView=$('#titleView'), titleEdit=$('#titleEdit'), titleEditBtn=$('#titleEditBtn');
   function startTitleEdit(){
     titleEdit.value=state.title;
@@ -1665,7 +1601,6 @@ $('#addEvBtn').onclick=async()=>{
     });
   });
 
-  // ---------- global memo ----------
   const memoArea=$('#memoArea'), mSaved=$('#mSaved');
   let memoTimer=null;
   function saveMemoNow(){
@@ -1736,7 +1671,6 @@ $('#addEvBtn').onclick=async()=>{
     };
   });
 
-  // ---------- init ----------
   (async function init(){
     try{ const r=await window.storage.get(KEY); state=r?JSON.parse(r.value):seed(); }
     catch(e){ state=seed(); }
@@ -1758,7 +1692,6 @@ $('#addEvBtn').onclick=async()=>{
   })();
 })();
 
-  // 답 가리기/보이기: 답안 영역에 실제 hidden 클래스를 적용
   document.addEventListener('click', function(e){
     const btn=e.target.closest('#hideAnswers,#toggleAnswers,[data-action="hide-answers"]');
     if(!btn) return;
@@ -1772,7 +1705,6 @@ $('#addEvBtn').onclick=async()=>{
 </script>
 
 <script>
-/* ---------- mood / state tracker ---------- */
 (function(){
   const KEY = 'mood-tracker-v1';
   const $ = (s) => document.querySelector(s);
@@ -1897,3 +1829,5 @@ $('#addEvBtn').onclick=async()=>{
   load();
 })();
 </script>
+</body>
+</html>
