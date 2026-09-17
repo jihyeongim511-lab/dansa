@@ -194,8 +194,23 @@
   .qafield:empty:before{content:attr(data-ph);color:#9AA79A}
   .qafield.q{background:#FBFAF3;border-left:3px solid var(--gold)}
   .qafield.a{border-left:3px solid var(--jade)}
+  .qa.hide .qafield.a{filter:blur(4.5px);transition:filter .2s}
+  .qa.hide .qafield.a:focus{filter:none}
   .qarow .rdel{position:absolute;top:-9px;right:-6px;width:22px;height:22px;border-radius:50%;border:1px solid var(--rule);background:#fff;color:var(--ink-soft);font-size:11px;line-height:1;display:flex;align-items:center;justify-content:center}
   .qarow .rdel:hover{color:var(--seal);border-color:#E3C9C5}
+
+  .qa-table{width:100%;border-collapse:collapse;margin:6px 0}
+  .qa-table td, .qa-table th{border:1px solid var(--rule);padding:4px 8px;min-height:24px}
+  .table-tools{display:flex;gap:4px;margin-top:4px}
+
+  .photos{margin-top:16px;padding-top:14px;border-top:1px dashed var(--rule)}
+  .photos h3{margin:0;font-size:13px;font-weight:700;margin-bottom:8px}
+  .thumbs{display:flex;gap:8px;flex-wrap:wrap}
+  .thumb{position:relative;width:74px;height:74px;border-radius:8px;overflow:hidden;border:1px solid var(--rule)}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .thumb button{position:absolute;top:2px;right:2px;width:20px;height:20px;border-radius:50%;border:none;background:rgba(22,32,43,.72);color:#fff;font-size:12px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .addphoto{width:74px;height:74px;border:1.5px dashed #B9C2B5;border-radius:8px;background:transparent;color:var(--ink-soft);font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .addphoto:hover{background:#EDF0EA}
 
   .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:9px 16px;border-radius:99px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:200}
   .toast.on{opacity:1}
@@ -242,7 +257,6 @@
   .profile-img-wrap img{width:100%;height:100%;object-fit:cover}
   .profile-bio{font-size:12px;color:var(--ink-soft);border:none;background:transparent;text-align:center;width:100%;outline:none;font-weight:600}
 
-  /* HOME (GOAL) 화면 전용 스타일 */
   .home-page-layout{display:flex;flex-direction:column;gap:12px;height:100%}
   .home-card{background:#fff;border:1.5px solid var(--d-theme);border-radius:12px;padding:12px;box-shadow:0 3px 8px rgba(0,0,0,0.03)}
   .home-card-header{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:800;color:var(--d-theme-dark);letter-spacing:1px;margin-bottom:8px;text-transform:uppercase}
@@ -273,7 +287,6 @@
   .side-tab{writing-mode:vertical-lr;text-orientation:mixed;font-size:11px;font-weight:800;letter-spacing:2px;padding:14px 6px;border:none;background:#FAFBF8;color:var(--ink-soft);border-radius:0 8px 8px 0;cursor:pointer;transition:all .15s}
   .side-tab.active{background:var(--d-theme);color:#fff;font-weight:900;transform:translateX(3px)}
 
-  /* 먼슬리 캘린더 (양면 꽉 차게 확장) */
   .d-cal-grid{display:grid;grid-template-columns:repeat(7, 1fr);border:1px solid #E3D9D0;border-radius:10px;background:#fff;overflow:hidden;flex:1}
   .d-cal-head{background:var(--d-theme-soft);font-size:11px;font-weight:800;text-align:center;padding:6px 0;color:var(--d-theme-dark);border-bottom:1px solid #E3D9D0}
   .d-cal-head:first-child{color:var(--seal)}
@@ -294,7 +307,6 @@
   .d-task-badge.done{text-decoration:line-through;opacity:0.6}
   .d-cal-text{margin-top:3px;font-size:10px;line-height:1.3;color:var(--ink);outline:none;word-break:break-all}
 
-  /* 양면 통 위클리 (총 8칸: 목표 1칸 + 요일 7칸, 양면 꽉 차게 확장) */
   #dWeeklyView{display:none;flex:1;flex-direction:column;gap:10px;overflow:auto}
   .d-weekly-spread-grid{display:grid;grid-template-columns:repeat(4, 1fr);gap:10px;flex:1}
   
@@ -312,7 +324,12 @@
   .d-week-memo{flex:1;min-height:70px;font-size:11.5px;line-height:1.45;outline:none;border-top:1px dashed #EFEAE3;padding-top:6px}
   .d-week-memo:empty:before{content:"메모를 적어보세요...";color:#B7C2B7}
 
-  /* 포스트잇 스티커 시스템 (현재 선택된 탭/주간별로만 유지되도록 설정) */
+  .diary-format-toolbar {
+    display: flex; gap: 4px; align-items: center; margin-bottom: 6px; background: #FAF9F5; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--rule); width: fit-content;
+  }
+  .diary-fmt-btn { border: 1px solid var(--rule); background: #fff; border-radius: 4px; padding: 2px 6px; font-size: 11px; font-weight: bold; cursor: pointer; }
+  .diary-fmt-btn:hover { background: #EDF0EA; }
+
   #stickerCanvas{position:absolute;inset:0;pointer-events:none;z-index:25}
   .placed-sticker{position:absolute;pointer-events:auto;cursor:grab;user-select:none;touch-action:none;display:inline-block}
   .placed-sticker:active{cursor:grabbing}
@@ -357,7 +374,7 @@
   <div class="mode-nav">
     <div class="nav-tabs">
       <button class="nav-tab active" id="btnModePlanner">📋 학습 플래너 모드</button>
-      <button class="nav-tab" id="btnModeDiary">📖 감성 다이어리 모드</button>
+      <button class="nav-tab" id="btnModeDiary">📖 다이어리 모드</button>
     </div>
 
     <div class="bg-theme-bar">
@@ -375,7 +392,7 @@
   <div id="plannerContainer">
     <div class="head">
       <div class="titlerow">
-        <h1 id="titleView">초등 임용 12일 학습 플랜</h1>
+        <h1 id="titleView">학습 플랜</h1>
         <input type="text" id="titleEdit" class="titleinput" style="display:none">
         <button class="btn small ghost" id="titleEditBtn">✎</button>
       </div>
@@ -432,6 +449,7 @@
       <div class="moodlog" id="moodLog"></div>
     </section>
 
+    <!-- 메모장 (표 추가/행추가/열추가 완벽 복구) -->
     <div class="memobox">
       <div class="mbhead">
         <h3>메모장 <span class="mbsub">전역 공통 링크, 자료 위치, 잡다한 메모</span></h3>
@@ -500,7 +518,7 @@
     <div class="book-spread">
       <div id="stickerCanvas"></div>
 
-      <!-- 왼쪽 페이지 (HOME 탭에서만 보이고, MONTH/WEEK 탭에서는 숨겨짐) -->
+      <!-- 왼쪽 페이지 -->
       <div class="book-left grid-paper" id="bookLeftPane">
         <div class="profile-badge">
           <span class="p-tag">MY DIARY</span>
@@ -519,6 +537,12 @@
 
       <!-- 오른쪽 페이지 -->
       <div class="book-right grid-paper" id="bookRightPane" style="grid-column: span 2;">
+        <div class="diary-format-toolbar">
+          <button class="diary-fmt-btn" id="dFmtBold"><b>B</b></button>
+          <span style="font-size:11px;font-weight:bold;margin-left:4px">글자색:</span>
+          <input type="color" id="dFmtColor" value="#16202B" style="width:20px;height:20px;border:none;background:none;cursor:pointer">
+        </div>
+
         <div class="month-header" id="diaryHeaderRow">
           <div class="m-title" id="dHeaderTitle">HOME DASHBOARD</div>
           <div class="m-nav-btns" id="dNavBtnsContainer">
@@ -527,7 +551,7 @@
           </div>
         </div>
 
-        <!-- 1. HOME 탭 화면 (월별 목표 달별 선택 기능 포함) -->
+        <!-- 1. HOME 탭 화면 -->
         <div id="dHomeView" class="home-page-layout">
           <div class="home-card">
             <div class="home-card-header">
@@ -712,13 +736,13 @@
   }
 
   function mk(date, label, rest, pairs) {
-    const items = (pairs||[]).map(p => ({ id:uid(), cat:p[0], text:p[1], kind:p[2]||'main', state:'none' }));
-    if(!rest){ items.push({id:uid(), cat:'자가 테스트', text:'오늘 암기 항목 백지 인출', kind:'test', state:'none'}); }
-    return {id:uid(), date, label, rest:!!rest, status:'none', events:[], qa:[{id:uid(),q:'',a:''}], studyMinutes:0, timerStart:null, availableMinutes:null, items};
+    const items = (pairs||[]).map(p => ({ id:uid(), cat:p[0], text:p[1], kind:p[2]||'main', state:'none', color:'#16202B', bold:false }));
+    if(!rest){ items.push({id:uid(), cat:'자가 테스트', text:'오늘 암기 항목 백지 인출', kind:'test', state:'none', color:'#16202B', bold:false}); }
+    return {id:uid(), date, label, rest:!!rest, status:'none', events:[], photos:[], qa:[{id:uid(),q:'',a:''}], studyMinutes:0, timerStart:null, availableMinutes:null, items};
   }
 
   function seed(){
-    return {title:'초등 임용 12일 학습 플랜', days:[
+    return {title:'학습 플랜', days:[
       mk('2026-09-16','1일차',false,[['국어','읽기']]),
       mk('2026-09-17','2일차',false,[['수학','측정']]),
       mk('2026-09-18','3일차',false,[['수학','자료와 가능성']]),
@@ -728,16 +752,20 @@
 
   function ensureShape(){
     if(!state || typeof state !== 'object') state = seed();
-    if(!state.title) state.title = '초등 임용 학습 플랜';
+    if(!state.title) state.title = '학습 플랜';
     if(!Array.isArray(state.days)) state.days = seed().days;
     state.days.forEach(d => {
       if(!Array.isArray(d.qa)) d.qa = [{id:uid(), q:'', a:''}];
       if(!Array.isArray(d.events)) d.events = [];
+      if(!Array.isArray(d.photos)) d.photos = [];
       if(!Array.isArray(d.items)) d.items = [];
       d.items.forEach(it => {
         if(!it.state){ it.state = it.done ? 'done' : 'none'; delete it.done; }
+        if(!it.color) it.color = '#16202B';
+        if(typeof it.bold !== 'boolean') it.bold = false;
       });
       if(typeof d.studyMinutes !== 'number') d.studyMinutes = 0;
+      if(typeof d.availableMinutes !== 'number') d.availableMinutes = null;
     });
   }
 
@@ -856,6 +884,11 @@
     if(!d) { panelEl.innerHTML = '<p class="sub">날짜를 선택하면 상세 일정과 할 일이 열립니다.</p>'; return; }
     
     const done = d.items.filter(i=>i.state==='done').length;
+    
+    const netAvail = Math.max(0, (d.availableMinutes || 0) - scheduledMinutes(d));
+    const currentStudy = liveMinutes(d);
+    const percent = netAvail > 0 ? Math.min(100, Math.round((currentStudy / netAvail) * 100)) : 0;
+
     panelEl.innerHTML = `
       <div class="prow">
         <div><h2>${esc(d.label)}</h2><p class="sub">${d.date.replace(/-/g,'.')} · 할 일 ${done}/${d.items.length} 완료</p></div>
@@ -899,21 +932,58 @@
 
       <div class="studybox">
         <div class="shead">
-          <div><div class="stime">${fmtDur(liveMinutes(d))}</div><div class="slabel">오늘 공부 시간</div></div>
+          <div>
+            <div class="stime">${fmtDur(currentStudy)} <span style="font-size:14px;color:var(--jade)">(${percent}% 달성)</span></div>
+            <div class="slabel">오늘 공부 시간 (순수 가용: ${fmtDur(netAvail)})</div>
+          </div>
           <button class="btn${d.timerStart?' timer-on':''}" id="timerBtn">${d.timerStart?'■ 종료':'▶ 시작'}</button>
+        </div>
+        <div class="srow" style="gap:12px;margin-top:10px">
+          <div class="timeedit">
+            <span style="font-size:12px;font-weight:700">총 가용시간:</span>
+            <input type="number" id="availMins" value="${d.availableMinutes || ''}" placeholder="분" style="width:65px"><span>분</span>
+            <button class="btn small" id="saveAvail">설정</button>
+          </div>
+          <div class="timeedit">
+            <span style="font-size:12px;font-weight:700">공부시간 직접수정:</span>
+            <input type="number" id="manualStudyMins" value="${Math.round(currentStudy)}" placeholder="분" style="width:65px"><span>분</span>
+            <button class="btn small primary" id="saveManualStudy">적용</button>
+          </div>
         </div>
       </div>
 
       <ul class="items">${d.items.map((it,idx)=>`
         <li class="${it.kind==='memo'?'memo':it.kind==='test'?'test':''}${it.state==='done'?' done':it.state==='partial'?' partial':''}" data-id="${it.id}">
           <button class="chk${it.state==='done'?' on':it.state==='partial'?' partial':''}" data-act="toggle">${it.state==='done'?'✓':it.state==='partial'?'◐':''}</button>
-          <span class="itxt"><span class="cat">${it.kind==='memo'?'➕ ':''}${esc(it.cat)}</span> · <span>${it.text}</span></span>
-          <span class="iact"><button data-act="del">삭제</button></span>
+          <span class="itxt" style="color:${it.color||'#16202B'}; font-weight:${it.bold?'800':'normal'}">
+            <span class="cat">${it.kind==='memo'?'➕ ':''}${esc(it.cat)}</span> · <span>${it.text}</span>
+          </span>
+          <span class="formatbar">
+            <button class="fmtbtn" data-act="bold" title="볼드체">B</button>
+            <input type="color" class="swatch" value="${it.color||'#16202B'}" data-act="color" title="글자 색상" style="width:18px;height:18px;border:none;background:none;cursor:pointer">
+          </span>
+          <span class="iact">
+            <button data-act="up" ${idx===0?'disabled':''}>▲</button>
+            <button data-act="down" ${idx===d.items.length-1?'disabled':''}>▼</button>
+            <button data-act="del">삭제</button>
+          </span>
         </li>`).join('')}</ul>
 
       <div class="addrow">
         <input class="cat" id="nCat" placeholder="과목"><input class="txt" id="nTxt" placeholder="할 일 내용">
         <button class="btn" id="addItem">할 일 추가</button>
+      </div>
+
+      <div class="photos">
+        <h3>📷 오늘의 인증 사진</h3>
+        <div class="thumbs">
+          ${(d.photos||[]).map((ph, pi)=>`
+          <div class="thumb" data-idx="${pi}">
+            <img src="${ph}">
+            <button class="p-del">✕</button>
+          </div>`).join('')}
+          <button class="addphoto" id="addPhotoBtn">＋</button>
+        </div>
       </div>
 
       <div class="verdict">
@@ -924,12 +994,37 @@
       </div>
 
       <div class="notes">
-        <div class="nhead"><h3>공부한 내용 필기</h3><button class="btn small" id="addQA">줄 추가</button></div>
+        <div class="nhead">
+          <h3>공부한 내용 필기</h3>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn small ghost" id="toggleHideBtn">👁 답 가리기 토글</button>
+            <button class="btn small ghost" id="addTableBtn">📊 표 삽입</button>
+            <button class="btn small ghost" id="addImgBtn">📷 사진 삽입</button>
+            <button class="btn small" id="addQA">줄 추가</button>
+          </div>
+        </div>
         <div class="qa" id="qaBox">
           ${d.qa.map(r=>`
           <div class="qarow" data-id="${r.id}">
-            <div class="qafield q" contenteditable="true" data-f="q">${r.q}</div>
-            <div class="qafield a" contenteditable="true" data-f="a">${r.a}</div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div class="formatbar" style="background:#f4f6f2;padding:2px 6px;border-radius:4px;display:flex;gap:4px;align-items:center">
+                <button class="fmtbtn qa-fmt" data-act="bold" title="볼드체">B</button>
+                <input type="color" class="swatch qa-color" value="#16202B" title="글자 색상" style="width:16px;height:16px;border:none;background:none;cursor:pointer">
+              </div>
+              <div class="qafield q" contenteditable="true" data-f="q" data-ph="문제/키워드...">${r.q}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div class="formatbar" style="background:#f4f6f2;padding:2px 6px;border-radius:4px;display:flex;gap:4px;align-items:center">
+                <button class="fmtbtn qa-fmt" data-act="bold" title="볼드체">B</button>
+                <input type="color" class="swatch qa-color" value="#16202B" title="글자 색상" style="width:16px;height:16px;border:none;background:none;cursor:pointer">
+              </div>
+              <div class="qafield a" contenteditable="true" data-f="a" data-ph="정답/설명...">${r.a}</div>
+              <div class="table-tools">
+                <button class="btn small ghost add-row-btn" style="font-size:10px;padding:2px 4px">➕ 행 추가</button>
+                <button class="btn small ghost add-col-btn" style="font-size:10px;padding:2px 4px">➕ 열 추가</button>
+                <button class="btn small danger ghost del-tbl-btn" style="font-size:10px;padding:2px 4px">🗑 표 삭제</button>
+              </div>
+            </div>
             <button class="rdel">✕</button>
           </div>`).join('')}
         </div>
@@ -964,39 +1059,173 @@
       if(d.timerStart){ d.studyMinutes += (Date.now()-d.timerStart)/60000; d.timerStart=null; } else { d.timerStart=Date.now(); }
       saveState(); renderPlannerCalendar(); openPlannerPanel();
     };
+    $('#saveAvail').onclick = () => {
+      d.availableMinutes = Number($('#availMins').value) || 0;
+      saveState(); openPlannerPanel(); toast('가용 시간이 설정되었습니다.');
+    };
+    $('#saveManualStudy').onclick = () => {
+      const targetMins = Number($('#manualStudyMins').value) || 0;
+      d.studyMinutes = targetMins;
+      d.timerStart = null;
+      saveState(); renderPlannerCalendar(); openPlannerPanel(); toast('공부 시간이 수정되었습니다.');
+    };
     $('#addItem').onclick = () => {
       const c = $('#nCat').value.trim(), t = $('#nTxt').value.trim(); if(!c && !t) return;
-      d.items.push({id:uid(), cat:c||'기타', text:t||'-', kind:'main', state:'none', rich:false});
+      d.items.push({id:uid(), cat:c||'기타', text:t||'-', kind:'main', state:'none', color:'#16202B', bold:false});
       saveState(); openPlannerPanel();
     };
+    
     panelEl.querySelectorAll('.items [data-act]').forEach(b => {
       b.onclick = () => {
-        const li = b.closest('li'), it = d.items.find(x=>x.id === li.dataset.id); if(!it) return;
-        const a = b.dataset.act;
+        const li = b.closest('li'), idx = d.items.findIndex(x=>x.id === li.dataset.id); if(idx === -1) return;
+        const it = d.items[idx], a = b.dataset.act;
         if(a==='toggle') it.state = it.state==='done' ? 'none' : 'done';
-        else if(a==='del') d.items = d.items.filter(x=>x.id!==it.id);
+        else if(a==='del') d.items.splice(idx, 1);
+        else if(a==='bold') it.bold = !it.bold;
+        else if(a==='up' && idx > 0) { const tmp = d.items[idx-1]; d.items[idx-1] = it; d.items[idx] = tmp; }
+        else if(a==='down' && idx < d.items.length - 1) { const tmp = d.items[idx+1]; d.items[idx+1] = it; d.items[idx] = tmp; }
         saveState(); renderPlannerCalendar(); openPlannerPanel();
       };
     });
+
+    panelEl.querySelectorAll('.items input[data-act="color"]').forEach(inp => {
+      inp.oninput = e => {
+        const it = d.items.find(x=>x.id === inp.closest('li').dataset.id);
+        if(it) { 
+          it.color = e.target.value; 
+          inp.closest('li').querySelector('.itxt').style.color = it.color; 
+          saveState(); 
+        }
+      };
+    });
+
+    $('#addPhotoBtn').onclick = () => {
+      pickFile(async file => {
+        const base64 = await shrinkImage(file, 500, 0.85);
+        if(!d.photos) d.photos = [];
+        d.photos.push(base64);
+        saveState(); openPlannerPanel(); toast('사진이 추가되었습니다.');
+      });
+    };
+    panelEl.querySelectorAll('.thumb .p-del').forEach(btn => {
+      btn.onclick = () => {
+        const idx = Number(btn.closest('.thumb').dataset.idx);
+        d.photos.splice(idx, 1);
+        saveState(); openPlannerPanel();
+      };
+    });
+
     $('#mS').onclick = () => { d.status='success'; saveState(); renderPlannerCalendar(); openPlannerPanel(); };
     $('#mF').onclick = () => { d.status='fail'; saveState(); renderPlannerCalendar(); openPlannerPanel(); };
     $('#mN').onclick = () => { d.status='none'; saveState(); renderPlannerCalendar(); openPlannerPanel(); };
 
+    const toggleHideBtn = $('#toggleHideBtn');
     const qaBox = $('#qaBox');
-    qaBox.addEventListener('input', e => {
-      if(e.target.matches('.qafield')) {
-        const r = d.qa.find(x => x.id === e.target.closest('.qarow').dataset.id);
-        if(r) { r[e.target.dataset.f] = e.target.innerHTML; saveState(); }
-      }
-    });
-    qaBox.querySelectorAll('.rdel').forEach(b => {
-      b.onclick = () => {
-        d.qa = d.qa.filter(x => x.id !== b.closest('.qarow').dataset.id);
-        if(!d.qa.length) d.qa = [{id:uid(),q:'',a:''}];
-        saveState(); openPlannerPanel();
+    if(toggleHideBtn && qaBox) {
+      toggleHideBtn.onclick = () => { qaBox.classList.toggle('hide'); };
+    }
+
+    panelEl.querySelectorAll('.qa-fmt').forEach(btn => {
+      btn.onclick = () => {
+        document.execCommand('bold', false, null);
+        saveState();
       };
     });
-    $('#addQA').onclick = () => { d.qa.push({id:uid(),q:'',a:''}); saveState(); openPlannerPanel(); };
+    panelEl.querySelectorAll('.qa-color').forEach(inp => {
+      inp.oninput = e => {
+        const selection = window.getSelection();
+        if(selection.rangeCount > 0) {
+          const span = document.createElement('span');
+          span.style.color = e.target.value;
+          try {
+            selection.getRangeAt(0).surroundContents(span);
+          } catch(err) {
+            document.execCommand('foreColor', false, e.target.value);
+          }
+          saveState();
+        }
+      };
+    });
+
+    $('#addTableBtn').onclick = () => {
+      const rowIdx = d.qa.length ? d.qa.length - 1 : 0;
+      d.qa[rowIdx].a += `<table class="qa-table"><tr><td>제목1</td><td>제목2</td></tr><tr><td>내용1</td><td>내용2</td></tr></table><p><br></p>`;
+      saveState(); openPlannerPanel();
+    };
+
+    // Q&A 내 표 조작 기능 (행 추가, 열 추가, 표 삭제)
+    qaBox.querySelectorAll('.add-row-btn').forEach((btn, rIdx) => {
+      btn.onclick = () => {
+        const rowDiv = qaBox.querySelectorAll('.qarow')[rIdx];
+        const table = rowDiv.querySelector('.qa-table');
+        if(table) {
+          const colsCount = table.rows[0] ? table.rows[0].cells.length : 2;
+          const newRow = table.insertRow();
+          for(let c=0; c<colsCount; c++){
+            const cell = newRow.insertCell(); cell.contentEditable = "true"; cell.innerText = "셀";
+          }
+          d.qa[rIdx].a = rowDiv.querySelector('.qafield.a').innerHTML;
+          saveState();
+        } else {
+          toast('추가할 표가 없습니다. 먼저 표 삽입을 눌러주세요.');
+        }
+      };
+    });
+
+    qaBox.querySelectorAll('.add-col-btn').forEach((btn, rIdx) => {
+      btn.onclick = () => {
+        const rowDiv = qaBox.querySelectorAll('.qarow')[rIdx];
+        const table = rowDiv.querySelector('.qa-table');
+        if(table) {
+          for(let i=0; i<table.rows.length; i++){
+            const cell = table.rows[i].insertCell(); cell.contentEditable = "true"; cell.innerText = i===0?"제목":"내용";
+          }
+          d.qa[rIdx].a = rowDiv.querySelector('.qafield.a').innerHTML;
+          saveState();
+        } else {
+          toast('추가할 표가 없습니다. 먼저 표 삽입을 눌러주세요.');
+        }
+      };
+    });
+
+    qaBox.querySelectorAll('.del-tbl-btn').forEach((btn, rIdx) => {
+      btn.onclick = () => {
+        const rowDiv = qaBox.querySelectorAll('.qarow')[rIdx];
+        const table = rowDiv.querySelector('.qa-table');
+        if(table) {
+          table.remove();
+          d.qa[rIdx].a = rowDiv.querySelector('.qafield.a').innerHTML;
+          saveState(); openPlannerPanel();
+        }
+      };
+    });
+
+    $('#addImgBtn').onclick = () => {
+      pickFile(async file => {
+        const base64 = await shrinkImage(file, 400, 0.85);
+        const rowIdx = d.qa.length ? d.qa.length - 1 : 0;
+        d.qa[rowIdx].a += `<br><img src="${base64}" style="max-width:100%;border-radius:6px;margin:4px 0"><p><br></p>`;
+        saveState(); openPlannerPanel();
+      });
+    };
+
+    if(qaBox) {
+      qaBox.addEventListener('input', e => {
+        if(e.target.matches('.qafield')) {
+          const r = d.qa.find(x => x.id === e.target.closest('.qarow').dataset.id);
+          if(r) { r[e.target.dataset.f] = e.target.innerHTML; saveState(); }
+        }
+      });
+      qaBox.querySelectorAll('.rdel').forEach(b => {
+        b.onclick = () => {
+          d.qa = d.qa.filter(x => x.id !== b.closest('.qarow').dataset.id);
+          if(!d.qa.length) d.qa = [{id:uid(),q:'',a:''}];
+          saveState(); openPlannerPanel();
+        };
+      });
+    }
+    const addQA = $('#addQA');
+    if(addQA) addQA.onclick = () => { d.qa.push({id:uid(),q:'',a:''}); saveState(); openPlannerPanel(); };
   }
 
   function nextDate(){
@@ -1087,7 +1316,7 @@
     modal.box.querySelector('#bApply').onclick = () => {
       const target = cur();
       const lines = modal.box.querySelector('#bText').value.split('\n').map(l=>l.trim()).filter(Boolean);
-      lines.forEach(l => { const p = l.split(','); target.items.push({id:uid(), cat:p[0]||'기타', text:p[1]||l, kind:'main', state:'none'}); });
+      lines.forEach(l => { const p = l.split(','); target.items.push({id:uid(), cat:p[0]||'기타', text:p[1]||l, kind:'main', state:'none', color:'#16202B', bold:false}); });
       saveState(); modal.close(); openPlannerPanel(); toast(`${lines.length}개 추가됨`);
     };
   };
@@ -1104,7 +1333,7 @@
         <li class="d-goal-item ${g.done ? 'done' : ''}" data-id="${g.id}">
           <input type="checkbox" ${g.done ? 'checked' : ''}>
           <span class="g-text" contenteditable="true">${g.text}</span>
-          <button class="g-del">✕</button>
+          <button class="d-goal-item g-del">✕</button>
         </li>`).join('');
       goalList.querySelectorAll('.d-goal-item').forEach(li => {
         const listArr = diaryData.monthlyGoalsMap[selMonth];
@@ -1168,7 +1397,6 @@
     grid.querySelectorAll('.d-cal-text').forEach(t=>{ t.oninput = () => { diaryData.cellTexts[t.dataset.k] = t.innerText; saveDiaryState(); }; });
   }
 
-  // 양면 통 위클리 렌더링 (총 8칸: 목표 1칸 + 요일 7칸, 양면 꽉 차게 확장)
   function renderDiaryWeekly() {
     const y = diaryData.year, m = diaryData.month;
     const baseDate = new Date(y, m - 1, 17 + (diaryData.currentWeekOffset * 7));
@@ -1185,7 +1413,6 @@
     const weekKey = `${startOfWeek.getFullYear()}-${startOfWeek.getMonth()+1}-${startOfWeek.getDate()}`;
     if(!diaryData.weeklyGoalsMap[weekKey]) diaryData.weeklyGoalsMap[weekKey] = ['임용 교육과정 1회독 완료하기', '백지인출 3회 실천'];
 
-    // 1번 칸: 위클리 목표 (WEEKLY GOAL)
     const goalCol = document.createElement('div'); goalCol.className = 'd-week-col';
     goalCol.innerHTML = `
       <div class="d-week-col-head"><span class="d-week-dayname" style="color:var(--jade)">WEEKLY GOAL</span><span class="d-week-date">🎯</span></div>
@@ -1213,7 +1440,6 @@
     });
     weekGrid.appendChild(goalCol);
 
-    // 나머지 7칸: 요일별 칸들
     for(let i=0; i<7; i++){
       const curDt = new Date(startOfWeek); curDt.setDate(startOfWeek.getDate() + i);
       const iso = `${curDt.getFullYear()}-${String(curDt.getMonth()+1).padStart(2,'0')}-${String(curDt.getDate()).padStart(2,'0')}`;
@@ -1292,6 +1518,17 @@
       saveDiaryState();
     };
     dtEdit.oninput = updateDday; dnEdit.oninput = updateDday; ddEdit.oninput = updateDday;
+
+    const dFmtBold = $('#dFmtBold'), dFmtColor = $('#dFmtColor');
+    if(dFmtBold) {
+      dFmtBold.onclick = () => { document.execCommand('bold', false, null); saveDiaryState(); };
+    }
+    if(dFmtColor) {
+      dFmtColor.oninput = e => {
+        document.execCommand('foreColor', false, e.target.value);
+        saveDiaryState();
+      };
+    }
 
     document.querySelectorAll('.sticky-btn').forEach(btn => {
       btn.onclick = () => addStickyNote(btn.dataset.color, '메모를 적어보세요...');
