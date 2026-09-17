@@ -229,7 +229,7 @@
   .moodlog{margin-top:9px;max-height:180px;overflow:auto;border:1px solid #E6EAE3;border-radius:8px;background:#fff}
   .moodentry{display:grid;grid-template-columns:70px 1fr auto;gap:8px;align-items:center;padding:7px 9px;border-bottom:1px solid #EEF1EC;font-size:12px}
 
-  /* 다이어리 감성 레이아웃 */
+  /* 다이어리 레이아웃 */
   #diaryContainer{
     display:none;max-width:1150px;margin:0 auto;
     background:var(--d-desk);padding:24px;border-radius:24px;
@@ -449,7 +449,7 @@
       <div class="moodlog" id="moodLog"></div>
     </section>
 
-    <!-- 메모장 (표 추가/행추가/열추가 완벽 복구) -->
+    <!-- 메모장 -->
     <div class="memobox">
       <div class="mbhead">
         <h3>메모장 <span class="mbsub">전역 공통 링크, 자료 위치, 잡다한 메모</span></h3>
@@ -458,6 +458,7 @@
           <button class="btn small ghost" id="mInsTable">표 삽입</button>
           <button class="btn small ghost" id="mAddRowBtn">행 추가</button>
           <button class="btn small ghost" id="mAddColBtn">열 추가</button>
+          <button class="btn small danger ghost" id="mDelTableBtn">표 삭제</button>
           <button class="btn small ghost" id="mInsImage">사진 삽입</button>
           <button class="btn small ghost" id="mBoldBtn"><b>B</b></button>
         </div>
@@ -477,6 +478,7 @@
       <div class="grid" id="grid"></div>
     </div>
 
+    <!-- 성공/실패 도장 업로드 섹션 -->
     <div class="stampset">
       <div class="stampbox">
         <div class="pv" id="pvS">✓</div>
@@ -617,7 +619,7 @@
         <span class="sticker-item">✨</span>
         <span class="sticker-item">🐱</span>
         <span class="sticker-item">🍰</span>
-        <span class="sticker-item">☕</span>
+        <span class="stampbox">☕</span>
         <span class="sticker-item">🌱</span>
         <span class="sticker-item">💖</span>
         <span class="sticker-item">⭐</span>
@@ -872,10 +874,29 @@
     $('#fill').style.width = (all ? dn/all*100 : 0) + '%';
     $('#pnum').textContent = `${Math.round(dn*10)/10} / ${all}`;
     $('#totalTime').textContent = `⏱ 누적 공부 시간 ${fmtDur(state.days.reduce((a,dd)=>a+liveMinutes(dd),0))}`;
+    
+    // 성공/실패 도장 미리보기 렌더링
+    const pvS = $('#pvS'), pvF = $('#pvF');
+    if(pvS) pvS.innerHTML = stamps.success ? `<img src="${stamps.success}">` : '✓';
+    if(pvF) pvF.innerHTML = stamps.fail ? `<img src="${stamps.fail}">` : '✕';
   }
 
   $('#pPrevMonthBtn').onclick = () => { viewMonth--; if(viewMonth < 1){ viewMonth = 12; viewYear--; } renderPlannerCalendar(); };
   $('#pNextMonthBtn').onclick = () => { viewMonth++; if(viewMonth > 12){ viewMonth = 1; viewYear++; } renderPlannerCalendar(); };
+
+  // 성공/실패 도장 업로드 기능 이벤트 연결
+  document.querySelectorAll('.stampset [data-stamp]').forEach(btn => {
+    btn.onclick = () => {
+      const type = btn.dataset.stamp;
+      pickFile(async f => {
+        const base64 = await shrinkImage(f, 120, 0.85);
+        stamps[type] = base64;
+        await storage.set(SKEY, JSON.stringify(stamps));
+        renderPlannerCalendar();
+        toast('도장 이미지가 등록되었습니다!');
+      });
+    };
+  });
 
   function openPlannerPanel() {
     clearInterval(studyTick); studyTick = null;
@@ -1153,7 +1174,6 @@
       saveState(); openPlannerPanel();
     };
 
-    // Q&A 내 표 조작 기능 (행 추가, 열 추가, 표 삭제)
     qaBox.querySelectorAll('.add-row-btn').forEach((btn, rIdx) => {
       btn.onclick = () => {
         const rowDiv = qaBox.querySelectorAll('.qarow')[rIdx];
