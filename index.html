@@ -1,4 +1,8 @@
-<div id="root">
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>초등 임용 12일 학습 플랜</title>
 <style>
   :root{
     --ink:#16202B;
@@ -352,7 +356,9 @@
   @media (max-width:420px){.moodgrid{grid-template-columns:1fr}}
 
 </style>
-
+</head>
+<body>
+<div id="root">
 <div class="head">
   <div class="titlerow">
     <h1 id="titleView">초등 임용 12일 학습 플랜</h1>
@@ -464,115 +470,51 @@
 <div class="toast" id="toast"></div>
 </div>
 
-
+<!-- Supabase 라이브러리 및 연동 스토리지 어댑터 -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/* Standalone-file storage compatibility:
-   The original planner expected ChatGPT's window.storage API.
-   When downloaded and opened as a normal HTML file, that API may not exist.
-   This adapter uses IndexedDB (large enough for photos) and falls back to localStorage.
-*/
 (function(){
   if (window.__plannerStorageReady) return;
   window.__plannerStorageReady = true;
 
-  const native = window.storage;
-  const DB_NAME = 'elementary-teacher-plan-storage';
-  const STORE = 'kv';
+  const SUPABASE_URL = 'https://szqlrwnsflfbmafwefac.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_Ib67bVHkQHq1r2w1yyBFDg_cTj1N5qd';
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  function openDB(){
-    return new Promise((resolve,reject)=>{
-      if (!window.indexedDB) return reject(new Error('IndexedDB unavailable'));
-      const req = indexedDB.open(DB_NAME, 1);
-      req.onupgradeneeded = () => {
-        const db = req.result;
-        if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE);
-      };
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error || new Error('IndexedDB open failed'));
-    });
-  }
-
-  async function idbSet(key,value){
-    const db = await openDB();
-    return new Promise((resolve,reject)=>{
-      const tx = db.transaction(STORE,'readwrite');
-      tx.objectStore(STORE).put(String(value), key);
-      tx.oncomplete = () => { db.close(); resolve({ok:true}); };
-      tx.onerror = () => { db.close(); reject(tx.error || new Error('IndexedDB write failed')); };
-    });
-  }
-
-  async function idbGet(key){
-    const db = await openDB();
-    return new Promise((resolve,reject)=>{
-      const tx = db.transaction(STORE,'readonly');
-      const req = tx.objectStore(STORE).get(key);
-      req.onsuccess = () => { db.close(); resolve(req.result === undefined ? null : {value:req.result}); };
-      req.onerror = () => { db.close(); reject(req.error || new Error('IndexedDB read failed')); };
-    });
-  }
-
-  async function idbDelete(key){
-    const db = await openDB();
-    return new Promise((resolve,reject)=>{
-      const tx = db.transaction(STORE,'readwrite');
-      tx.objectStore(STORE).delete(key);
-      tx.oncomplete = () => { db.close(); resolve({ok:true}); };
-      tx.onerror = () => { db.close(); reject(tx.error || new Error('IndexedDB delete failed')); };
-    });
-  }
-
-  function lsSet(key,value){
-    localStorage.setItem('planner:'+key, String(value));
-    return {ok:true};
-  }
-  function lsGet(key){
-    const v = localStorage.getItem('planner:'+key);
-    return v === null ? null : {value:v};
-  }
-  function lsDelete(key){
-    localStorage.removeItem('planner:'+key);
-    return {ok:true};
-  }
-
-  async function set(key,value){
-    if (native && typeof native.set === 'function'){
-      try { return await native.set(key,value); } catch(e){}
+  async function set(key, value){
+    const { error } = await supabaseClient
+      .from('my_planner')
+      .upsert({ key: key, value: String(value) });
+    
+    if (error) {
+      console.error('저장 에러:', error);
+      throw new Error('Supabase 저장 실패');
     }
-    try { return await idbSet(key,value); }
-    catch(e1){
-      try { return lsSet(key,value); }
-      catch(e2){ throw new Error('저장 공간에 접근할 수 없습니다. 브라우저의 사이트 데이터 저장을 허용해 주세요.'); }
-    }
+    return { ok: true };
   }
 
   async function get(key){
-    if (native && typeof native.get === 'function'){
-      try {
-        const r = await native.get(key);
-        if (r != null) return r;
-      } catch(e){}
-    }
-    try {
-      const r = await idbGet(key);
-      if (r != null) return r;
-    } catch(e1){}
-    try { return lsGet(key); }
-    catch(e2){ throw new Error('저장 공간에 접근할 수 없습니다.'); }
+    const { data, error } = await supabaseClient
+      .from('my_planner')
+      .select('value')
+      .eq('key', key)
+      .maybeSingle(); 
+    
+    if (error) console.error('불러오기 에러:', error);
+    if (!data) return null; 
+    return { value: data.value };
   }
 
   async function del(key){
-    if (native && typeof native.delete === 'function'){
-      try { return await native.delete(key); } catch(e){}
-    }
-    try { return await idbDelete(key); }
-    catch(e1){
-      try { return lsDelete(key); }
-      catch(e2){ throw new Error('저장 공간에 접근할 수 없습니다.'); }
-    }
+    const { error } = await supabaseClient
+      .from('my_planner')
+      .delete()
+      .eq('key', key);
+    if (error) console.error('삭제 에러:', error);
+    return { ok: true };
   }
 
-  window.storage = {set, get, delete:del};
+  window.storage = { set, get, delete: del };
 })();
 </script>
 
@@ -640,7 +582,6 @@
     catch(e){ console.error(e); toast('도장 사진을 저장하지 못했습니다'); }
   }
 
-  // ---------- image handling ----------
   function shrink(file,max,quality){
     return new Promise((res,rej)=>{
       const r=new FileReader();
@@ -696,7 +637,6 @@
     });
   }
 
-  // ---------- calendar ----------
   function parse(d){const[y,m,dd]=d.split('-').map(Number);return new Date(y,m-1,dd);}
   function render(){
     $('#titleView').textContent=state.title;
@@ -966,7 +906,6 @@
         <input class="txt" id="nTxt" placeholder="공부할 내용">
         <button class="btn" id="addItem">추가</button>
         <button class="btn ghost" id="addMemo">암기 항목으로 추가</button>
-        <button class="btn ghost" id="multiItemBtn">여러 날에 추가</button>
       </div>
       <div class="clipbar">
         <button class="btn small ghost" id="copyAll">이 날 항목 전체 복사</button>
@@ -1063,7 +1002,6 @@
   };
 
 
-  // 같은 일정을 여러 날짜에 한 번에 추가 + 요일 반복 + 종료일
   if($('#multiScheduleBtn')) $('#multiScheduleBtn').onclick=()=>{
     const days=[...state.days].sort((a,b)=>a.date.localeCompare(b.date));
     const minDate=days[0]?.date || '';
@@ -1234,7 +1172,7 @@
     }
   };
 
-$('#addEvBtn').onclick=async()=>{
+  $('#addEvBtn').onclick=async()=>{
       const time=$('#newEvTime').value||'09:00';
       const duration=Math.max(0,Number($('#newEvDuration')?.value)||0);
       const title=$('#newEvTitle').value.trim();
@@ -1308,8 +1246,7 @@ $('#addEvBtn').onclick=async()=>{
       state.days.forEach(dd=>dd.availableMinutes=mins);
       save(); render(); openPanel(); toast('모든 날짜에 적용했습니다');
     };
-    // ---------- checklist actions ----------
-    // Use event delegation so edit/save/delete/toggle keep working after every re-render.
+
     panel.addEventListener('click', function(e){
       const b=e.target.closest('ul.items li [data-act]');
       if(!b || !panel.contains(b)) return;
@@ -1398,80 +1335,6 @@ $('#addEvBtn').onclick=async()=>{
     $('#addItem').onclick=()=>add('main');
     $('#addMemo').onclick=()=>add('memo');
     $('#nTxt').onkeydown=e=>{if(e.key==='Enter')add('main');};
-    
-    // 추가: 여러 날짜에 체크리스트 일괄 추가 기능
-    if($('#multiItemBtn')) $('#multiItemBtn').onclick=()=>{
-      const days=[...state.days].sort((a,b)=>a.date.localeCompare(b.date));
-      
-      const overlay=document.createElement('div');
-      overlay.style.cssText='position:fixed;inset:0;background:rgba(22,32,43,.55);z-index:100;display:flex;align-items:center;justify-content:center;padding:18px;';
-      const box=document.createElement('div');
-      box.style.cssText='width:min(620px,100%);max-height:90vh;overflow:auto;background:#FAFBF8;border:1px solid #D6DCD3;border-radius:12px;padding:16px;box-shadow:0 12px 40px rgba(0,0,0,.18);';
-      box.innerHTML=`
-        <h3 style="margin:0 0 4px;font-size:17px">항목 여러 날짜에 한 번에 추가</h3>
-        <p style="margin:0 0 12px;color:#4A5A66;font-size:12px;line-height:1.5">매일 반복되는 과목이나 체크리스트를 원하는 날짜들에 동시에 넣을 수 있어요.</p>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;align-items:center">
-          <input type="text" id="mItemCat" placeholder="과목" style="width:110px;border:1px solid #D6DCD3;background:#fff;border-radius:7px;padding:6px 8px;font:inherit">
-          <input type="text" id="mItemTxt" placeholder="공부할 내용" style="flex:1;min-width:160px;border:1px solid #D6DCD3;background:#fff;border-radius:7px;padding:6px 8px;font:inherit">
-        </div>
-        <div style="display:flex;gap:12px;margin-bottom:12px">
-          <label style="font-size:13px;display:flex;align-items:center;gap:4px;cursor:pointer"><input type="radio" name="mItemKind" value="main" checked> 일반 항목</label>
-          <label style="font-size:13px;display:flex;align-items:center;gap:4px;cursor:pointer"><input type="radio" name="mItemKind" value="memo"> 암기(메모) 항목</label>
-        </div>
-        <div style="display:flex;gap:6px;margin-bottom:8px;align-items:center;flex-wrap:wrap">
-          <button class="btn small ghost" id="miSelectAll">전체 선택</button>
-          <button class="btn small ghost" id="miSelectNone">전체 해제</button>
-        </div>
-        <div id="miDateList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:6px;max-height:38vh;overflow:auto;padding:8px;border:1px solid #D6DCD3;border-radius:8px;background:#fff">
-          ${days.map(dd=>`<label style="display:flex;align-items:center;gap:7px;padding:7px 8px;border:1px solid #E6EAE3;border-radius:7px;cursor:pointer;font-size:12px">
-            <input type="checkbox" class="miDateCheck" value="${dd.id}" ${dd.id===d.id?'checked':''}>
-            <span>${esc(dd.date.replace(/-/g,'.'))} · ${esc(dd.label)}</span>
-          </label>`).join('')}
-        </div>
-        <div style="display:flex;justify-content:flex-end;gap:6px;margin-top:12px">
-          <button class="btn small ghost" id="miCancel">취소</button>
-          <button class="btn small primary" id="miApply">선택한 날짜에 추가</button>
-        </div>`;
-      overlay.appendChild(box);
-      document.body.appendChild(overlay);
-
-      const close=()=>overlay.remove();
-      box.querySelector('#miCancel').onclick=close;
-      overlay.onclick=e=>{if(e.target===overlay)close();};
-
-      box.querySelector('#miSelectAll').onclick=()=>{
-        box.querySelectorAll('.miDateCheck').forEach(c=>c.checked=true);
-      };
-      box.querySelector('#miSelectNone').onclick=()=>{
-        box.querySelectorAll('.miDateCheck').forEach(c=>c.checked=false);
-      };
-
-      box.querySelector('#miApply').onclick=async()=>{
-        const cat=box.querySelector('#mItemCat').value.trim()||'기타';
-        const txt=box.querySelector('#mItemTxt').value.trim();
-        if(!txt){toast('공부할 내용을 입력하세요');return;}
-        const kind=box.querySelector('input[name="mItemKind"]:checked').value;
-        
-        const checks=[...box.querySelectorAll('.miDateCheck:checked')];
-        if(!checks.length){toast('날짜를 하나 이상 선택하세요');return;}
-
-        const ids=checks.map(c=>c.value);
-        const selectedDays=state.days.filter(dd=>ids.includes(dd.id));
-
-        selectedDays.forEach(dd=>{
-          dd.items.push({id:uid(),cat,text:txt,kind,state:'none',rich:false});
-        });
-
-        await save();
-        close();
-        render();
-        openPanel();
-        toast(`${selectedDays.length}개 날짜에 항목을 추가했어요`);
-      };
-      
-      box.querySelector('#mItemTxt').focus();
-    };
-
     $('#mS').onclick=()=>{
       if(d.items.some(x=>x.state!=='done')){
         toast('안 끝낸 항목이 있어요 — 한 번 더 누르면 성공으로 표시합니다');
@@ -1631,7 +1494,6 @@ $('#addEvBtn').onclick=async()=>{
     });
   }
 
-  // ---------- gallery ----------
   let viewMode='day';
   function showLightbox(src){
     const lb=document.createElement('div'); lb.className='lightbox';
@@ -1675,14 +1537,13 @@ $('#addEvBtn').onclick=async()=>{
   }
   $('#galleryBtn').onclick=()=>setView(viewMode==='gallery'?'day':'gallery');
 
-  // ---------- toolbar ----------
   function nextDate(){
     const ds=state.days.map(d=>d.date).sort();
     const base=ds.length?parse(ds[ds.length-1]):new Date();
     base.setDate(base.getDate()+1);
     return `${base.getFullYear()}-${String(base.getMonth()+1).padStart(2,'0')}-${String(base.getDate()).padStart(2,'0')}`;
   }
-  // ---------- title ----------
+
   const titleView=$('#titleView'), titleEdit=$('#titleEdit'), titleEditBtn=$('#titleEditBtn');
   function startTitleEdit(){
     titleEdit.value=state.title;
@@ -1740,7 +1601,6 @@ $('#addEvBtn').onclick=async()=>{
     });
   });
 
-  // ---------- global memo ----------
   const memoArea=$('#memoArea'), mSaved=$('#mSaved');
   let memoTimer=null;
   function saveMemoNow(){
@@ -1811,7 +1671,6 @@ $('#addEvBtn').onclick=async()=>{
     };
   });
 
-  // ---------- init ----------
   (async function init(){
     try{ const r=await window.storage.get(KEY); state=r?JSON.parse(r.value):seed(); }
     catch(e){ state=seed(); }
@@ -1833,7 +1692,6 @@ $('#addEvBtn').onclick=async()=>{
   })();
 })();
 
-  // 답 가리기/보이기: 답안 영역에 실제 hidden 클래스를 적용
   document.addEventListener('click', function(e){
     const btn=e.target.closest('#hideAnswers,#toggleAnswers,[data-action="hide-answers"]');
     if(!btn) return;
@@ -1847,7 +1705,6 @@ $('#addEvBtn').onclick=async()=>{
 </script>
 
 <script>
-/* ---------- mood / state tracker ---------- */
 (function(){
   const KEY = 'mood-tracker-v1';
   const $ = (s) => document.querySelector(s);
@@ -1972,3 +1829,5 @@ $('#addEvBtn').onclick=async()=>{
   load();
 })();
 </script>
+</body>
+</html>
