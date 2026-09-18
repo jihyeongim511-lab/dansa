@@ -41,7 +41,7 @@
     background:#fff;padding:8px 14px;border-radius:12px;border:1px solid var(--rule);box-shadow:0 2px 8px rgba(0,0,0,0.03);
     flex-wrap:wrap;gap:8px;
   }
-  .nav-tabs{display:flex;gap:6px}
+  .nav-tabs{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
   .nav-tab{border:1px solid var(--rule);background:#FAFBF8;padding:7px 15px;border-radius:8px;font-size:13px;font-weight:700;color:var(--ink-soft);transition:all .15s}
   .nav-tab.active{background:var(--ink);color:#fff;border-color:var(--ink)}
 
@@ -72,6 +72,12 @@
   .btn.danger:hover{background:#FAECEB}
   .btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
   .btn.primary:hover{background:#2A3B4C}
+  .btn.save-btn{background:#2F6F5E;color:#fff;border-color:#2F6F5E;font-weight:700}
+  .btn.save-btn:hover{background:#265A4C}
+  .btn.cal-btn{background:#285994;color:#fff;border-color:#285994;font-weight:700}
+  .btn.cal-btn:hover{background:#1E4473}
+  .btn.cal-link-btn{background:#EBF3FA;color:#205284;border-color:#BACFE5}
+  .btn.cal-link-btn:hover{background:#DEEDFB}
   .btn.small{padding:4px 9px;font-size:12px;border-radius:6px}
   
   .toolbar-date-picker{display:inline-flex;align-items:center;gap:4px;background:#fff;padding:3px 6px;border-radius:8px;border:1px solid var(--rule)}
@@ -237,7 +243,7 @@
   .addphoto{width:74px;height:74px;border:1.5px dashed #B9C2B5;border-radius:8px;background:transparent;color:var(--ink-soft);font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer}
   .addphoto:hover{background:#EDF0EA}
 
-  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:9px 16px;border-radius:99px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:200}
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:9px 16px;border-radius:99px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:9999}
   .toast.on{opacity:1}
 
   .moodbox{max-width:980px;margin:0 auto 14px;background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:14px}
@@ -295,12 +301,20 @@
   .d-goal-item .g-del{border:none;background:none;color:#B9C2B5;font-size:12px;padding:0 4px;line-height:1}
   .d-goal-item .g-del:hover{color:var(--seal)}
 
-  .dday-card{background:var(--d-theme-soft);border:1.5px solid var(--d-theme);border-radius:12px;padding:14px;text-align:center}
-  .dday-title{font-size:11px;font-weight:800;color:var(--d-theme-dark);margin-bottom:4px}
-  .dday-number{font-size:22px;font-weight:900;color:var(--ink);letter-spacing:-0.5px;outline:none;border-bottom:1px dashed transparent}
-  .dday-number:focus{border-bottom-color:var(--d-theme-dark)}
-  .dday-date{font-size:10.5px;color:var(--ink-soft);margin-top:2px;outline:none;border-bottom:1px dashed transparent}
-  .dday-date:focus{border-bottom-color:var(--d-theme-dark)}
+  /* 디데이 카드 커스텀 스타일 */
+  .dday-card{
+    background:var(--d-theme-soft);border:1.5px solid var(--d-theme);border-radius:12px;
+    padding:14px;text-align:center;cursor:pointer;transition:transform .15s, box-shadow .15s;
+    position:relative;
+  }
+  .dday-card:hover{transform:translateY(-2px);box-shadow:0 4px 10px rgba(0,0,0,0.05)}
+  .dday-card::after{
+    content:"📅 클릭하여 목표일 설정";position:absolute;bottom:4px;right:8px;
+    font-size:9.5px;color:var(--d-theme-dark);font-weight:700;opacity:0.8;
+  }
+  .dday-title{font-size:12px;font-weight:800;color:var(--d-theme-dark);margin-bottom:4px}
+  .dday-number{font-size:24px;font-weight:900;color:var(--ink);letter-spacing:-0.5px}
+  .dday-date{font-size:11px;color:var(--ink-soft);margin-top:3px;margin-bottom:8px}
 
   .book-right{padding:20px;position:relative;display:flex;flex-direction:column;overflow:hidden}
   .month-header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid var(--d-theme);padding-bottom:10px;margin-bottom:12px}
@@ -408,6 +422,11 @@
     <div class="nav-tabs">
       <button class="nav-tab active" id="btnModePlanner">📋 학습 플래너 모드</button>
       <button class="nav-tab" id="btnModeDiary">📖 다이어리 모드</button>
+      <!-- 수동 전체 저장 버튼 -->
+      <button class="btn save-btn" id="manualGlobalSaveBtn" title="모든 변경 사항을 저장소에 즉시 동기화합니다.">💾 전체 저장</button>
+      <!-- 구글 캘린더 동기화 및 링크 버튼 -->
+      <button class="btn cal-btn" id="syncGCalBtn" title="구글 캘린더에서 일정을 실시간으로 가져옵니다.">📥 구글 캘린더 동기화</button>
+      <a href="https://calendar.google.com/calendar/u/2?cid=ZGFuc2FnYWU1MjVAZ21haWwuY29t" target="_blank" rel="noopener noreferrer" class="btn cal-link-btn" title="공유된 구글 캘린더 열기">📅 구글 캘린더 열기 ↗</a>
     </div>
 
     <div class="bg-theme-bar">
@@ -562,10 +581,11 @@
           <input type="text" class="profile-bio" id="dProfileBio" value="오늘도 힘내서 합격하기 ✨" placeholder="한 줄 소개">
         </div>
 
-        <div class="dday-card">
-          <div class="dday-title" contenteditable="true" id="ddayTitleEdit" title="클릭해서 제목 수정">🎯 임용시험 D-DAY</div>
-          <div class="dday-number" contenteditable="true" id="ddayNumEdit" title="클릭해서 D-Day 수정">D-105</div>
-          <div class="dday-date" contenteditable="true" id="ddayDateEdit" title="클릭해서 목표일 수정">2026. 12. 31. 까지</div>
+        <!-- 디데이 카드 (클릭 시 자동 계산 모달 오픈) -->
+        <div class="dday-card" id="ddayCardWrap" title="클릭하여 목표 날짜를 변경하면 D-Day가 자동 계산됩니다.">
+          <div class="dday-title" id="ddayTitleEdit">🎯 임용시험 D-DAY</div>
+          <div class="dday-number" id="ddayNumEdit">D-105</div>
+          <div class="dday-date" id="ddayDateEdit">2026. 12. 31. 까지</div>
         </div>
       </div>
 
@@ -691,20 +711,27 @@
   const KEY='plan-v1', SKEY='stamps-v1', CKEY='clip-v1', MKEY='memo-v1', APPKEY='app-settings-v1', DKEY='diary-v1';
   const $ = s => document.querySelector(s);
   
+  // 구글 캘린더 iCal 비공개 주소 설정
+  const GOOGLE_ICAL_URL = "https://calendar.google.com/calendar/ical/dansagae525%40gmail.com/private-2f442def1c2f816de819739e4f58ded7/basic.ics";
+
   const SUPABASE_URL = 'https://szqlrwnsflfbmafwefac.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_Ib67bVHkQHq1r2w1yyBFDg_cTj1N5qd';
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   
   const storage = {
     async set(k, v) {
+      try { localStorage.setItem(k, String(v)); } catch(e){}
       const { error } = await supabaseClient.from('my_planner').upsert({ key: k, value: String(v) });
       if (error) console.error('Supabase 저장 에러:', error);
     },
     async get(k) {
       const { data, error } = await supabaseClient.from('my_planner').select('value').eq('key', k).maybeSingle();
-      return data ? { value: data.value } : null;
+      if(data && data.value) return { value: data.value };
+      const localVal = localStorage.getItem(k);
+      return localVal ? { value: localVal } : null;
     },
     async delete(k) {
+      localStorage.removeItem(k);
       await supabaseClient.from('my_planner').delete().eq('key', k);
     }
   };
@@ -723,7 +750,7 @@
   let diaryData = {
     theme: '#FFC1CC', themeSoft: '#FFF0F3', themeDark: '#D87080', themeBg: '#FCECE8',
     bio: '오늘도 힘내서 합격하기 ✨', profileImg: null, pageStickers: {},
-    dday: { title: '🎯 임용시험 D-DAY', num: 'D-105', date: '2026. 12. 31. 까지' },
+    dday: { title: '🎯 임용시험 D-DAY', num: 'D-105', date: '2026. 12. 31. 까지', targetDate: '2026-12-31' },
     year: viewYear, month: viewMonth, currentWeekOffset: 0, currentTab: 'HOME',
     selectedGoalMonth: '9',
     monthlyGoalsMap: {
@@ -744,7 +771,7 @@
     const el = $('#toast');
     if(!el) return;
     el.textContent = msg; el.classList.add('on');
-    clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('on'), 1800);
+    clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('on'), 2200);
   }
   function parse(d) { const [y,m,dd]=d.split('-').map(Number); return new Date(y, m-1, dd); }
   function esc(s) { return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
@@ -761,6 +788,184 @@
     if(diaryData.currentTab === 'WEEK') return `WEEK-${diaryData.year}-${diaryData.month}-${diaryData.currentWeekOffset}`;
     return 'HOME';
   }
+
+  // D-Day 계산 함수
+  function calculateDDay(targetDateStr) {
+    if(!targetDateStr) return { num: 'D-Day', diffDays: 0 };
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const target = parse(targetDateStr);
+    target.setHours(0, 0, 0, 0);
+    const diffTime = target.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    if(diffDays === 0) return { num: 'D-DAY', diffDays };
+    if(diffDays > 0) return { num: `D-${diffDays}`, diffDays };
+    return { num: `D+${Math.abs(diffDays)}`, diffDays };
+  }
+
+  function updateDDayDisplay() {
+    if(!diaryData.dday) return;
+    const target = diaryData.dday.targetDate;
+    if(target) {
+      const calc = calculateDDay(target);
+      diaryData.dday.num = calc.num;
+    }
+    const dt = $('#ddayTitleEdit'), dn = $('#ddayNumEdit'), dd = $('#ddayDateEdit');
+    if(dt) dt.innerText = diaryData.dday.title || '🎯 임용시험 D-DAY';
+    if(dn) dn.innerText = diaryData.dday.num || 'D-Day';
+    if(dd) dd.innerText = diaryData.dday.date || (target ? `${target.replace(/-/g, '. ')} 까지` : '');
+  }
+
+  function openDDaySettingsModal() {
+    const defaultDate = diaryData.dday?.targetDate || '2026-12-31';
+    const defaultTitle = diaryData.dday?.title || '🎯 목표 시험 D-DAY';
+    const modal = createModal(`
+      <h3 style="margin:0 0 12px;font-size:16px;color:var(--jade)">🎯 D-DAY 목표일 자동 설정</h3>
+      <p style="font-size:12px;color:var(--ink-soft);margin-bottom:12px">목표 시험 또는 중요한 일정을 선택하면 남은 날짜(D-Day)를 자동으로 계산합니다.</p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div>
+          <label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px">목표 타이틀</label>
+          <input type="text" id="modalDdayTitle" value="${esc(defaultTitle)}" style="width:100%;border:1px solid var(--rule);border-radius:6px;padding:6px 8px;font-size:13px">
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px">목표 날짜 선택</label>
+          <input type="date" id="modalDdayDate" value="${defaultDate}" style="width:100%;border:1px solid var(--rule);border-radius:6px;padding:6px 8px;font-size:13px">
+        </div>
+      </div>
+      <div style="margin-top:16px;display:flex;justify-content:flex-end;gap:6px">
+        <button class="btn ghost small" id="modalDdayCancel">취소</button>
+        <button class="btn primary small" id="modalDdayApply">계산 및 저장</button>
+      </div>
+    `);
+
+    modal.box.querySelector('#modalDdayCancel').onclick = () => modal.close();
+    modal.box.querySelector('#modalDdayApply').onclick = () => {
+      const tDate = modal.box.querySelector('#modalDdayDate').value;
+      const tTitle = modal.box.querySelector('#modalDdayTitle').value.trim() || '🎯 D-DAY';
+      if(!tDate) { toast('날짜를 지정해주세요.'); return; }
+      
+      const calc = calculateDDay(tDate);
+      diaryData.dday = {
+        title: tTitle,
+        num: calc.num,
+        date: `${tDate.replace(/-/g, '. ')} 까지`,
+        targetDate: tDate
+      };
+      updateDDayDisplay();
+      saveDiaryState();
+      modal.close();
+      toast(`디데이가 설정되었습니다! (${calc.num})`);
+    };
+  }
+
+  // ----------------------------------------------------
+  // 구글 캘린더 iCal (.ics) 일정 파싱 및 플래너 자동 등록 로직
+  // ----------------------------------------------------
+  function parseIcsDate(icsStr) {
+    if(!icsStr) return null;
+    const cleanStr = icsStr.replace(/Z$/, '');
+    if(cleanStr.length === 8) { // YYYYMMDD (종일 일정)
+      const y = parseInt(cleanStr.substring(0, 4), 10);
+      const m = parseInt(cleanStr.substring(4, 6), 10) - 1;
+      const d = parseInt(cleanStr.substring(6, 8), 10);
+      return { date: `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`, time: '09:00', duration: 60, isAllDay: true };
+    } else if(cleanStr.includes('T')) {
+      const [dPart, tPart] = cleanStr.split('T');
+      let y = parseInt(dPart.substring(0, 4), 10);
+      let m = parseInt(dPart.substring(4, 6), 10) - 1;
+      let d = parseInt(dPart.substring(6, 8), 10);
+      let hh = parseInt(tPart.substring(0, 2), 10);
+      let mm = parseInt(tPart.substring(2, 4), 10);
+
+      // UTC(Z) 기준일 경우 한국 표준시(+9시간) 변환
+      if(icsStr.endsWith('Z')) {
+        const utcDate = new Date(Date.UTC(y, m, d, hh, mm));
+        y = utcDate.getFullYear();
+        m = utcDate.getMonth();
+        d = utcDate.getDate();
+        hh = utcDate.getHours();
+        mm = utcDate.getMinutes();
+      }
+      return {
+        date: `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`,
+        time: `${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`,
+        duration: 60,
+        isAllDay: false,
+        fullDate: new Date(y, m, d, hh, mm)
+      };
+    }
+    return null;
+  }
+
+  async function syncGoogleCalendar() {
+    toast('구글 캘린더 일정을 가져오는 중입니다...');
+    try {
+      // 브라우저 CORS 제한 우회를 위한 고속 프록시 연결
+      const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(GOOGLE_ICAL_URL);
+      const res = await fetch(proxyUrl);
+      if(!res.ok) throw new Error('Network response not ok');
+      const text = await res.text();
+
+      // iCal VEVENT 파싱
+      const rawEvents = text.split('BEGIN:VEVENT');
+      let addedCount = 0;
+
+      for(let i = 1; i < rawEvents.length; i++) {
+        const block = rawEvents[i].split('END:VEVENT')[0];
+        
+        // SUMMARY (제목)
+        const summaryMatch = block.match(/SUMMARY:(.*?)(\r?\n)/);
+        const title = summaryMatch ? summaryMatch[1].trim() : '구글 캘린더 일정';
+
+        // DTSTART (시작일시)
+        const dtstartMatch = block.match(/DTSTART(?:;[^:]+)?:(\d{8}(?:T\d{6}Z?)?)/);
+        if(!dtstartMatch) continue;
+        const startInfo = parseIcsDate(dtstartMatch[1]);
+        if(!startInfo) continue;
+
+        // DTEND (종료일시를 통한 소요시간 계산)
+        const dtendMatch = block.match(/DTEND(?:;[^:]+)?:(\d{8}(?:T\d{6}Z?)?)/);
+        let duration = 60;
+        if(dtendMatch && !startInfo.isAllDay) {
+          const endInfo = parseIcsDate(dtendMatch[1]);
+          if(endInfo && endInfo.fullDate && startInfo.fullDate) {
+            const diffMins = Math.round((endInfo.fullDate - startInfo.fullDate) / (1000 * 60));
+            if(diffMins > 0) duration = diffMins;
+          }
+        }
+
+        // 플래너의 state.days에 병합
+        let targetDay = state.days.find(d => d.date === startInfo.date);
+        if(!targetDay) {
+          targetDay = mk(startInfo.date, `${startInfo.date.slice(5)} 일정`, false, []);
+          state.days.push(targetDay);
+        }
+
+        // 중복 방지 (동일 시간 + 동일 일정명이 없을 때만 등록)
+        const isDuplicate = targetDay.events.some(e => e.time === startInfo.time && e.title === title);
+        if(!isDuplicate) {
+          targetDay.events.push({
+            id: uid(),
+            time: startInfo.time,
+            duration: duration,
+            title: title,
+            done: false
+          });
+          addedCount++;
+        }
+      }
+
+      await saveState();
+      renderPlannerCalendar();
+      if(selected) openPlannerPanel();
+      toast(`구글 캘린더에서 총 ${addedCount}개의 새 일정을 등록했습니다!`);
+    } catch(err) {
+      console.error('캘린더 동기화 에러:', err);
+      toast('구글 캘린더 일정을 가져오지 못했습니다. 잠시 후 다시 시도해주세요.');
+    }
+  }
+
+  $('#syncGCalBtn').onclick = syncGoogleCalendar;
 
   function shrinkImage(file, max, quality) {
     return new Promise((res, rej) => {
@@ -831,6 +1036,30 @@
   async function saveDiaryState(){
     try { await storage.set(DKEY, JSON.stringify(diaryData)); } catch(e) { console.error(e); }
   }
+
+  // 전체 데이터 통합 수동 저장
+  async function triggerGlobalManualSave() {
+    try {
+      const memoEl = $('#memoArea');
+      const cleanState = JSON.stringify(state, (k,v) => k === '_editing' ? undefined : v);
+      await Promise.all([
+        storage.set(KEY, cleanState),
+        storage.set(DKEY, JSON.stringify(diaryData)),
+        storage.set(MKEY, JSON.stringify({ html: memoEl ? memoEl.innerHTML : '' })),
+        storage.set('mood-tracker-v1', JSON.stringify(moodRecords))
+      ]);
+      const savedNotice = $('#mSaved');
+      if(savedNotice) {
+        savedNotice.textContent = '저장됨 ✓';
+        setTimeout(() => savedNotice.textContent = '저장됨', 2000);
+      }
+      toast('💾 모든 데이터가 안전하게 저장되었습니다!');
+    } catch(err) {
+      console.error('전체 저장 오류:', err);
+      toast('저장 중 오류가 발생했습니다.');
+    }
+  }
+  $('#manualGlobalSaveBtn').onclick = triggerGlobalManualSave;
 
   function setAppBackground(color){
     document.documentElement.style.setProperty('--app-bg', color);
@@ -943,7 +1172,6 @@
     };
   });
 
-  // 사진 모아보기 (전체 날짜 갤러리)
   $('#galleryBtn').onclick = () => {
     const grid = $('#galleryGrid');
     grid.innerHTML = '';
@@ -978,7 +1206,6 @@
     const hours = [6,7,8,9,10,11,12,1,2,3,4,5,6,7,8,9,10,11,12,1,2,3,4,5];
     const hour24 = [6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,0,1,2,3,4,5];
     
-    // 캘린더 일정(events)으로 점유된 10분 슬롯 계산
     const scheduledSlots = new Set();
     (d.events || []).forEach(ev => {
       const [eh, em] = ev.time.split(':').map(Number);
@@ -1015,13 +1242,10 @@
     if(!d) { panelEl.innerHTML = '<p class="sub">날짜를 선택하면 상세 일정과 할 일이 열립니다.</p>'; return; }
     
     const done = d.items.filter(i=>i.state==='done').length;
-    
-    // 계산 공식: 순수가용시간 = 총 가용시간 - 캘린더 일정 소요시간
     const avail = d.availableMinutes || 600;
     const schedMins = scheduledMinutes(d);
     const netAvail = Math.max(0, avail - schedMins);
 
-    // 타임트래커로 기록된 공부시간
     const trackerMinutes = (d.trackerSlots || []).length * 10;
     const currentStudy = trackerMinutes > 0 ? trackerMinutes : liveMinutes(d);
     const percent = netAvail > 0 ? Math.min(100, Math.round((currentStudy / netAvail) * 100)) : 0;
@@ -1029,7 +1253,10 @@
     panelEl.innerHTML = `
       <div class="prow">
         <div><h2>${esc(d.label)}</h2><p class="sub">${d.date.replace(/-/g,'.')} · 할 일 ${done}/${d.items.length} 완료</p></div>
-        <button class="btn small danger" id="delDay">이 날 삭제</button>
+        <div style="display:flex;gap:6px">
+          <button class="btn small save-btn" id="panelSaveBtn">💾 변경사항 저장</button>
+          <button class="btn small danger" id="delDay">이 날 삭제</button>
+        </div>
       </div>
 
       <div class="dateedit">
@@ -1084,7 +1311,11 @@
 
       <div class="schedbox">
         <div class="sched-head">
-          <h3>⏰ 이 날의 일정 (캘린더 연동)</h3>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <h3>⏰ 이 날의 일정 (캘린더 연동)</h3>
+            <button class="btn small cal-btn" id="panelSyncGCalBtn">📥 구글 캘린더 동기화</button>
+            <a href="https://calendar.google.com/calendar/u/2?cid=ZGFuc2FnYWU1MjVAZ21haWwuY29t" target="_blank" rel="noopener noreferrer" class="btn small cal-link-btn">📅 캘린더 열기 ↗</a>
+          </div>
           <span class="sched-date">${d.events.length}개 · ${fmtDur(scheduledMinutes(d))}</span>
         </div>
         ${d.events.length ? `<ul class="sched-list">${[...d.events].sort((a,b)=>a.time.localeCompare(b.time)).map(ev=>`
@@ -1131,7 +1362,7 @@
         </div>
       </div>
 
-      <!-- 할 일 리스트 (수정 버튼 및 더블클릭 전환 지원) -->
+      <!-- 할 일 리스트 -->
       <div style="margin-top:16px;padding-top:14px;border-top:1px dashed var(--rule)">
         <h3 style="margin:0 0 6px;font-size:13px;font-weight:700">✅ 오늘 할 일 목록 <span style="font-size:11px;font-weight:normal;color:var(--ink-soft)">(수정 버튼을 누르거나 더블 클릭하여 수정)</span></h3>
         <ul class="items">${d.items.map((it,idx)=>`
@@ -1224,7 +1455,15 @@
       </div>
     `;
 
-    // 타임트래커 상호작용 (클릭 & 드래그)
+    $('#panelSaveBtn').onclick = () => {
+      saveState();
+      toast('이 날의 모든 내용이 저장되었습니다.');
+    };
+
+    const panelSyncBtn = $('#panelSyncGCalBtn');
+    if(panelSyncBtn) panelSyncBtn.onclick = syncGoogleCalendar;
+
+    // 타임트래커 상호작용
     const trackerContainer = $('#trackerGridContainer');
     let isTrackingMouseDown = false;
     let trackAction = null;
@@ -1335,7 +1574,6 @@
       saveState(); openPlannerPanel();
     };
     
-    // 할 일 액션 리스너 (수정/저장/삭제/순서변경)
     panelEl.querySelectorAll('.items [data-act]').forEach(b => {
       b.onclick = () => {
         const li = b.closest('li'), idx = d.items.findIndex(x=>x.id === li.dataset.id); if(idx === -1) return;
@@ -1371,7 +1609,6 @@
       };
     });
 
-    // 할 일 텍스트 영역 더블 클릭 시 수정 모드로 진입
     panelEl.querySelectorAll('.items .itxt').forEach(txtEl => {
       txtEl.ondblclick = () => {
         const li = txtEl.closest('li');
@@ -1442,7 +1679,6 @@
       };
     });
 
-    // 커서 포커스된 표 추적 (복수 표 분리 처리)
     document.addEventListener('focusin', e => {
       const tbl = e.target.closest('table');
       if(tbl) lastActiveTable = tbl;
@@ -1457,12 +1693,7 @@
     qaBox.querySelectorAll('.add-row-btn').forEach((btn, rIdx) => {
       btn.onclick = () => {
         const rowDiv = qaBox.querySelectorAll('.qarow')[rIdx];
-        let targetTable = null;
-        if(lastActiveTable && rowDiv.contains(lastActiveTable)) {
-          targetTable = lastActiveTable;
-        } else {
-          targetTable = rowDiv.querySelector('.qa-table');
-        }
+        let targetTable = (lastActiveTable && rowDiv.contains(lastActiveTable)) ? lastActiveTable : rowDiv.querySelector('.qa-table');
 
         if(targetTable) {
           const colsCount = targetTable.rows[0] ? targetTable.rows[0].cells.length : 2;
@@ -1481,12 +1712,7 @@
     qaBox.querySelectorAll('.add-col-btn').forEach((btn, rIdx) => {
       btn.onclick = () => {
         const rowDiv = qaBox.querySelectorAll('.qarow')[rIdx];
-        let targetTable = null;
-        if(lastActiveTable && rowDiv.contains(lastActiveTable)) {
-          targetTable = lastActiveTable;
-        } else {
-          targetTable = rowDiv.querySelector('.qa-table');
-        }
+        let targetTable = (lastActiveTable && rowDiv.contains(lastActiveTable)) ? lastActiveTable : rowDiv.querySelector('.qa-table');
 
         if(targetTable) {
           for(let i=0; i<targetTable.rows.length; i++){
@@ -1503,12 +1729,7 @@
     qaBox.querySelectorAll('.del-tbl-btn').forEach((btn, rIdx) => {
       btn.onclick = () => {
         const rowDiv = qaBox.querySelectorAll('.qarow')[rIdx];
-        let targetTable = null;
-        if(lastActiveTable && rowDiv.contains(lastActiveTable)) {
-          targetTable = lastActiveTable;
-        } else {
-          targetTable = rowDiv.querySelector('.qa-table');
-        }
+        let targetTable = (lastActiveTable && rowDiv.contains(lastActiveTable)) ? lastActiveTable : rowDiv.querySelector('.qa-table');
 
         if(targetTable) {
           targetTable.remove();
@@ -1546,7 +1767,7 @@
     if(addQA) addQA.onclick = () => { d.qa.push({id:uid(),q:'',a:''}); saveState(); openPlannerPanel(); };
   }
 
-  // 상단 메모장 표 기능 연결
+  // 상단 메모장 기능
   $('#mInsTable').onclick = () => {
     const memo = $('#memoArea');
     memo.focus();
@@ -1628,9 +1849,9 @@
 
   function createModal(htmlContent) {
     const overlay = document.createElement('div');
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9000;display:flex;align-items:center;justify-content:center;padding:16px;';
     const box = document.createElement('div');
-    box.style.cssText = 'width:min(600px,100%);max-height:90vh;overflow:auto;background:var(--card);border-radius:12px;padding:20px;';
+    box.style.cssText = 'width:min(500px,100%);max-height:90vh;overflow:auto;background:var(--card);border-radius:12px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.2);';
     box.innerHTML = htmlContent;
     overlay.appendChild(box); document.body.appendChild(overlay);
     overlay.onclick = e => { if(e.target === overlay) overlay.remove(); };
@@ -1864,17 +2085,12 @@
     }
     if(pImg) pImg.onclick = () => pickFile(async f => { const d = await shrinkImage(f, 200, .85); diaryData.profileImg = d; pImg.innerHTML = `<img src="${d}">`; saveDiaryState(); });
 
-    const dtEdit = $('#ddayTitleEdit'), dnEdit = $('#ddayNumEdit'), ddEdit = $('#ddayDateEdit');
-    if(diaryData.dday) {
-      dtEdit.innerText = diaryData.dday.title || '🎯 임용시험 D-DAY';
-      dnEdit.innerText = diaryData.dday.num || 'D-105';
-      ddEdit.innerText = diaryData.dday.date || '2026. 12. 31. 까지';
+    // D-Day 카드 클릭 시 자동 계산 모달 오픈
+    const ddayCard = $('#ddayCardWrap');
+    if(ddayCard) {
+      ddayCard.onclick = () => openDDaySettingsModal();
     }
-    const updateDday = () => {
-      diaryData.dday = { title: dtEdit.innerText.trim(), num: dnEdit.innerText.trim(), date: ddEdit.innerText.trim() };
-      saveDiaryState();
-    };
-    dtEdit.oninput = updateDday; dnEdit.oninput = updateDday; ddEdit.oninput = updateDday;
+    updateDDayDisplay();
 
     const dFmtBold = $('#dFmtBold'), dFmtColor = $('#dFmtColor');
     if(dFmtBold) {
@@ -2063,16 +2279,14 @@
         el.innerHTML = `<div class="sticky-note ${s.color}" contenteditable="true">${s.content}</div><button class="s-del">✕</button><div class="s-resizer" title="드래그하여 크기 조절">⇲</div>`;
         const noteEl = el.querySelector('.sticky-note');
         noteEl.oninput = () => { s.content = noteEl.innerText; saveDiaryState(); };
-      } else { // image sticker
+      } else {
         el.style.width = (s.w || s.size || 70) + 'px';
         el.style.height = (s.h || s.size || 70) + 'px';
         el.innerHTML = `<img src="${s.content}"><button class="s-del">✕</button><div class="s-resizer" title="드래그하여 크기 조절">⇲</div>`;
       }
       
-      // 삭제 핸들
       el.querySelector('.s-del').onclick = e => { e.stopPropagation(); currentStickers.splice(idx, 1); renderStickers(); saveDiaryState(); };
       
-      // 크기 조절 리사이저 핸들 바인딩
       const resizer = el.querySelector('.s-resizer');
       let isResizing = false, rStartX, rStartY, rInitW, rInitH, rInitSize;
 
@@ -2120,7 +2334,6 @@
       window.addEventListener('mouseup', onResizeUp);
       window.addEventListener('touchend', onResizeUp);
 
-      // 드래그 이동 핸들
       let isDragging = false, startX, startY, initX, initY;
       const onDown = e => {
         if(e.target.closest('.s-resizer') || e.target.closest('.s-del')) return;
@@ -2147,7 +2360,6 @@
     });
   }
 
-  // 바깥 영역 클릭 시 스티커 선택 해제
   window.addEventListener('mousedown', e => {
     if(!e.target.closest('.placed-sticker') && !e.target.closest('.sticker-drawer') && !e.target.closest('.sticky-btn')) {
       document.querySelectorAll('.placed-sticker').forEach(st => st.classList.remove('selected'));
@@ -2170,7 +2382,7 @@
       w: type==='sticky' ? 130 : 80,
       h: type==='sticky' ? 130 : 80
     });
-    renderStickers(); saveDiaryState(); toast('붙여졌습니다! (클릭 시 크기 조절 핸들 표시)');
+    renderStickers(); saveDiaryState(); toast('붙여졌습니다!');
   }
 
   function addStickyNote(color, text) {
