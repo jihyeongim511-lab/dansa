@@ -94,10 +94,11 @@
   .mbhead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:6px;flex-wrap:wrap}
   .mbhead h3{margin:0;font-size:13px;font-weight:700}
   .mbhead .mbsub{font-weight:400;color:var(--ink-soft);font-size:11px;margin-left:6px}
-  .mbtools{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .mbtools{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
   #memoArea{width:100%;min-height:70px;font-family:inherit;font-size:13.5px;line-height:1.6;color:var(--ink);border:1px solid var(--rule);border-radius:8px;padding:8px 10px;background:#fff;overflow-x:auto;outline:none;}
   #memoArea:focus{outline:2px solid var(--jade);outline-offset:1px}
   #memoArea:empty:before{content:attr(data-ph);color:#9AA79A}
+  #memoArea ul, #memoArea ol{padding-left:24px;margin:6px 0}
 
   .cal{max-width:980px;margin:0 auto;background:var(--card);border:1px solid var(--rule);border-radius:12px;overflow:hidden}
   .cal-top-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--rule);background:#FAFBF8}
@@ -216,6 +217,7 @@
   .btn.mark-s.on{background:var(--jade);color:#fff;border-color:var(--jade)}
   .btn.mark-f.on{background:var(--seal);color:#fff;border-color:var(--seal)}
 
+  /* 필기 섹션 & 개별 문제 접기 카드 스타일 */
   .notes{margin-top:16px;padding-top:14px;border-top:1px dashed var(--rule)}
   .notes .nhead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap}
   .notes h3{margin:0;font-size:14px;font-weight:800}
@@ -246,6 +248,8 @@
   .qafield.a{border-left:3px solid var(--jade)}
   .qa.hide .qafield.a{filter:blur(4.5px);transition:filter .2s}
   .qa.hide .qafield.a:focus{filter:none}
+  .qafield ul, .qafield ol{padding-left:24px;margin:6px 0}
+
   .rdel-btn{border:none;background:none;color:var(--seal);font-size:12px;font-weight:bold;cursor:pointer;padding:2px 6px;border-radius:4px}
   .rdel-btn:hover{background:#FDF2F2}
 
@@ -526,7 +530,7 @@
 
     <div class="memobox">
       <div class="mbhead">
-        <h3>메모장 <span class="mbsub">전역 공통 링크, 자료 위치, 잡다한 메모 (Ctrl+V 이미지 붙여넣기 지원)</span></h3>
+        <h3>메모장 <span class="mbsub">전역 공통 링크, 자료 위치, 잡다한 메모 (Tab/Shift+Tab 들여쓰기 지원)</span></h3>
         <div class="mbtools">
           <span class="saved" id="mSaved">저장됨</span>
           <button class="btn small ghost" id="mInsTable">표 삽입</button>
@@ -535,6 +539,15 @@
           <button class="btn small danger ghost" id="mDelTableBtn">표 삭제</button>
           <button class="btn small ghost" id="mInsImage">사진 삽입</button>
           <button class="btn small ghost" id="mBoldBtn"><b>B</b></button>
+          <button class="btn small ghost" id="mBulletBtn" title="글머리 기호(•)">• 목록</button>
+          <button class="btn small ghost" id="mNumBtn" title="번호 매기기(1. 2.)">1. 목록</button>
+          <button class="btn small ghost" id="mIndentBtn" title="들여쓰기 (Tab)">⇥ 들여쓰기</button>
+          <button class="btn small ghost" id="mOutdentBtn" title="내어쓰기 (Shift+Tab)">⇤ 내어쓰기</button>
+          <div style="display:inline-flex;align-items:center;gap:3px;background:#f0f4ee;padding:1px 5px;border-radius:6px;border:1px solid var(--rule)">
+            <span style="font-size:11px;font-weight:bold">🖍</span>
+            <input type="color" id="mHiliteColor" value="#FFF176" title="형광펜 색상 선택" style="width:18px;height:18px;border:none;background:none;cursor:pointer;padding:0">
+            <button class="btn small ghost" id="mHiliteClear" style="font-size:10px;padding:1px 4px" title="형광펜 지우기">✕</button>
+          </div>
         </div>
       </div>
       <div id="memoArea" contenteditable="true" data-ph="자유 메모..."></div>
@@ -1052,6 +1065,7 @@
     i.onchange = () => { if(i.files && i.files[0]) cb(i.files[0]); }; i.click();
   }
 
+  // --- 클립보드 붙여넣기(Cmd+V / Ctrl+V) 전역 핸들러 ---
   window.addEventListener('paste', async (e) => {
     if (e.target.tagName === 'INPUT' && !e.target.classList.contains('swatch') && !e.target.classList.contains('ed-color')) return;
     if (e.target.tagName === 'TEXTAREA') return;
@@ -1104,6 +1118,70 @@
       toast('📋 클립보드 이미지가 오늘의 인증 사진에 등록되었습니다!');
     }
   });
+
+  // 에디터(메모장, Q&A) 내 Tab 키 들여쓰기 / Shift+Tab 내어쓰기 단축키 지원
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Tab') {
+      const active = document.activeElement;
+      if (active && (active.id === 'memoArea' || active.classList.contains('qafield'))) {
+        e.preventDefault();
+        if (e.shiftKey) {
+          document.execCommand('outdent');
+        } else {
+          document.execCommand('indent');
+        }
+        if (active.id === 'memoArea') {
+          storage.set(MKEY, JSON.stringify({ html: $('#memoArea').innerHTML }));
+        } else {
+          saveState();
+        }
+      }
+    }
+  });
+
+  // 상단 메모장 서식 도구 바인딩
+  const mHiliteColor = $('#mHiliteColor');
+  if(mHiliteColor) {
+    mHiliteColor.oninput = e => {
+      document.execCommand('hiliteColor', false, e.target.value);
+      storage.set(MKEY, JSON.stringify({ html: $('#memoArea').innerHTML }));
+    };
+  }
+  const mHiliteClear = $('#mHiliteClear');
+  if(mHiliteClear) {
+    mHiliteClear.onclick = () => {
+      document.execCommand('hiliteColor', false, 'transparent');
+      storage.set(MKEY, JSON.stringify({ html: $('#memoArea').innerHTML }));
+    };
+  }
+  const mBulletBtn = $('#mBulletBtn');
+  if(mBulletBtn) {
+    mBulletBtn.onclick = () => {
+      document.execCommand('insertUnorderedList');
+      storage.set(MKEY, JSON.stringify({ html: $('#memoArea').innerHTML }));
+    };
+  }
+  const mNumBtn = $('#mNumBtn');
+  if(mNumBtn) {
+    mNumBtn.onclick = () => {
+      document.execCommand('insertOrderedList');
+      storage.set(MKEY, JSON.stringify({ html: $('#memoArea').innerHTML }));
+    };
+  }
+  const mIndentBtn = $('#mIndentBtn');
+  if(mIndentBtn) {
+    mIndentBtn.onclick = () => {
+      document.execCommand('indent');
+      storage.set(MKEY, JSON.stringify({ html: $('#memoArea').innerHTML }));
+    };
+  }
+  const mOutdentBtn = $('#mOutdentBtn');
+  if(mOutdentBtn) {
+    mOutdentBtn.onclick = () => {
+      document.execCommand('outdent');
+      storage.set(MKEY, JSON.stringify({ html: $('#memoArea').innerHTML }));
+    };
+  }
 
   function mk(date, label, rest, pairs) {
     const items = (pairs||[]).map(p => ({ id:uid(), cat:p[0], text:p[1], kind:p[2]||'main', state:'none', color:'#16202B', bold:false }));
@@ -1542,7 +1620,7 @@
         <button class="btn ghost small" id="mN">지우기</button>
       </div>
 
-      <!-- 자유 편집 표 기능이 강화된 필기 영역 -->
+      <!-- 들여쓰기/내어쓰기가 지원되는 필기 영역 -->
       <div class="notes">
         <div class="nhead">
           <div style="display:flex;align-items:center;gap:8px">
@@ -1573,20 +1651,39 @@
               </div>
               <div class="qarow-body">
                 <div style="display:flex;flex-direction:column;gap:4px">
-                  <div class="formatbar" style="background:#f4f6f2;padding:2px 6px;border-radius:4px;display:flex;gap:4px;align-items:center">
+                  <div class="formatbar" style="background:#f4f6f2;padding:2px 6px;border-radius:4px;display:flex;gap:5px;align-items:center;flex-wrap:wrap">
                     <button class="fmtbtn qa-fmt" data-act="bold" title="볼드체">B</button>
+                    <button type="button" class="btn small ghost qa-list-btn" data-act="bullet" title="글머리 기호(•)">• 목록</button>
+                    <button type="button" class="btn small ghost qa-list-btn" data-act="number" title="번호 매기기(1. 2.)">1. 목록</button>
+                    <button type="button" class="btn small ghost qa-list-btn" data-act="indent" title="들여쓰기 (Tab)">⇥ 들여쓰기</button>
+                    <button type="button" class="btn small ghost qa-list-btn" data-act="outdent" title="내어쓰기 (Shift+Tab)">⇤ 내어쓰기</button>
+                    <span style="font-size:11px;font-weight:bold;color:var(--ink-soft)">글자색:</span>
                     <input type="color" class="swatch qa-color" value="#16202B" title="글자 색상" style="width:16px;height:16px;border:none;background:none;cursor:pointer">
+                    <div style="display:inline-flex;align-items:center;gap:3px;margin-left:4px;background:#fff;padding:1px 4px;border-radius:4px;border:1px solid var(--rule)">
+                      <span style="font-size:11px;font-weight:bold">🖍</span>
+                      <input type="color" class="qa-hilite" value="#FFF176" title="형광펜 색상 선택" style="width:16px;height:16px;border:none;background:none;cursor:pointer;padding:0">
+                      <button type="button" class="btn small ghost qa-hilite-clear" style="font-size:9.5px;padding:1px 3px" title="형광펜 지우기">✕</button>
+                    </div>
                   </div>
                   <div class="qafield q" contenteditable="true" data-f="q" data-ph="문제/키워드...">${r.q}</div>
                 </div>
                 <div style="display:flex;flex-direction:column;gap:4px">
-                  <div class="formatbar" style="background:#f4f6f2;padding:2px 6px;border-radius:4px;display:flex;gap:4px;align-items:center">
+                  <div class="formatbar" style="background:#f4f6f2;padding:2px 6px;border-radius:4px;display:flex;gap:5px;align-items:center;flex-wrap:wrap">
                     <button class="fmtbtn qa-fmt" data-act="bold" title="볼드체">B</button>
+                    <button type="button" class="btn small ghost qa-list-btn" data-act="bullet" title="글머리 기호(•)">• 목록</button>
+                    <button type="button" class="btn small ghost qa-list-btn" data-act="number" title="번호 매기기(1. 2.)">1. 목록</button>
+                    <button type="button" class="btn small ghost qa-list-btn" data-act="indent" title="들여쓰기 (Tab)">⇥ 들여쓰기</button>
+                    <button type="button" class="btn small ghost qa-list-btn" data-act="outdent" title="내어쓰기 (Shift+Tab)">⇤ 내어쓰기</button>
+                    <span style="font-size:11px;font-weight:bold;color:var(--ink-soft)">글자색:</span>
                     <input type="color" class="swatch qa-color" value="#16202B" title="글자 색상" style="width:16px;height:16px;border:none;background:none;cursor:pointer">
+                    <div style="display:inline-flex;align-items:center;gap:3px;margin-left:4px;background:#fff;padding:1px 4px;border-radius:4px;border:1px solid var(--rule)">
+                      <span style="font-size:11px;font-weight:bold">🖍</span>
+                      <input type="color" class="qa-hilite" value="#FFF176" title="형광펜 색상 선택" style="width:16px;height:16px;border:none;background:none;cursor:pointer;padding:0">
+                      <button type="button" class="btn small ghost qa-hilite-clear" style="font-size:9.5px;padding:1px 3px" title="형광펜 지우기">✕</button>
+                    </div>
                   </div>
                   <div class="qafield a" contenteditable="true" data-f="a" data-ph="정답/설명...">${r.a}</div>
                   
-                  <!-- 표 자유 편집 도구 바 -->
                   <div class="table-tools">
                     <span>표 편집:</span>
                     <button class="btn small ghost add-row-btn" title="아래에 새 행 추가">➕행</button>
@@ -1730,6 +1827,7 @@
       saveState(); openPlannerPanel();
     };
     
+    // 할 일 수정 리스너
     panelEl.querySelectorAll('.items [data-act]').forEach(b => {
       b.onclick = () => {
         const li = b.closest('li'), idx = d.items.findIndex(x=>x.id === li.dataset.id); if(idx === -1) return;
@@ -1819,6 +1917,7 @@
     $('#mF').onclick = () => { d.status='fail'; saveState(); renderPlannerCalendar(); openPlannerPanel(); };
     $('#mN').onclick = () => { d.status='none'; saveState(); renderPlannerCalendar(); openPlannerPanel(); };
 
+    // 문제별 접기/펼치기 및 삭제
     const qaBox = $('#qaBox');
     if(qaBox) {
       qaBox.querySelectorAll('.qarow').forEach(row => {
@@ -1895,6 +1994,37 @@
       };
     });
 
+    // Q&A 목록 및 들여쓰기/내어쓰기 서식 바인딩
+    panelEl.querySelectorAll('.qa-list-btn').forEach(btn => {
+      btn.onclick = () => {
+        const act = btn.dataset.act;
+        if(act === 'bullet') {
+          document.execCommand('insertUnorderedList');
+        } else if(act === 'number') {
+          document.execCommand('insertOrderedList');
+        } else if(act === 'indent') {
+          document.execCommand('indent');
+        } else if(act === 'outdent') {
+          document.execCommand('outdent');
+        }
+        saveState();
+      };
+    });
+
+    // Q&A 필기 영역 하이라이트(형광펜) 이벤트
+    panelEl.querySelectorAll('.qa-hilite').forEach(inp => {
+      inp.oninput = e => {
+        document.execCommand('hiliteColor', false, e.target.value);
+        saveState();
+      };
+    });
+    panelEl.querySelectorAll('.qa-hilite-clear').forEach(btn => {
+      btn.onclick = () => {
+        document.execCommand('hiliteColor', false, 'transparent');
+        saveState();
+      };
+    });
+
     // 테이블 셀 포커스 추적
     document.addEventListener('focusin', e => {
       const cell = e.target.closest('td, th');
@@ -1912,7 +2042,6 @@
       saveState(); openPlannerPanel();
     };
 
-    // 1. 행 추가
     qaBox.querySelectorAll('.add-row-btn').forEach((btn, rIdx) => {
       btn.onclick = () => {
         const rowDiv = qaBox.querySelectorAll('.qarow')[rIdx];
@@ -1932,7 +2061,6 @@
       };
     });
 
-    // 2. 열 추가
     qaBox.querySelectorAll('.add-col-btn').forEach((btn, rIdx) => {
       btn.onclick = () => {
         const rowDiv = qaBox.querySelectorAll('.qarow')[rIdx];
@@ -1950,7 +2078,6 @@
       };
     });
 
-    // 3. 가로 셀 합치기 (Colspan 병합)
     qaBox.querySelectorAll('.merge-right-btn').forEach((btn, rIdx) => {
       btn.onclick = () => {
         const rowDiv = qaBox.querySelectorAll('.qarow')[rIdx];
@@ -1974,7 +2101,6 @@
       };
     });
 
-    // 4. 가로 셀 나누기 (Colspan 분할)
     qaBox.querySelectorAll('.split-col-btn').forEach((btn, rIdx) => {
       btn.onclick = () => {
         const rowDiv = qaBox.querySelectorAll('.qarow')[rIdx];
@@ -2003,7 +2129,6 @@
       };
     });
 
-    // 5. 세로 셀 합치기 (Rowspan 병합)
     qaBox.querySelectorAll('.merge-down-btn').forEach((btn, rIdx) => {
       btn.onclick = () => {
         const rowDiv = qaBox.querySelectorAll('.qarow')[rIdx];
@@ -2034,7 +2159,6 @@
       };
     });
 
-    // 6. 세로 셀 나누기 (Rowspan 분할)
     qaBox.querySelectorAll('.split-row-btn').forEach((btn, rIdx) => {
       btn.onclick = () => {
         const rowDiv = qaBox.querySelectorAll('.qarow')[rIdx];
@@ -2061,7 +2185,6 @@
       };
     });
 
-    // 7. 선택된 행 삭제
     qaBox.querySelectorAll('.del-row-btn').forEach((btn, rIdx) => {
       btn.onclick = () => {
         const rowDiv = qaBox.querySelectorAll('.qarow')[rIdx];
@@ -2078,7 +2201,6 @@
       };
     });
 
-    // 8. 선택된 열 삭제
     qaBox.querySelectorAll('.del-col-btn').forEach((btn, rIdx) => {
       btn.onclick = () => {
         const rowDiv = qaBox.querySelectorAll('.qarow')[rIdx];
@@ -2100,7 +2222,6 @@
       };
     });
 
-    // 9. 표 전체 삭제
     qaBox.querySelectorAll('.del-tbl-btn').forEach((btn, rIdx) => {
       btn.onclick = () => {
         const rowDiv = qaBox.querySelectorAll('.qarow')[rIdx];
@@ -2138,7 +2259,6 @@
     if(addQA) addQA.onclick = () => { d.qa.push({id:uid(), q:'', a:'', collapsed:false}); saveState(); openPlannerPanel(); };
   }
 
-  // 상단 메모장 기능
   $('#mInsTable').onclick = () => {
     const memo = $('#memoArea');
     memo.focus();
