@@ -427,7 +427,6 @@
   .d-cal-text:empty:before{content:attr(placeholder);color:#C6CFC6}
 
   #dWeeklyView{display:none;flex:1;flex-direction:column;gap:8px;overflow:hidden;min-height:0}
-  /* 위클리 전체(주간 목표 + 7일)를 4열×2행으로 배치해 페이지 안에서 한눈에 보이게 함 */
   .d-weekly-spread-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:8px;flex:1;min-height:0}
   
   .d-week-col{background:#fff;border:1.5px solid #E5DCD4;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;box-shadow:0 2px 6px rgba(0,0,0,0.02);min-height:0;overflow:hidden}
@@ -913,9 +912,8 @@
     dday: { title: '🎯 임용시험 D-DAY', num: 'D-105', date: '2026. 12. 31. 까지', targetDate: '2026-12-31' },
     year: viewYear, month: viewMonth, currentWeekOffset: 0, currentTab: 'HOME',
     selectedGoalMonth: '9',
-    showWeeklyEvents: true, // 위클리 일정 표시 여부 플래그
-    showMonthlyEvents: true, // 먼슬리 일정 표시 여부 플래그
-    showMonthlyEvents: true, // 먼슬리 일정 표시 여부 플래그
+    showWeeklyEvents: true,
+    showMonthlyEvents: true,
     monthlyGoalsMap: {
       '9': [
         { id: 'g1', text: '교육과정 총론 암기 끝내기', done: false },
@@ -3183,7 +3181,7 @@
     });
   }
 
-  // [다이어리 위클리 렌더링 - 일정 숨기기 토글 & 과목 복수 선택 필터링 지원]
+  // [다이어리 위클리 렌더링 - 현재 화면(이번 주) 7개 날짜에 있는 과목만 수집 & 유령 과목 필터링 제거]
   function renderDiaryWeekly() {
     const y = diaryData.year, m = diaryData.month;
     const baseDate = new Date(y, m - 1, 17 + (diaryData.currentWeekOffset * 7));
@@ -3193,14 +3191,33 @@
     const headerTitle = $('#dHeaderTitle');
     if(headerTitle) headerTitle.textContent = `WEEK: ${startOfWeek.getMonth()+1}.${startOfWeek.getDate()} ~ ${endOfWeek.getMonth()+1}.${endOfWeek.getDate()}`;
 
-    // 전체 과목 목록 수집
+    // 1. 현재 화면(SUNDAY ~ SATURDAY)에 렌더링될 실제 7개 날짜 목록 계산
+    const currentWeekISOs = new Set();
+    for(let i = 0; i < 7; i++){
+      const dt = new Date(startOfWeek);
+      dt.setDate(startOfWeek.getDate() + i);
+      const isoStr = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+      currentWeekISOs.add(isoStr);
+    }
+
+    // 2. 화면에 표시되는 7개 날짜 중 실제 플래너에 존재하는 할 일(items)의 과목만 수집
     const allCategories = new Set();
     state.days.forEach(d => {
-      (d.items || []).forEach(it => {
-        if(it.cat && it.cat.trim()) allCategories.add(it.cat.trim());
-      });
+      if(currentWeekISOs.has(d.date)) {
+        (d.items || []).forEach(it => {
+          const catName = (it.cat || '').trim();
+          if(catName) allCategories.add(catName);
+        });
+      }
     });
     const sortedCats = Array.from(allCategories).sort();
+
+    // 3. 이번 주 7일에 없는 과목은 체크 상태(Set)에서도 자동 정리
+    Array.from(selectedWeeklyCats).forEach(cat => {
+      if(!allCategories.has(cat)) {
+        selectedWeeklyCats.delete(cat);
+      }
+    });
 
     // 일정 보이기/숨기기 버튼 레이블 업데이트
     const evToggleBtn = $('#weeklyEventToggleBtn');
@@ -3214,37 +3231,42 @@
     const btn = $('#multiCatDropdownBtn');
     const container = $('#multiCatItemsContainer');
     if(btn && container) {
-      if(selectedWeeklyCats.size === 0 || selectedWeeklyCats.size === sortedCats.length) {
-        btn.textContent = '과목 선택 (전체) ▾';
+      if(sortedCats.length === 0) {
+        btn.textContent = '과목 없음';
+        container.innerHTML = '<div style="font-size:11px;color:#9AA79A;padding:4px">등록된 과목이 없습니다</div>';
       } else {
-        btn.textContent = `과목 선택 (${selectedWeeklyCats.size}개) ▾`;
+        if(selectedWeeklyCats.size === 0 || selectedWeeklyCats.size === sortedCats.length) {
+          btn.textContent = '과목 선택 (전체) ▾';
+        } else {
+          btn.textContent = `과목 선택 (${selectedWeeklyCats.size}개) ▾`;
+        }
+
+        container.innerHTML = sortedCats.map(cat => {
+          const isChecked = selectedWeeklyCats.size === 0 || selectedWeeklyCats.has(cat);
+          return `
+            <label class="multi-cat-item">
+              <input type="checkbox" class="w-cat-chk" value="${esc(cat)}" ${isChecked ? 'checked' : ''}>
+              <span>${esc(cat)}</span>
+            </label>
+          `;
+        }).join('');
+
+        container.querySelectorAll('.w-cat-chk').forEach(chk => {
+          chk.onchange = () => {
+            const val = chk.value;
+            if(selectedWeeklyCats.size === 0) {
+              sortedCats.forEach(c => selectedWeeklyCats.add(c));
+            }
+            if(chk.checked) selectedWeeklyCats.add(val);
+            else selectedWeeklyCats.delete(val);
+
+            if(selectedWeeklyCats.size === sortedCats.length || selectedWeeklyCats.size === 0) {
+              selectedWeeklyCats.clear();
+            }
+            renderDiaryWeekly();
+          };
+        });
       }
-
-      container.innerHTML = sortedCats.map(cat => {
-        const isChecked = selectedWeeklyCats.size === 0 || selectedWeeklyCats.has(cat);
-        return `
-          <label class="multi-cat-item">
-            <input type="checkbox" class="w-cat-chk" value="${esc(cat)}" ${isChecked ? 'checked' : ''}>
-            <span>${esc(cat)}</span>
-          </label>
-        `;
-      }).join('');
-
-      container.querySelectorAll('.w-cat-chk').forEach(chk => {
-        chk.onchange = () => {
-          const val = chk.value;
-          if(selectedWeeklyCats.size === 0) {
-            sortedCats.forEach(c => selectedWeeklyCats.add(c));
-          }
-          if(chk.checked) selectedWeeklyCats.add(val);
-          else selectedWeeklyCats.delete(val);
-
-          if(selectedWeeklyCats.size === sortedCats.length || selectedWeeklyCats.size === 0) {
-            selectedWeeklyCats.clear();
-          }
-          renderDiaryWeekly();
-        };
-      });
     }
 
     const weekGrid = $('#dWeeklyGrid'); 
@@ -3301,7 +3323,7 @@
       
       let taskHtml = '';
       if(matchedPlan && matchedPlan.items.length) {
-        // [다중 과목 선택 필터링 적용]
+        // [이번 주 과목 필터링 적용]
         const filteredItems = selectedWeeklyCats.size === 0 
           ? matchedPlan.items 
           : matchedPlan.items.filter(it => selectedWeeklyCats.has((it.cat || '').trim()));
@@ -3443,8 +3465,20 @@
 
   function initDiaryEvents(){
     const prevBtn = $('#dPrevBtn'), nextBtn = $('#dNextBtn');
-    if(prevBtn) prevBtn.onclick = () => { if(diaryData.currentTab === 'WEEK') diaryData.currentWeekOffset--; else { diaryData.month--; if(diaryData.month<1){ diaryData.month=12; diaryData.year--; } } (diaryData.currentTab === 'WEEK') ? renderDiaryWeekly() : renderDiaryMonthly(); renderStickers(); saveDiaryState(); };
-    if(nextBtn) nextBtn.onclick = () => { if(diaryData.currentTab === 'WEEK') diaryData.currentWeekOffset++; else { diaryData.month++; if(diaryData.month>12){ diaryData.month=1; diaryData.year++; } } (diaryData.currentTab === 'WEEK') ? renderDiaryWeekly() : renderDiaryMonthly(); renderStickers(); saveDiaryState(); };
+    if(prevBtn) prevBtn.onclick = () => { 
+      if(diaryData.currentTab === 'WEEK') diaryData.currentWeekOffset--; 
+      else { diaryData.month--; if(diaryData.month<1){ diaryData.month=12; diaryData.year--; } } 
+      (diaryData.currentTab === 'WEEK') ? renderDiaryWeekly() : renderDiaryMonthly(); 
+      renderStickers(); 
+      saveDiaryState(); 
+    };
+    if(nextBtn) nextBtn.onclick = () => { 
+      if(diaryData.currentTab === 'WEEK') diaryData.currentWeekOffset++; 
+      else { diaryData.month++; if(diaryData.month>12){ diaryData.month=1; diaryData.year++; } } 
+      (diaryData.currentTab === 'WEEK') ? renderDiaryWeekly() : renderDiaryMonthly(); 
+      renderStickers(); 
+      saveDiaryState(); 
+    };
     
     // [위클리 일정 보이기/숨기기 토글 버튼 이벤트]
     const evToggleBtn = $('#weeklyEventToggleBtn');
