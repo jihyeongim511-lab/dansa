@@ -488,7 +488,7 @@
     </div>
 
     <div class="top-custom-bar">
-      <!-- 폰트 선택기 및 내 폰트 업로드 버튼 -->
+      <!-- 폰트 선택기 및 내 폰트 추가(Supabase 동기화) 버튼 -->
       <div class="font-picker-box">
         <span>🔤 글꼴:</span>
         <select class="font-select" id="fontSelector">
@@ -498,7 +498,7 @@
           <option value="'MaruBuri', serif">마루 부리 (단정한 명조체)</option>
           <option value="'Apple SD Gothic Neo', sans-serif">시스템 고딕</option>
         </select>
-        <button class="btn small font-upload-btn" id="uploadCustomFontBtn" title="내 컴퓨터의 .ttf, .woff 폰트 파일 업로드">📁 내 폰트 추가</button>
+        <button class="btn small font-upload-btn" id="uploadCustomFontBtn" title="내 컴퓨터의 .ttf, .woff 폰트 파일을 올려 모든 기기에서 공유합니다">📁 내 폰트 추가</button>
       </div>
 
       <!-- 배경 색상 바 -->
@@ -782,7 +782,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (async function initApp() {
-  const KEY='plan-v1', SKEY='stamps-v1', CKEY='clip-v1', MKEY='memo-v1', APPKEY='app-settings-v1', DKEY='diary-v1';
+  const KEY='plan-v1', SKEY='stamps-v1', CKEY='clip-v1', MKEY='memo-v1', APPKEY='app-settings-v1', DKEY='diary-v1', FKEY='custom-font-v1';
   const $ = s => document.querySelector(s);
   
   const GOOGLE_EMBED_URL = "https://calendar.google.com/calendar/embed?src=dansagae525%40gmail.com&ctz=Asia%2FSeoul";
@@ -950,7 +950,6 @@
     modal.box.querySelector('#closeGCalEmbedModal').onclick = () => modal.close();
   }
 
-  // --- 문제 모아보기 모달 열기 ---
   function openQACollectorModal() {
     const sortedDays = [...state.days].sort((a,b) => a.date.localeCompare(b.date));
     
@@ -1186,46 +1185,69 @@
     input.click();
   }
 
-  // --- 사용자 컴퓨터 폰트 파일 업로드 처리 핸들러 ---
-  function handleCustomFontUpload() {
+  async function handleCustomFontUpload() {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.ttf,.woff,.woff2,.otf';
-    input.onchange = e => {
+    input.onchange = async e => {
       const file = e.target.files[0];
       if(!file) return;
 
-      const fontName = 'CustomUploaded_' + Date.now();
-      const fontUrl = URL.createObjectURL(file);
-
-      const styleId = 'dynamic-custom-font';
-      let styleEl = document.getElementById(styleId);
-      if(!styleEl) {
-        styleEl = document.createElement('style');
-        styleEl.id = styleId;
-        document.head.appendChild(styleEl);
-      }
-
-      styleEl.innerHTML += `
-        @font-face {
-          font-family: '${fontName}';
-          src: url('${fontUrl}');
+      toast('폰트 파일을 클라우드에 업로드 중입니다...');
+      const fileName = `font_${Date.now()}_${file.name}`;
+      
+      try {
+        const { data, error } = await supabaseClient.storage.from('fonts').upload(fileName, file);
+        if (error) {
+          console.error(error);
+          toast('업로드 실패: Supabase Storage에 "fonts" 버킷이 공개로 생성되어 있는지 확인하세요.');
+          return;
         }
-      `;
 
-      const selector = $('#fontSelector');
-      if(selector) {
-        const opt = document.createElement('option');
-        opt.value = `'${fontName}', sans-serif`;
-        opt.textContent = `📁 내 폰트: ${file.name}`;
-        selector.appendChild(opt);
-        selector.value = opt.value;
+        const { data: pubData } = supabaseClient.storage.from('fonts').getPublicUrl(fileName);
+        const fontPublicUrl = pubData.publicUrl;
+
+        const fontName = 'CloudFont_' + Date.now();
+        registerAndApplyFont(fontName, fontPublicUrl, file.name);
+
+        await storage.set(FKEY, JSON.stringify({ name: fontName, url: fontPublicUrl, origName: file.name }));
+        toast(`'${file.name}' 폰트가 클라우드에 저장되어 모든 기기에 동기화되었습니다!`);
+      } catch(err) {
+        console.error(err);
+        toast('폰트 업로드 중 오류가 발생했습니다.');
       }
-
-      setAppFont(`'${fontName}', sans-serif`);
-      toast(`'${file.name}' 폰트가 성공적으로 적용되었습니다!`);
     };
     input.click();
+  }
+
+  function registerAndApplyFont(fontName, fontUrl, origName) {
+    const styleId = 'dynamic-custom-font';
+    let styleEl = document.getElementById(styleId);
+    if(!styleEl) {
+      styleEl = document.createElement('style');
+      styleEl.id = styleId;
+      document.head.appendChild(styleEl);
+    }
+
+    styleEl.innerHTML += `
+      @font-face {
+        font-family: '${fontName}';
+        src: url('${fontUrl}');
+      }
+    `;
+
+    const selector = $('#fontSelector');
+    if(selector) {
+      if(![...selector.options].some(opt => opt.text.includes(origName))) {
+        const opt = document.createElement('option');
+        opt.value = `'${fontName}', sans-serif`;
+        opt.textContent = `📁 내 폰트: ${origName}`;
+        selector.appendChild(opt);
+      }
+      selector.value = `'${fontName}', sans-serif`;
+    }
+
+    setAppFont(`'${fontName}', sans-serif`);
   }
 
   $('#openGCalEmbedBtn').onclick = openGoogleCalendarModal;
@@ -1868,7 +1890,7 @@
                   <button class="rdel-btn" data-act="del-qa" title="이 문제 삭제">✕</button>
                 </div>
               </div>
-              <div class="qarow-body">
+              <div class="qarow-body" style="display: ${r.collapsed ? 'none' : 'grid'};">
                 <div style="display:flex;flex-direction:column;gap:4px">
                   <div class="formatbar" style="background:#f4f6f2;padding:2px 6px;border-radius:4px;display:flex;gap:5px;align-items:center;flex-wrap:wrap">
                     <button class="fmtbtn qa-fmt" data-act="bold" title="볼드체">B</button>
@@ -1923,7 +1945,7 @@
                   </div>
                 </div>
               </div>
-            `;
+            </div>`;
           }).join('')}
         </div>
       </div>
@@ -2144,6 +2166,7 @@
       field.onfocus = () => { lastActiveQAField = field; };
     });
 
+    // 문제별 접기/펼치기 이벤트 수정 (각각 개별 작동)
     const qaBox = $('#qaBox');
     if(qaBox) {
       qaBox.querySelectorAll('.qarow').forEach(row => {
@@ -2153,12 +2176,16 @@
 
         const header = row.querySelector('.qarow-header');
         const toggleBtn = row.querySelector('.q-toggle-btn');
+        const bodyEl = row.querySelector('.qarow-body');
         const delBtn = row.querySelector('.rdel-btn');
 
         header.onclick = e => {
           if(e.target.closest('.rdel-btn')) return;
           targetQ.collapsed = !targetQ.collapsed;
           row.classList.toggle('collapsed', targetQ.collapsed);
+          if(bodyEl) {
+            bodyEl.style.display = targetQ.collapsed ? 'none' : 'grid';
+          }
           toggleBtn.textContent = targetQ.collapsed ? '▼ 펼치기' : '▲ 접기';
           saveState();
         };
@@ -2936,221 +2963,19 @@
     renderStickers();
   };
 
-  function executeGlobalSearch() {
-    const kw = $('#globalSearchInput').value.trim().toLowerCase();
-    if(!kw) return;
-    const res = [];
-    function hl(txt) { return txt.replace(new RegExp(`(${kw})`, 'gi'), '<b style="color:var(--jade);background:#EBF4EC">$1</b>'); }
-
-    if(stripHTML($('#memoArea').innerHTML).toLowerCase().includes(kw)) res.push({ t: '전체 공통 메모장', d: hl(stripHTML($('#memoArea').innerHTML)), l: 'memo' });
-
-    state.days.forEach(d => {
-      d.items.forEach(it => { if(stripHTML(it.text).toLowerCase().includes(kw)) res.push({ t: `[학습 할 일] ${d.date}`, d: hl(stripHTML(it.text)), did: d.id }); });
-      d.qa.forEach(qa => { if((qa.q+qa.a).toLowerCase().includes(kw)) res.push({ t: `[Q&A 필기] ${d.date}`, d: hl(stripHTML(qa.q) + ' ' + stripHTML(qa.a)), did: d.id }); });
-    });
-
-    Object.keys(diaryData.monthlyGoalsMap || {}).forEach(mKey => {
-      diaryData.monthlyGoalsMap[mKey].forEach(g => {
-        if(g.text.toLowerCase().includes(kw)) res.push({ t: `[다이어리] ${mKey}월 목표`, d: hl(g.text), l: 'HOME' });
-      });
-    });
-    diaryData.buckets.forEach(b => { if(b.text.toLowerCase().includes(kw)) res.push({ t: '[다이어리] 버킷리스트', d: hl(b.text), l: 'HOME' }); });
-    Object.keys(diaryData.cellTexts).forEach(k => { if(diaryData.cellTexts[k].toLowerCase().includes(kw)) res.push({ t: `[다이어리] 먼슬리 메모 (${k})`, d: hl(diaryData.cellTexts[k]), l: 'MONTH' }); });
-    Object.keys(diaryData.weekTexts).forEach(k => { if(diaryData.weekTexts[k].toLowerCase().includes(kw)) res.push({ t: `[다이어리] 위클리 메모 (${k})`, d: hl(diaryData.weekTexts[k]), l: 'WEEK' }); });
-
-    const box = $('#searchResults');
-    box.innerHTML = res.length ? res.map(r => `<div class="search-res-item" style="padding:10px;border:1px solid #ddd;border-radius:8px;margin-bottom:6px;cursor:pointer" data-id="${r.did}" data-link="${r.l}"><div style="font-size:11px;font-weight:800;color:var(--ink-soft)">${r.t}</div><div style="font-size:13px">${r.d}</div></div>`).join('') : '<div style="padding:20px;text-align:center;font-size:13px">검색 결과가 없습니다.</div>';
-    $('#searchModalOverlay').style.display = 'flex';
-
-    box.querySelectorAll('.search-res-item').forEach(el => {
-      el.onclick = () => {
-        $('#searchModalOverlay').style.display = 'none';
-        if(el.dataset.id && el.dataset.id !== 'undefined') {
-          $('#btnModePlanner').click(); selected = el.dataset.id;
-          const p = parse(state.days.find(x=>x.id===selected).date); viewYear = p.getFullYear(); viewMonth = p.getMonth() + 1;
-          renderPlannerCalendar(); openPlannerPanel(); setTimeout(()=>$('#panel').scrollIntoView({behavior:'smooth'}), 100);
-        } else if(el.dataset.link) {
-          if(el.dataset.link === 'memo'){ $('#btnModePlanner').click(); setTimeout(()=>$('#memoArea').scrollIntoView({behavior:'smooth'}), 100); }
-          else {
-            $('#btnModeDiary').click(); diaryData.currentTab = el.dataset.link;
-            document.querySelectorAll('.side-tab').forEach(t=>t.classList.toggle('active', t.dataset.tab === diaryData.currentTab));
-            const leftPane = $('#bookLeftPane'); const rightPane = $('#bookRightPane');
-            if(diaryData.currentTab === 'HOME') {
-              if(leftPane) leftPane.style.display = 'flex'; if(rightPane) rightPane.style.gridColumn = 'auto';
-              $('#dHomeView').style.display = 'flex'; $('#dMonthlyView').style.display = 'none'; $('#dWeeklyView').style.display = 'none';
-              $('#dHeaderTitle').textContent = 'HOME DASHBOARD'; if($('#dNavBtnsContainer')) $('#dNavBtnsContainer').style.display = 'none';
-              renderHomeDashboard();
-            } else if(diaryData.currentTab === 'WEEK') {
-              if(leftPane) leftPane.style.display = 'none'; if(rightPane) rightPane.style.gridColumn = 'span 2';
-              $('#dHomeView').style.display = 'none'; $('#dMonthlyView').style.display = 'none'; $('#dWeeklyView').style.display = 'flex';
-              if($('#dNavBtnsContainer')) $('#dNavBtnsContainer').style.display = 'flex';
-              renderDiaryWeekly();
-            } else {
-              if(leftPane) leftPane.style.display = 'none'; if(rightPane) rightPane.style.gridColumn = 'span 2';
-              $('#dHomeView').style.display = 'none'; $('#dMonthlyView').style.display = 'grid'; $('#dWeeklyView').style.display = 'none';
-              if($('#dNavBtnsContainer')) $('#dNavBtnsContainer').style.display = 'flex';
-              renderDiaryWeekly();
-            }
-            renderStickers();
-          }
-        }
-      };
-    });
-  }
-  $('#globalSearchBtn').onclick = executeGlobalSearch;
-  $('#globalSearchInput').onkeydown = e => { if(e.key === 'Enter') executeGlobalSearch(); };
-  $('#closeSearchModal').onclick = () => { $('#searchModalOverlay').style.display = 'none'; };
-
-  const canvas = $('#stickerCanvas');
-  function renderStickers(){
-    if(!canvas) return;
-    canvas.innerHTML = '';
-    const pageKey = getCurrentPageKey();
-    if(!diaryData.pageStickers) diaryData.pageStickers = {};
-    const currentStickers = diaryData.pageStickers[pageKey] || [];
-
-    currentStickers.forEach((s, idx)=>{
-      const el = document.createElement('div'); el.className = 'placed-sticker';
-      el.style.left = s.x + 'px'; el.style.top = s.y + 'px';
-
-      if(s.type === 'emoji') {
-        const size = s.size || 34;
-        el.style.fontSize = size + 'px';
-        el.innerHTML = `<span class="s-emoji-val">${s.content}</span><button class="s-del">✕</button><div class="s-resizer" title="드래그하여 크기 조절">⇲</div>`;
-      } else if(s.type === 'sticky') {
-        el.style.width = (s.w || 130) + 'px';
-        el.style.height = (s.h || 130) + 'px';
-        el.innerHTML = `<div class="sticky-note ${s.color}" contenteditable="true">${s.content}</div><button class="s-del">✕</button><div class="s-resizer" title="드래그하여 크기 조절">⇲</div>`;
-        const noteEl = el.querySelector('.sticky-note');
-        noteEl.oninput = () => { s.content = noteEl.innerText; saveDiaryState(); };
-      } else {
-        el.style.width = (s.w || s.size || 70) + 'px';
-        el.style.height = (s.h || s.size || 70) + 'px';
-        el.innerHTML = `<img src="${s.content}"><button class="s-del">✕</button><div class="s-resizer" title="드래그하여 크기 조절">⇲</div>`;
-      }
-      
-      el.querySelector('.s-del').onclick = e => { e.stopPropagation(); currentStickers.splice(idx, 1); renderStickers(); saveDiaryState(); };
-      
-      const resizer = el.querySelector('.s-resizer');
-      let isResizing = false, rStartX, rStartY, rInitW, rInitH, rInitSize;
-
-      const onResizeDown = e => {
-        isResizing = true;
-        rStartX = e.touches ? e.touches[0].clientX : e.clientX;
-        rStartY = e.touches ? e.touches[0].clientY : e.clientY;
-        rInitW = el.offsetWidth;
-        rInitH = el.offsetHeight;
-        rInitSize = s.size || (s.type === 'emoji' ? 34 : 70);
-        e.stopPropagation();
-      };
-      const onResizeMove = e => {
-        if(!isResizing) return;
-        const cx = e.touches ? e.touches[0].clientX : e.clientX;
-        const cy = e.touches ? e.touches[0].clientY : e.clientY;
-        const dx = cx - rStartX;
-        const dy = cy - rStartY;
-
-        if(s.type === 'sticky' || s.type === 'image') {
-          const newW = Math.max(60, rInitW + dx);
-          const newH = Math.max(60, rInitH + dy);
-          el.style.width = newW + 'px';
-          el.style.height = newH + 'px';
-          s.w = newW;
-          s.h = newH;
-        } else if(s.type === 'emoji') {
-          const delta = Math.max(dx, dy);
-          const newSize = Math.max(18, Math.min(120, rInitSize + Math.round(delta)));
-          el.style.fontSize = newSize + 'px';
-          s.size = newSize;
-        }
-      };
-      const onResizeUp = () => {
-        if(isResizing) {
-          isResizing = false;
-          saveDiaryState();
-        }
-      };
-
-      resizer.addEventListener('mousedown', onResizeDown);
-      resizer.addEventListener('touchstart', onResizeDown);
-      window.addEventListener('mousemove', onResizeMove);
-      window.addEventListener('touchmove', onResizeMove);
-      window.addEventListener('mouseup', onResizeUp);
-      window.addEventListener('touchend', onResizeUp);
-
-      let isDragging = false, startX, startY, initX, initY;
-      const onDown = e => {
-        if(e.target.closest('.s-resizer') || e.target.closest('.s-del')) return;
-        isDragging = true; 
-        document.querySelectorAll('.placed-sticker').forEach(st=>st.classList.remove('selected')); 
-        el.classList.add('selected');
-        startX = e.touches ? e.touches[0].clientX : e.clientX; 
-        startY = e.touches ? e.touches[0].clientY : e.clientY;
-        initX = s.x; initY = s.y; 
-        e.stopPropagation();
-      };
-      const onMove = e => {
-        if(!isDragging) return;
-        const cx = e.touches ? e.touches[0].clientX : e.clientX; const cy = e.touches ? e.touches[0].clientY : e.clientY;
-        s.x = Math.round(initX + (cx - startX)); s.y = Math.round(initY + (cy - startY));
-        el.style.left = s.x + 'px'; el.style.top = s.y + 'px';
-      };
-      const onUp = () => { if(isDragging){ isDragging = false; saveDiaryState(); } };
-      el.addEventListener('mousedown', onDown); el.addEventListener('touchstart', onDown);
-      window.addEventListener('mousemove', onMove); window.addEventListener('touchmove', onMove);
-      window.addEventListener('mouseup', onUp); window.addEventListener('touchend', onUp);
-      
-      canvas.appendChild(el);
-    });
-  }
-
-  window.addEventListener('mousedown', e => {
-    if(!e.target.closest('.placed-sticker') && !e.target.closest('.sticker-drawer') && !e.target.closest('.sticky-btn')) {
-      document.querySelectorAll('.placed-sticker').forEach(st => st.classList.remove('selected'));
-    }
-  });
-
-  function addSticker(type, content, color='yellow'){
-    const spread = $('.book-spread');
-    if(!spread) return;
-    const rect = spread.getBoundingClientRect();
-    const pageKey = getCurrentPageKey();
-    if(!diaryData.pageStickers) diaryData.pageStickers = {};
-    if(!diaryData.pageStickers[pageKey]) diaryData.pageStickers[pageKey] = [];
-    
-    diaryData.pageStickers[pageKey].push({ 
-      type, content, color, 
-      x: Math.round(rect.width / 2) + Math.random()*40 - 20, 
-      y: 150 + Math.random()*50, 
-      size: type==='emoji' ? 36 : 70,
-      w: type==='sticky' ? 130 : 80,
-      h: type==='sticky' ? 130 : 80
-    });
-    renderStickers(); saveDiaryState(); toast('붙여졌습니다!');
-  }
-
-  function addStickyNote(color, text) {
-    addSticker('sticky', text, color);
-  }
-
-  const stickerTray = $('#stickerTray');
-  if(stickerTray) stickerTray.onclick = e => { const item = e.target.closest('.sticker-item'); if(item) addSticker('emoji', item.innerText.trim()); };
-  $('#dUploadStickerBtn').onclick = () => { pickFile(async file => { addSticker('image', await shrinkImage(file, 200, 0.85)); }); };
-  $('#dClearStickersBtn').onclick = () => { 
-    if(confirm('현재 페이지의 스티커와 포스트잇을 전부 지울까요?')){ 
-      const pageKey = getCurrentPageKey();
-      if(diaryData.pageStickers) diaryData.pageStickers[pageKey] = [];
-      renderStickers(); saveDiaryState(); 
-    } 
-  };
-
   try {
     const appRes = await storage.get(APPKEY);
     if(appRes && appRes.value) { const parsed = JSON.parse(appRes.value); if(parsed.bgColor) setAppBackground(parsed.bgColor); }
 
-    const fontRes = await storage.get('app-font-v1');
-    if(fontRes && fontRes.value) {
-      setAppFont(fontRes.value);
+    const cloudFontRes = await storage.get(FKEY);
+    if(cloudFontRes && cloudFontRes.value) {
+      try {
+        const cf = JSON.parse(cloudFontRes.value);
+        registerAndApplyFont(cf.name, cf.url, cf.origName);
+      } catch(e) {}
+    } else {
+      const fontRes = await storage.get('app-font-v1');
+      if(fontRes && fontRes.value) setAppFont(fontRes.value);
     }
     
     const dRes = await storage.get(DKEY);
@@ -3179,24 +3004,6 @@
     openPlannerPanel();
 
     if($('#directAddDateInput')) $('#directAddDateInput').value = nextDate();
-    
-    function rMood(){
-      const d = $('#moodDate').value || new Date().toISOString().slice(0,10);
-      const dayR = moodRecords.filter(x=>x.date===d);
-      $('#moodTotal').textContent=`${d} ${dayR.length}회 기록`;
-      $('#moodLog').innerHTML=dayR.map((r,i)=>`<div class="moodentry"><span style="color:#3D6EA5;font-weight:800">${r.time}</span><span>${r.emoji} ${r.mood}</span><span style="color:#9AA79A">#${i+1}</span></div>`).join('');
-    }
-    $('#moodDate').onchange = rMood;
-    $('#moodGrid').onclick = e => {
-      const b=e.target.closest('.moodbtn'); if(!b)return;
-      moodRecords.push({date:$('#moodDate').value, time:new Date().toTimeString().slice(0,8), mood:b.dataset.mood, emoji:b.querySelector('.memoji').textContent});
-      storage.set('mood-tracker-v1', JSON.stringify(moodRecords)); rMood();
-    };
-    $('#moodClearDay').onclick = () => {
-      moodRecords = moodRecords.filter(x=>x.date!==$('#moodDate').value);
-      storage.set('mood-tracker-v1', JSON.stringify(moodRecords)); rMood();
-    };
-    rMood();
 
   } catch (e) {
     console.error('초기화 에러:', e);
