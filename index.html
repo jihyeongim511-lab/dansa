@@ -2,8 +2,9 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>학습 플랜 & 다이어리</title>
-  <!-- 웹폰트 불러오기 (Pretendard, 나눔스퀘어라운드, 교보손글씨, 마루부리) -->
+  <!-- 웹폰트 불러오기 (Pretendard, 나눔스퀘어라운드, 마루부리, 교보손글씨) -->
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
   <link rel="stylesheet" href="https://hangeul.pstatic.net/hangeul_style/css/nanum-square-round.css" />
   <link rel="stylesheet" href="https://hangeul.pstatic.net/hangeul_style/css/maru-buri.css" />
@@ -30,21 +31,27 @@
 
     --app-bg:#ECEFE9;
     --app-font: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+    --app-font-scale: 1; /* 전역 폰트 크기 배율 */
+    --base-font-size: 14px;
     --d-theme:#FFC1CC;
     --d-theme-soft:#FFF0F3;
     --d-theme-dark:#D87080;
     --d-desk:#FCECE8;
   }
-  body, html { margin: 0; padding: 0; }
+  body, html { 
+    margin: 0; 
+    padding: 0; 
+  }
   #root{
     font-family: var(--app-font);
+    font-size: calc(var(--base-font-size) * var(--app-font-scale));
     color:var(--ink);
     background:var(--app-bg);
     padding:20px 16px 60px;
     line-height:1.5;
     -webkit-font-smoothing:antialiased;
     min-height:100vh;
-    transition:background 0.3s ease;
+    transition:background 0.3s ease, font-size 0.2s ease;
   }
   #root *{box-sizing:border-box}
   button, input, textarea, select {font-family:inherit; cursor:pointer}
@@ -52,19 +59,33 @@
 
   .mode-nav{
     max-width:980px;margin:0 auto 16px;display:flex;justify-content:space-between;align-items:center;
-    background:#fff;padding:8px 14px;border-radius:12px;border:1px solid var(--rule);box-shadow:0 2px 8px rgba(0,0,0,0.03);
-    flex-wrap:wrap;gap:8px;
+    background:#fff;padding:10px 14px;border-radius:12px;border:1px solid var(--rule);box-shadow:0 2px 8px rgba(0,0,0,0.03);
+    flex-wrap:wrap;gap:10px;
   }
   .nav-tabs{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
   .nav-tab{border:1px solid var(--rule);background:#FAFBF8;padding:7px 15px;border-radius:8px;font-size:13px;font-weight:700;color:var(--ink-soft);transition:all .15s}
   .nav-tab.active{background:var(--ink);color:#fff;border-color:var(--ink)}
 
-  .top-custom-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .top-custom-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
   .font-picker-box{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700}
   .font-select{
-    border:1px solid var(--rule);background:#FAFBF8;border-radius:6px;padding:3px 8px;font-size:12px;
+    border:1px solid var(--rule);background:#FAFBF8;border-radius:6px;padding:4px 8px;font-size:12px;
     color:var(--ink);outline:none;font-weight:700;
   }
+
+  /* 전역 폰트 크기 컨트롤러 */
+  .font-size-ctrl-box{
+    display:flex;align-items:center;gap:4px;font-size:12px;font-weight:700;background:#FAFBF8;
+    border:1px solid var(--rule);border-radius:8px;padding:3px 8px;
+  }
+  .fs-btn-group{display:flex;gap:2px;align-items:center}
+  .fs-btn{
+    border:1px solid var(--rule);background:#fff;border-radius:5px;padding:2px 7px;
+    font-size:11.5px;font-weight:700;color:var(--ink-soft);line-height:1.2;
+  }
+  .fs-btn:hover{background:#EDF1EB;color:var(--ink)}
+  .fs-btn.active{background:var(--jade);color:#fff;border-color:var(--jade)}
+  .fs-display{font-size:11px;font-weight:800;color:var(--ink-soft);min-width:34px;text-align:center;font-variant-numeric:tabular-nums}
 
   .bg-theme-bar{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700}
   .bg-swatch{width:18px;height:18px;border-radius:50%;border:1.5px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.2);cursor:pointer;display:inline-block}
@@ -117,13 +138,19 @@
 
   .memobox{max-width:980px;margin:0 auto 14px;background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:12px 14px}
   .mbhead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:6px;flex-wrap:wrap}
-  .mbhead h3{margin:0;font-size:13px;font-weight:700}
+  .mbhead h3{margin:0;font-size:13.5px;font-weight:700}
   .mbhead .mbsub{font-weight:400;color:var(--ink-soft);font-size:11px;margin-left:6px}
   .mbtools{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
-  #memoArea{width:100%;min-height:70px;font-size:13.5px;line-height:1.6;color:var(--ink);border:1px solid var(--rule);border-radius:8px;padding:8px 10px;background:#fff;overflow-x:auto;outline:none;}
+  #memoArea{width:100%;min-height:75px;font-size:13.5px;line-height:1.6;color:var(--ink);border:1px solid var(--rule);border-radius:8px;padding:8px 10px;background:#fff;overflow-x:auto;outline:none;}
   #memoArea:focus{outline:2px solid var(--jade);outline-offset:1px}
   #memoArea:empty:before{content:attr(data-ph);color:#9AA79A}
   #memoArea ul, #memoArea ol{padding-left:24px;margin:6px 0}
+
+  /* 인라인 폰트 크기 선택 셀렉트 */
+  .editor-fs-select{
+    border:1px solid var(--rule);background:#fff;border-radius:5px;padding:2px 5px;
+    font-size:11px;color:var(--ink);font-weight:700;outline:none;
+  }
 
   .cal{max-width:980px;margin:0 auto;background:var(--card);border:1px solid var(--rule);border-radius:12px;overflow:hidden}
   .cal-top-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--rule);background:#FAFBF8}
@@ -242,7 +269,7 @@
   .btn.mark-s.on{background:var(--jade);color:#fff;border-color:var(--jade)}
   .btn.mark-f.on{background:var(--seal);color:#fff;border-color:var(--seal)}
 
-  /* 필기 섹션 & 개별 문제 접기 카드 스타일 */
+  /* 필기 섹션 & 개별 문제 카드 스타일 */
   .notes{margin-top:16px;padding-top:14px;border-top:1px dashed var(--rule)}
   .notes .nhead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap}
   .notes h3{margin:0;font-size:14px;font-weight:800}
@@ -422,7 +449,7 @@
   .d-week-memo:empty:before{content:"메모를 적어보세요...";color:#B7C2B7}
 
   .diary-format-toolbar {
-    display: flex; gap: 4px; align-items: center; margin-bottom: 6px; background: #FAF9F5; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--rule); width: fit-content;
+    display: flex; gap: 6px; align-items: center; margin-bottom: 6px; background: #FAF9F5; padding: 5px 9px; border-radius: 6px; border: 1px solid var(--rule); width: fit-content; flex-wrap: wrap;
   }
   .diary-fmt-btn { border: 1px solid var(--rule); background: #fff; border-radius: 4px; padding: 2px 6px; font-size: 11px; font-weight: bold; cursor: pointer; }
   .diary-fmt-btn:hover { background: #EDF0EA; }
@@ -471,7 +498,6 @@
     .side-tab{writing-mode:horizontal-tb;padding:6px 12px;border-radius:8px}
   }
 
-  /* 인쇄 시 모달 내용 최적화 */
   @media print {
     body * { visibility: hidden; }
     #qaCollPrintArea, #qaCollPrintArea * { visibility: visible; }
@@ -495,7 +521,21 @@
     </div>
 
     <div class="top-custom-bar">
-      <!-- 폰트 선택기 및 내 폰트 추가(Supabase 동기화) 버튼 -->
+      <!-- 전역 폰트 크기 변경 컨트롤러 -->
+      <div class="font-size-ctrl-box" title="전체 화면의 글자 크기를 조절합니다">
+        <span>🔍 글자:</span>
+        <div class="fs-btn-group">
+          <button class="fs-btn" id="fsDecBtn" title="글자 작게">A-</button>
+          <button class="fs-btn active" data-scale="0.9" title="작게">소</button>
+          <button class="fs-btn" data-scale="1" title="보통 (기본값)">중</button>
+          <button class="fs-btn" data-scale="1.15" title="크게">대</button>
+          <button class="fs-btn" data-scale="1.3" title="더 크게">특대</button>
+          <button class="fs-btn" id="fsIncBtn" title="글자 크게">A+</button>
+        </div>
+        <span class="fs-display" id="fsPercentDisplay">100%</span>
+      </div>
+
+      <!-- 폰트 선택기 및 내 폰트 추가 버튼 -->
       <div class="font-picker-box">
         <span>🔤 글꼴:</span>
         <select class="font-select" id="fontSelector">
@@ -581,11 +621,23 @@
       <div class="moodlog" id="moodLog"></div>
     </section>
 
+    <!-- 메모장 (텍스트 폰트 크기 조절 기능 포함) -->
     <div class="memobox">
       <div class="mbhead">
-        <h3>메모장 <span class="mbsub">전역 공통 링크, 자료 위치, 잡다한 메모 (Tab/Shift+Tab 들여쓰기 지원)</span></h3>
+        <h3>메모장 <span class="mbsub">전역 공통 링크, 자료 위치, 잡다한 메모 (블록 선택 후 글자 크기/형광펜 적용 가능)</span></h3>
         <div class="mbtools">
           <span class="saved" id="mSaved">저장됨</span>
+          <!-- 메모장 텍스트 폰트 크기 셀렉터 -->
+          <select class="editor-fs-select" id="mFontSizeSelect" title="선택한 텍스트의 글자 크기를 변경합니다">
+            <option value="" disabled selected>크기</option>
+            <option value="11px">11px</option>
+            <option value="12px">12px</option>
+            <option value="14px">14px (기본)</option>
+            <option value="16px">16px</option>
+            <option value="18px">18px</option>
+            <option value="21px">21px</option>
+            <option value="26px">26px</option>
+          </select>
           <button class="btn small ghost" id="mInsTable">표 삽입</button>
           <button class="btn small ghost" id="mAddRowBtn">행 추가</button>
           <button class="btn small ghost" id="mAddColBtn">열 추가</button>
@@ -679,6 +731,16 @@
       <div class="book-right grid-paper" id="bookRightPane" style="grid-column: span 2;">
         <div class="diary-format-toolbar">
           <button class="diary-fmt-btn" id="dFmtBold"><b>B</b></button>
+          <span style="font-size:11px;font-weight:bold;margin-left:4px">글자 크기:</span>
+          <select class="editor-fs-select" id="dFmtFontSize" title="선택 영역 글자 크기 변경">
+            <option value="" disabled selected>크기</option>
+            <option value="10px">10px</option>
+            <option value="12px">12px</option>
+            <option value="14px">14px</option>
+            <option value="16px">16px</option>
+            <option value="18px">18px</option>
+            <option value="22px">22px</option>
+          </select>
           <span style="font-size:11px;font-weight:bold;margin-left:4px">글자색:</span>
           <input type="color" id="dFmtColor" value="#16202B" style="width:20px;height:20px;border:none;background:none;cursor:pointer">
         </div>
@@ -789,7 +851,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (async function initApp() {
-  const KEY='plan-v1', SKEY='stamps-v1', CKEY='clip-v1', MKEY='memo-v1', APPKEY='app-settings-v1', DKEY='diary-v1', FKEY='custom-font-v1';
+  const KEY='plan-v1', SKEY='stamps-v1', CKEY='clip-v1', MKEY='memo-v1', APPKEY='app-settings-v1', DKEY='diary-v1', FKEY='custom-font-v1', FSKEY='app-font-scale-v1';
   const $ = s => document.querySelector(s);
   
   const GOOGLE_EMBED_URL = "https://calendar.google.com/calendar/embed?src=dansagae525%40gmail.com&ctz=Asia%2FSeoul";
@@ -828,6 +890,7 @@
   let lastActiveCell = null;
   let savedSelectionRange = null;
   let lastActiveQAField = null;
+  let currentFontScale = 1.0;
   
   let viewYear = new Date().getFullYear();
   let viewMonth = new Date().getMonth() + 1;
@@ -866,6 +929,107 @@
   function scheduledMinutes(d) { return (d.events||[]).reduce((sum,ev)=>sum+(Number(ev.duration)||0),0); }
   function stripHTML(html) { const div = document.createElement('div'); div.innerHTML = String(html||''); return div.textContent || ''; }
   function cur() { return state.days.find(x => x.id === selected) || state.days[0]; }
+
+  function setAppFontScale(scale, save = true) {
+    const clamped = Math.max(0.75, Math.min(1.6, Math.round(scale * 100) / 100));
+    currentFontScale = clamped;
+    document.documentElement.style.setProperty('--app-font-scale', clamped);
+    
+    const pct = Math.round(clamped * 100);
+    const disp = $('#fsPercentDisplay');
+    if(disp) disp.textContent = `${pct}%`;
+
+    document.querySelectorAll('.fs-btn[data-scale]').forEach(btn => {
+      const bScale = parseFloat(btn.dataset.scale);
+      btn.classList.toggle('active', Math.abs(bScale - clamped) < 0.04);
+    });
+
+    if(save) {
+      storage.set(FSKEY, String(clamped));
+    }
+  }
+
+  // 선택한 텍스트에 특정 폰트 크기(px)를 적용하는 유틸리티
+  function applySelectionFontSize(sizePx) {
+    const sel = window.getSelection();
+    if (savedSelectionRange && (!sel.rangeCount || sel.isCollapsed)) {
+      sel.removeAllRanges();
+      sel.addRange(savedSelectionRange);
+    }
+    if (!sel || !sel.rangeCount || sel.isCollapsed) {
+      toast('크기를 변경할 텍스트를 먼저 드래그하여 선택하세요.');
+      return false;
+    }
+
+    const range = sel.getRangeAt(0);
+    const span = document.createElement('span');
+    span.style.fontSize = sizePx;
+    span.style.lineHeight = "1.35";
+    try {
+      span.appendChild(range.extractContents());
+      range.insertNode(span);
+      sel.removeAllRanges();
+      const newRange = document.createRange();
+      newRange.selectNodeContents(span);
+      sel.addRange(newRange);
+      savedSelectionRange = newRange.cloneRange();
+      return true;
+    } catch(err) {
+      document.execCommand('fontSize', false, '3');
+      return true;
+    }
+  }
+
+  // 전역 폰트 크기 버튼 이벤트
+  document.querySelectorAll('.fs-btn[data-scale]').forEach(btn => {
+    btn.onclick = () => {
+      const scale = parseFloat(btn.dataset.scale);
+      setAppFontScale(scale);
+      toast(`화면 글자 크기: ${Math.round(scale * 100)}%`);
+    };
+  });
+
+  const fsDecBtn = $('#fsDecBtn');
+  if(fsDecBtn) {
+    fsDecBtn.onclick = () => {
+      setAppFontScale(currentFontScale - 0.05);
+      toast(`화면 글자 크기: ${Math.round(currentFontScale * 100)}%`);
+    };
+  }
+
+  const fsIncBtn = $('#fsIncBtn');
+  if(fsIncBtn) {
+    fsIncBtn.onclick = () => {
+      setAppFontScale(currentFontScale + 0.05);
+      toast(`화면 글자 크기: ${Math.round(currentFontScale * 100)}%`);
+    };
+  }
+
+  // 메모장 폰트 크기 셀렉터 연동
+  const mFontSizeSelect = $('#mFontSizeSelect');
+  if(mFontSizeSelect) {
+    mFontSizeSelect.onchange = (e) => {
+      const sz = e.target.value;
+      if(sz && applySelectionFontSize(sz)) {
+        storage.set(MKEY, JSON.stringify({ html: $('#memoArea').innerHTML }));
+        toast(`선택 영역 글자 크기: ${sz}`);
+      }
+      e.target.selectedIndex = 0;
+    };
+  }
+
+  // 다이어리 폰트 크기 셀렉터 연동
+  const dFmtFontSize = $('#dFmtFontSize');
+  if(dFmtFontSize) {
+    dFmtFontSize.onchange = (e) => {
+      const sz = e.target.value;
+      if(sz && applySelectionFontSize(sz)) {
+        saveDiaryState();
+        toast(`선택 영역 글자 크기: ${sz}`);
+      }
+      e.target.selectedIndex = 0;
+    };
+  }
 
   function getCurrentPageKey() {
     if(diaryData.currentTab === 'HOME') return 'HOME';
@@ -1524,7 +1688,7 @@
     const sel = window.getSelection();
     if (sel && sel.rangeCount > 0) {
       const node = sel.anchorNode;
-      if (node && (node.nodeType === 3 ? node.parentNode : node).closest('.qafield, #memoArea')) {
+      if (node && (node.nodeType === 3 ? node.parentNode : node).closest('.qafield, #memoArea, .d-week-memo, .d-cal-text')) {
         savedSelectionRange = sel.getRangeAt(0).cloneRange();
       }
     }
@@ -1658,7 +1822,8 @@
         storage.set(KEY, cleanState),
         storage.set(DKEY, JSON.stringify(diaryData)),
         storage.set(MKEY, JSON.stringify({ html: memoEl ? memoEl.innerHTML : '' })),
-        storage.set('mood-tracker-v1', JSON.stringify(moodRecords))
+        storage.set('mood-tracker-v1', JSON.stringify(moodRecords)),
+        storage.set(FSKEY, String(currentFontScale))
       ]);
       const savedNotice = $('#mSaved');
       if(savedNotice) {
@@ -2037,7 +2202,7 @@
         <button class="btn ghost small" id="mN">지우기</button>
       </div>
 
-      <!-- 커서 위치 기반 표 삽입이 보정된 필기 영역 -->
+      <!-- 개별 문제 필기 영역 (폰트 크기 변경 기능 추가) -->
       <div class="notes">
         <div class="nhead">
           <div style="display:flex;align-items:center;gap:8px">
@@ -2068,13 +2233,23 @@
               </div>
               <div class="qarow-body" style="display: ${r.collapsed ? 'none' : 'grid'};">
                 <div style="display:flex;flex-direction:column;gap:4px">
-                  <div class="formatbar" style="background:#f4f6f2;padding:2px 6px;border-radius:4px;display:flex;gap:5px;align-items:center;flex-wrap:wrap">
+                  <div class="formatbar" style="background:#f4f6f2;padding:3px 6px;border-radius:4px;display:flex;gap:5px;align-items:center;flex-wrap:wrap">
                     <button class="fmtbtn qa-fmt" data-act="bold" title="볼드체">B</button>
+                    <!-- 글자 크기 조절 셀렉트 -->
+                    <select class="editor-fs-select qa-fs-select" title="선택 텍스트 글자 크기">
+                      <option value="" disabled selected>크기</option>
+                      <option value="11px">11px</option>
+                      <option value="12px">12px</option>
+                      <option value="14px">14px</option>
+                      <option value="16px">16px</option>
+                      <option value="18px">18px</option>
+                      <option value="22px">22px</option>
+                    </select>
                     <button type="button" class="btn small ghost qa-list-btn" data-act="bullet" title="글머리 기호(•)">• 목록</button>
                     <button type="button" class="btn small ghost qa-list-btn" data-act="number" title="번호 매기기(1. 2.)">1. 목록</button>
                     <button type="button" class="btn small ghost qa-list-btn" data-act="indent" title="들여쓰기 (Tab)">⇥ 들여쓰기</button>
                     <button type="button" class="btn small ghost qa-list-btn" data-act="outdent" title="내어쓰기 (Shift+Tab)">⇤ 내어쓰기</button>
-                    <span style="font-size:11px;font-weight:bold;color:var(--ink-soft)">글자색:</span>
+                    <span style="font-size:11px;font-weight:bold;color:var(--ink-soft)">색상:</span>
                     <input type="color" class="swatch qa-color" value="#16202B" title="글자 색상" style="width:16px;height:16px;border:none;background:none;cursor:pointer">
                     
                     <div class="hl-palette-wrap">
@@ -2088,13 +2263,23 @@
                   <div class="qafield q" contenteditable="true" data-f="q" data-ph="문제/키워드...">${r.q}</div>
                 </div>
                 <div style="display:flex;flex-direction:column;gap:4px">
-                  <div class="formatbar" style="background:#f4f6f2;padding:2px 6px;border-radius:4px;display:flex;gap:5px;align-items:center;flex-wrap:wrap">
+                  <div class="formatbar" style="background:#f4f6f2;padding:3px 6px;border-radius:4px;display:flex;gap:5px;align-items:center;flex-wrap:wrap">
                     <button class="fmtbtn qa-fmt" data-act="bold" title="볼드체">B</button>
+                    <!-- 글자 크기 조절 셀렉트 -->
+                    <select class="editor-fs-select qa-fs-select" title="선택 텍스트 글자 크기">
+                      <option value="" disabled selected>크기</option>
+                      <option value="11px">11px</option>
+                      <option value="12px">12px</option>
+                      <option value="14px">14px</option>
+                      <option value="16px">16px</option>
+                      <option value="18px">18px</option>
+                      <option value="22px">22px</option>
+                    </select>
                     <button type="button" class="btn small ghost qa-list-btn" data-act="bullet" title="글머리 기호(•)">• 목록</button>
                     <button type="button" class="btn small ghost qa-list-btn" data-act="number" title="번호 매기기(1. 2.)">1. 목록</button>
                     <button type="button" class="btn small ghost qa-list-btn" data-act="indent" title="들여쓰기 (Tab)">⇥ 들여쓰기</button>
                     <button type="button" class="btn small ghost qa-list-btn" data-act="outdent" title="내어쓰기 (Shift+Tab)">⇤ 내어쓰기</button>
-                    <span style="font-size:11px;font-weight:bold;color:var(--ink-soft)">글자색:</span>
+                    <span style="font-size:11px;font-weight:bold;color:var(--ink-soft)">색상:</span>
                     <input type="color" class="swatch qa-color" value="#16202B" title="글자 색상" style="width:16px;height:16px;border:none;background:none;cursor:pointer">
                     
                     <div class="hl-palette-wrap">
@@ -2340,6 +2525,24 @@
 
     panelEl.querySelectorAll('.qafield').forEach(field => {
       field.onfocus = () => { lastActiveQAField = field; };
+    });
+
+    // Q&A 폰트 크기 선택 이벤트 연결
+    panelEl.querySelectorAll('.qa-fs-select').forEach(sel => {
+      sel.onchange = e => {
+        const sz = e.target.value;
+        if(sz && applySelectionFontSize(sz)) {
+          const active = document.activeElement;
+          if(active && active.classList.contains('qafield')) {
+            const rowEl = active.closest('.qarow');
+            const targetQ = d.qa.find(x => x.id === rowEl.dataset.id);
+            if (targetQ) targetQ[active.dataset.f] = active.innerHTML;
+          }
+          saveState();
+          toast(`선택 영역 글자 크기: ${sz}`);
+        }
+        e.target.selectedIndex = 0;
+      };
     });
 
     const qaBox = $('#qaBox');
@@ -3141,6 +3344,15 @@
   try {
     const appRes = await storage.get(APPKEY);
     if(appRes && appRes.value) { const parsed = JSON.parse(appRes.value); if(parsed.bgColor) setAppBackground(parsed.bgColor); }
+
+    // 폰트 크기 배율 복원
+    const scaleRes = await storage.get(FSKEY);
+    if(scaleRes && scaleRes.value) {
+      const parsedScale = parseFloat(scaleRes.value);
+      if(!isNaN(parsedScale)) setAppFontScale(parsedScale, false);
+    } else {
+      setAppFontScale(1.0, false);
+    }
 
     const cloudFontRes = await storage.get(FKEY);
     if(cloudFontRes && cloudFontRes.value) {
