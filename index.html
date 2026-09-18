@@ -76,8 +76,10 @@
   .btn.save-btn:hover{background:#265A4C}
   .btn.cal-btn{background:#285994;color:#fff;border-color:#285994;font-weight:700}
   .btn.cal-btn:hover{background:#1E4473}
-  .btn.cal-link-btn{background:#EBF3FA;color:#205284;border-color:#BACFE5}
-  .btn.cal-link-btn:hover{background:#DEEDFB}
+  .btn.cal-file-btn{background:#EBF2FB;color:#285994;border-color:#C6D8EB;font-weight:700}
+  .btn.cal-file-btn:hover{background:#DEEDFB}
+  .btn.cal-link-btn{background:#FAFBF8;color:#4A5A66;border-color:var(--rule)}
+  .btn.cal-link-btn:hover{background:#EEF2EB}
   .btn.small{padding:4px 9px;font-size:12px;border-radius:6px}
   
   .toolbar-date-picker{display:inline-flex;align-items:center;gap:4px;background:#fff;padding:3px 6px;border-radius:8px;border:1px solid var(--rule)}
@@ -301,7 +303,7 @@
   .d-goal-item .g-del{border:none;background:none;color:#B9C2B5;font-size:12px;padding:0 4px;line-height:1}
   .d-goal-item .g-del:hover{color:var(--seal)}
 
-  /* 디데이 카드 커스텀 스타일 */
+  /* 디데이 카드 */
   .dday-card{
     background:var(--d-theme-soft);border:1.5px solid var(--d-theme);border-radius:12px;
     padding:14px;text-align:center;cursor:pointer;transition:transform .15s, box-shadow .15s;
@@ -424,8 +426,10 @@
       <button class="nav-tab" id="btnModeDiary">📖 다이어리 모드</button>
       <!-- 수동 전체 저장 버튼 -->
       <button class="btn save-btn" id="manualGlobalSaveBtn" title="모든 변경 사항을 저장소에 즉시 동기화합니다.">💾 전체 저장</button>
-      <!-- 구글 캘린더 동기화 및 링크 버튼 -->
-      <button class="btn cal-btn" id="syncGCalBtn" title="구글 캘린더에서 일정을 실시간으로 가져옵니다.">📥 구글 캘린더 동기화</button>
+      
+      <!-- 구글 캘린더 동기화 및 파일 업로드 버튼 -->
+      <button class="btn cal-btn" id="syncGCalBtn" title="구글 캘린더에서 웹 링크를 통해 일정을 불러옵니다.">📥 구글 캘린더 동기화</button>
+      <button class="btn cal-file-btn" id="uploadIcsBtn" title="다운로드받은 basic.ics 파일을 직접 올려 100% 확실하게 일정을 넣습니다.">📁 캘린더 파일(ics) 불러오기</button>
       <a href="https://calendar.google.com/calendar/u/2?cid=ZGFuc2FnYWU1MjVAZ21haWwuY29t" target="_blank" rel="noopener noreferrer" class="btn cal-link-btn" title="공유된 구글 캘린더 열기">📅 구글 캘린더 열기 ↗</a>
     </div>
 
@@ -581,7 +585,7 @@
           <input type="text" class="profile-bio" id="dProfileBio" value="오늘도 힘내서 합격하기 ✨" placeholder="한 줄 소개">
         </div>
 
-        <!-- 디데이 카드 (클릭 시 자동 계산 모달 오픈) -->
+        <!-- 디데이 카드 -->
         <div class="dday-card" id="ddayCardWrap" title="클릭하여 목표 날짜를 변경하면 D-Day가 자동 계산됩니다.">
           <div class="dday-title" id="ddayTitleEdit">🎯 임용시험 D-DAY</div>
           <div class="dday-number" id="ddayNumEdit">D-105</div>
@@ -771,7 +775,7 @@
     const el = $('#toast');
     if(!el) return;
     el.textContent = msg; el.classList.add('on');
-    clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('on'), 2200);
+    clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('on'), 2500);
   }
   function parse(d) { const [y,m,dd]=d.split('-').map(Number); return new Date(y, m-1, dd); }
   function esc(s) { return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
@@ -859,12 +863,12 @@
   }
 
   // ----------------------------------------------------
-  // 구글 캘린더 iCal (.ics) 일정 파싱 및 플래너 등록 (중복 허용 + 다중 프록시 폴백)
+  // 구글 캘린더 iCal (.ics) 일정 파싱 및 플래너 등록 (중복 허용)
   // ----------------------------------------------------
   function parseIcsDate(icsStr) {
     if(!icsStr) return null;
     const cleanStr = icsStr.replace(/Z$/, '');
-    if(cleanStr.length === 8) { // YYYYMMDD (종일 일정)
+    if(cleanStr.length === 8) {
       const y = parseInt(cleanStr.substring(0, 4), 10);
       const m = parseInt(cleanStr.substring(4, 6), 10) - 1;
       const d = parseInt(cleanStr.substring(6, 8), 10);
@@ -877,7 +881,6 @@
       let hh = parseInt(tPart.substring(0, 2), 10);
       let mm = parseInt(tPart.substring(2, 4), 10);
 
-      // UTC(Z) 기준일 경우 한국 표준시(+9시간) 변환
       if(icsStr.endsWith('Z')) {
         const utcDate = new Date(Date.UTC(y, m, d, hh, mm));
         y = utcDate.getFullYear();
@@ -897,6 +900,59 @@
     return null;
   }
 
+  // 텍스트 형태의 iCal 데이터를 플래너 상태(state.days)에 파싱 및 저장하는 공통 함수
+  async function parseAndLoadIcsText(icsText) {
+    const rawEvents = icsText.split('BEGIN:VEVENT');
+    if (rawEvents.length <= 1) {
+      throw new Error('올바른 캘린더 이벤트 형식이 아닙니다.');
+    }
+
+    let addedCount = 0;
+    for(let i = 1; i < rawEvents.length; i++) {
+      const block = rawEvents[i].split('END:VEVENT')[0];
+      
+      const summaryMatch = block.match(/SUMMARY:(.*?)(\r?\n)/);
+      const title = summaryMatch ? summaryMatch[1].trim() : '구글 캘린더 일정';
+
+      const dtstartMatch = block.match(/DTSTART(?:;[^:]+)?:(\d{8}(?:T\d{6}Z?)?)/);
+      if(!dtstartMatch) continue;
+      const startInfo = parseIcsDate(dtstartMatch[1]);
+      if(!startInfo) continue;
+
+      const dtendMatch = block.match(/DTEND(?:;[^:]+)?:(\d{8}(?:T\d{6}Z?)?)/);
+      let duration = 60;
+      if(dtendMatch && !startInfo.isAllDay) {
+        const endInfo = parseIcsDate(dtendMatch[1]);
+        if(endInfo && endInfo.fullDate && startInfo.fullDate) {
+          const diffMins = Math.round((endInfo.fullDate - startInfo.fullDate) / (1000 * 60));
+          if(diffMins > 0) duration = diffMins;
+        }
+      }
+
+      let targetDay = state.days.find(d => d.date === startInfo.date);
+      if(!targetDay) {
+        targetDay = mk(startInfo.date, `${startInfo.date.slice(5)} 일정`, false, []);
+        state.days.push(targetDay);
+      }
+
+      // 중복 체크 없이 그대로 추가
+      targetDay.events.push({
+        id: uid(),
+        time: startInfo.time,
+        duration: duration,
+        title: title,
+        done: false
+      });
+      addedCount++;
+    }
+
+    await saveState();
+    renderPlannerCalendar();
+    if(selected) openPlannerPanel();
+    toast(`구글 캘린더에서 총 ${addedCount}개의 일정을 등록했습니다!`);
+  }
+
+  // 프록시 다중 시도 함수
   async function fetchWithFallback(targetUrl) {
     const proxies = [
       url => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
@@ -914,70 +970,45 @@
             return text;
           }
         }
-      } catch (e) {
-        // 다음 프록시 시도
-      }
+      } catch (e) {}
     }
     throw new Error('모든 프록시 서버 연결 실패');
   }
 
+  // 1. 웹 주소를 통한 자동 동기화
   async function syncGoogleCalendar() {
     toast('구글 캘린더 일정을 가져오는 중입니다...');
     try {
       const text = await fetchWithFallback(GOOGLE_ICAL_URL);
-
-      const rawEvents = text.split('BEGIN:VEVENT');
-      let addedCount = 0;
-
-      for(let i = 1; i < rawEvents.length; i++) {
-        const block = rawEvents[i].split('END:VEVENT')[0];
-        
-        const summaryMatch = block.match(/SUMMARY:(.*?)(\r?\n)/);
-        const title = summaryMatch ? summaryMatch[1].trim() : '구글 캘린더 일정';
-
-        const dtstartMatch = block.match(/DTSTART(?:;[^:]+)?:(\d{8}(?:T\d{6}Z?)?)/);
-        if(!dtstartMatch) continue;
-        const startInfo = parseIcsDate(dtstartMatch[1]);
-        if(!startInfo) continue;
-
-        const dtendMatch = block.match(/DTEND(?:;[^:]+)?:(\d{8}(?:T\d{6}Z?)?)/);
-        let duration = 60;
-        if(dtendMatch && !startInfo.isAllDay) {
-          const endInfo = parseIcsDate(dtendMatch[1]);
-          if(endInfo && endInfo.fullDate && startInfo.fullDate) {
-            const diffMins = Math.round((endInfo.fullDate - startInfo.fullDate) / (1000 * 60));
-            if(diffMins > 0) duration = diffMins;
-          }
-        }
-
-        let targetDay = state.days.find(d => d.date === startInfo.date);
-        if(!targetDay) {
-          targetDay = mk(startInfo.date, `${startInfo.date.slice(5)} 일정`, false, []);
-          state.days.push(targetDay);
-        }
-
-        // 기존 일정과 중복 검사 없이 그대로 무조건 추가
-        targetDay.events.push({
-          id: uid(),
-          time: startInfo.time,
-          duration: duration,
-          title: title,
-          done: false
-        });
-        addedCount++;
-      }
-
-      await saveState();
-      renderPlannerCalendar();
-      if(selected) openPlannerPanel();
-      toast(`구글 캘린더에서 총 ${addedCount}개의 일정을 등록했습니다!`);
+      await parseAndLoadIcsText(text);
     } catch(err) {
       console.error('캘린더 동기화 에러:', err);
-      toast('구글 서버 또는 프록시 응답 지연으로 가져오지 못했습니다. 잠시 후 다시 눌러주세요.');
+      toast('구글의 외부 접근 차단으로 직접 가져오지 못했습니다. 옆의 [📁 캘린더 파일(ics) 불러오기]를 이용해주세요!');
     }
   }
 
+  // 2. 다운로드받은 ics 파일 직접 선택해서 즉시 100% 반영하는 기능
+  function handleIcsFileUpload() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.ics,text/calendar';
+    input.onchange = async () => {
+      if (input.files && input.files[0]) {
+        try {
+          toast('파일을 읽어 일정으로 등록 중입니다...');
+          const fileText = await input.files[0].text();
+          await parseAndLoadIcsText(fileText);
+        } catch(e) {
+          console.error(e);
+          toast('ics 파일을 처리하지 못했습니다. 올바른 파일인지 확인해주세요.');
+        }
+      }
+    };
+    input.click();
+  }
+
   $('#syncGCalBtn').onclick = syncGoogleCalendar;
+  $('#uploadIcsBtn').onclick = handleIcsFileUpload;
 
   function shrinkImage(file, max, quality) {
     return new Promise((res, rej) => {
@@ -1325,7 +1356,8 @@
         <div class="sched-head">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <h3>⏰ 이 날의 일정 (캘린더 연동)</h3>
-            <button class="btn small cal-btn" id="panelSyncGCalBtn">📥 구글 캘린더 동기화</button>
+            <button class="btn small cal-btn" id="panelSyncGCalBtn">📥 캘린더 동기화</button>
+            <button class="btn small cal-file-btn" id="panelUploadIcsBtn">📁 파일(ics) 불러오기</button>
             <a href="https://calendar.google.com/calendar/u/2?cid=ZGFuc2FnYWU1MjVAZ21haWwuY29t" target="_blank" rel="noopener noreferrer" class="btn small cal-link-btn">📅 캘린더 열기 ↗</a>
           </div>
           <span class="sched-date">${d.events.length}개 · ${fmtDur(scheduledMinutes(d))}</span>
@@ -1474,6 +1506,8 @@
 
     const panelSyncBtn = $('#panelSyncGCalBtn');
     if(panelSyncBtn) panelSyncBtn.onclick = syncGoogleCalendar;
+    const panelUploadBtn = $('#panelUploadIcsBtn');
+    if(panelUploadBtn) panelUploadBtn.onclick = handleIcsFileUpload;
 
     // 타임트래커 상호작용
     const trackerContainer = $('#trackerGridContainer');
@@ -1944,7 +1978,7 @@
         <li class="d-goal-item ${b.done ? 'done' : ''}" data-id="${b.id}">
           <input type="checkbox" ${b.done ? 'checked' : ''}>
           <span class="g-text" contenteditable="true">${b.text}</span>
-          <button class="g-del">✕</button>
+          <button class="d-goal-item g-del">✕</button>
         </li>`).join('');
       bucketList.querySelectorAll('.d-goal-item').forEach(li => {
         const b = diaryData.buckets.find(x => x.id === li.dataset.id);
@@ -2097,7 +2131,7 @@
     }
     if(pImg) pImg.onclick = () => pickFile(async f => { const d = await shrinkImage(f, 200, .85); diaryData.profileImg = d; pImg.innerHTML = `<img src="${d}">`; saveDiaryState(); });
 
-    // D-Day 카드 클릭 시 자동 계산 모달 오픈
+    // D-Day 카드 클릭 시 모달 오픈
     const ddayCard = $('#ddayCardWrap');
     if(ddayCard) {
       ddayCard.onclick = () => openDDaySettingsModal();
@@ -2257,7 +2291,7 @@
               if(leftPane) leftPane.style.display = 'none'; if(rightPane) rightPane.style.gridColumn = 'span 2';
               $('#dHomeView').style.display = 'none'; $('#dMonthlyView').style.display = 'grid'; $('#dWeeklyView').style.display = 'none';
               if($('#dNavBtnsContainer')) $('#dNavBtnsContainer').style.display = 'flex';
-              renderDiaryWeekly();
+              renderDiaryMonthly();
             }
             renderStickers();
           }
