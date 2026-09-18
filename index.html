@@ -109,6 +109,8 @@
   .btn.cal-file-btn:hover{background:#EEF2EB}
   .btn.qa-collect-btn{background:#AA52B6;color:#fff;border-color:#AA52B6;font-weight:700}
   .btn.qa-collect-btn:hover{background:#933FA0}
+  .btn.analytics-btn{background:#107C41;color:#fff;border-color:#107C41;font-weight:700}
+  .btn.analytics-btn:hover{background:#0C6133}
   .btn.font-upload-btn{background:#FAF9F5;color:var(--jade);border-color:var(--jade);font-weight:700}
   .btn.font-upload-btn:hover{background:#F0F6F4}
   .btn.small{padding:4px 9px;font-size:12px;border-radius:6px}
@@ -385,7 +387,6 @@
   .m-nav-btns{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
   .m-nav-btns button{border:1px solid var(--rule);background:#fff;border-radius:6px;padding:4px 9px;font-size:11px;font-weight:700}
 
-  /* 다중 과목 선택 팝업 UI 스타일 */
   .multi-cat-filter-wrap{position:relative;display:inline-block}
   .multi-cat-btn{
     border:1.5px solid var(--jade);background:#fff;border-radius:6px;padding:4px 9px;
@@ -462,15 +463,36 @@
   .diary-fmt-btn { border: 1px solid var(--rule); background: #fff; border-radius: 4px; padding: 2px 6px; font-size: 11px; font-weight: bold; cursor: pointer; }
   .diary-fmt-btn:hover { background: #EDF0EA; }
 
-  #stickerCanvas{position:absolute;inset:0;pointer-events:none;z-index:25}
-  .placed-sticker{position:absolute;pointer-events:auto;cursor:grab;user-select:none;touch-action:none;display:inline-block;box-sizing:border-box}
+  /* 스티커 캔버스 및 조작 스타일 */
+  #stickerCanvas{position:absolute;inset:0;pointer-events:none;z-index:95}
+  .placed-sticker{
+    position:absolute;pointer-events:auto;cursor:grab;user-select:none;touch-action:none;
+    display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;
+  }
   .placed-sticker:active{cursor:grabbing}
-  .placed-sticker.selected{outline:2px dashed var(--d-theme-dark);outline-offset:2px}
-  .placed-sticker .s-del{display:none;position:absolute;top:-8px;right:-8px;width:20px;height:20px;border-radius:50%;background:var(--seal);color:#fff;font-size:12px;font-weight:bold;line-height:1;border:none;cursor:pointer;align-items:center;justify-content:center;z-index:10}
+  .placed-sticker.selected{outline:2px dashed var(--d-theme-dark);outline-offset:3px}
+  .placed-sticker .s-del{
+    display:none;position:absolute;top:-10px;right:-10px;width:22px;height:22px;
+    border-radius:50%;background:var(--seal);color:#fff;font-size:12px;font-weight:bold;
+    line-height:1;border:2px solid #fff;cursor:pointer;align-items:center;justify-content:center;
+    z-index:110;box-shadow:0 2px 5px rgba(0,0,0,0.2);
+  }
   .placed-sticker.selected .s-del{display:flex}
-  .placed-sticker .s-resizer{display:none;position:absolute;bottom:-6px;right:-6px;width:18px;height:18px;background:var(--d-theme-dark);color:#fff;border-radius:4px;cursor:nwse-resize;font-size:11px;align-items:center;justify-content:center;line-height:1;z-index:10;user-select:none}
+  .placed-sticker .s-resizer{
+    display:none;position:absolute;bottom:-8px;right:-8px;width:20px;height:20px;
+    background:var(--d-theme-dark);color:#fff;border-radius:4px;cursor:nwse-resize;
+    font-size:11px;align-items:center;justify-content:center;line-height:1;z-index:110;
+    user-select:none;border:1.5px solid #fff;box-shadow:0 2px 5px rgba(0,0,0,0.2);
+  }
   .placed-sticker.selected .s-resizer{display:flex}
-  .placed-sticker img{pointer-events:none;display:block;width:100%;height:100%;object-fit:contain}
+  .placed-sticker .s-rotator{
+    display:none;position:absolute;top:-22px;left:50%;transform:translateX(-50%);width:20px;height:20px;
+    background:var(--jade);color:#fff;border-radius:50%;cursor:crosshair;
+    font-size:11px;align-items:center;justify-content:center;line-height:1;z-index:110;
+    user-select:none;border:1.5px solid #fff;box-shadow:0 2px 5px rgba(0,0,0,0.2);
+  }
+  .placed-sticker.selected .s-rotator{display:flex}
+  .placed-sticker img{pointer-events:none;display:block;width:100%;height:100%;object-fit:contain;background:transparent !important}
   
   .sticky-note{
     width:100%;height:100%;min-width:70px;min-height:70px;padding:12px;border-radius:4px;box-shadow:2px 4px 12px rgba(0,0,0,0.12);
@@ -499,12 +521,32 @@
   .gallery-card img{width:100%;height:110px;object-fit:cover;display:block}
   .gallery-card-info{padding:6px 8px;font-size:11px;font-weight:700;color:var(--ink-soft);text-align:center;background:#FAFBF9}
 
+  /* 학습 밸런스 & 잔디 히트맵 스타일 */
+  .analytics-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:16px;margin-top:12px}
+  .chart-card{background:#fff;border:1.5px solid var(--rule);border-radius:12px;padding:14px;box-shadow:0 2px 6px rgba(0,0,0,0.02)}
+  .chart-card h4{margin:0 0 10px;font-size:13px;font-weight:800;color:var(--jade);display:flex;align-items:center;gap:6px}
+  .donut-wrap{position:relative;width:150px;height:150px;margin:0 auto}
+  .cat-bar-list{display:flex;flex-direction:column;gap:8px;max-height:220px;overflow-y:auto}
+  .cat-bar-item{display:flex;flex-direction:column;gap:3px;font-size:12px}
+  .cat-bar-head{display:flex;justify-content:space-between;font-weight:700}
+  .cat-bar-bg{height:8px;background:#ECEEE9;border-radius:99px;overflow:hidden}
+  .cat-bar-fill{height:100%;border-radius:99px;transition:width .4s}
+
+  .heatmap-wrap{display:grid;grid-template-columns:repeat(auto-fill, minmax(28px, 1fr));gap:4px;padding:6px 0}
+  .heatmap-cell{aspect-ratio:1;border-radius:4px;background:#ECEEE9;cursor:pointer;position:relative;transition:transform .12s}
+  .heatmap-cell:hover{transform:scale(1.2);z-index:5}
+  .heatmap-cell.lvl-1{background:#D1E7DD}
+  .heatmap-cell.lvl-2{background:#75B798}
+  .heatmap-cell.lvl-3{background:#2F6F5E}
+  .heatmap-cell.lvl-4{background:#144537}
+
   @media(max-width:860px){
     .book-spread{grid-template-columns:1fr;min-height:auto}
     .book-left{border-right:none;border-bottom:2px dashed #E0D7D0}
     .book-tabs{flex-direction:row;writing-mode:horizontal-tb;padding:8px;border-left:none;border-top:1px solid #D9CFC7}
     .side-tab{writing-mode:horizontal-tb;padding:6px 12px;border-radius:8px}
     .d-weekly-spread-grid{grid-template-columns:1fr 1fr;grid-template-rows:repeat(4,minmax(0,1fr))}
+    .analytics-grid{grid-template-columns:1fr}
   }
 
   @media(max-width:520px){
@@ -530,6 +572,7 @@
       <button class="btn save-btn" id="manualGlobalSaveBtn" title="모든 변경 사항을 저장소에 즉시 동기화합니다.">💾 전체 저장</button>
       
       <button class="btn qa-collect-btn" id="openQACollectorBtn" title="원하는 날짜들의 문제와 정답만 모아서 봅니다.">📚 문제 모아보기</button>
+      <button class="btn analytics-btn" id="openAnalyticsBtn" title="과목별 비중 파이차트와 공부 잔디를 확인합니다.">📊 학습 밸런스 분석</button>
       <button class="btn cal-embed-btn" id="openGCalEmbedBtn" title="구글 캘린더를 팝업 창으로 바로 열어 확인합니다.">📅 캘린더 보기</button>
       <button class="btn cal-btn" id="syncGCalBtn" title="구글 캘린더 일정을 플래너 목록으로 자동 동기화합니다.">📥 일정 동기화</button>
       <button class="btn cal-file-btn" id="uploadIcsBtn" title="다운로드받은 ics 파일을 직접 올려 등록합니다.">📁 파일(ics)</button>
@@ -739,7 +782,6 @@
         <div class="month-header" id="diaryHeaderRow">
           <div class="m-title" id="dHeaderTitle">HOME DASHBOARD</div>
           <div class="m-nav-btns" id="dNavBtnsContainer">
-            <!-- 위클리 전용 컨트롤 영역 (일정 토글 + 복수 과목 선택 드롭다운) -->
             <div id="weeklyFilterBox" style="display:none;align-items:center;gap:6px;flex-wrap:wrap">
               <button class="btn small ghost" id="weeklyEventToggleBtn" style="border:1.5px solid #3D6EA5;color:#3D6EA5;font-weight:bold">⏰ 일정 숨기기</button>
               <div class="multi-cat-filter-wrap">
@@ -753,7 +795,6 @@
                 </div>
               </div>
             </div>
-            <!-- 먼슬리 전용 일정 표시/숨기기 버튼 -->
             <button class="btn small ghost" id="monthlyEventToggleBtn" style="display:none;border:1.5px solid #3D6EA5;color:#3D6EA5;font-weight:bold">⏰ 일정 숨기기</button>
             <button id="dPrevBtn" class="btn small ghost">◀</button>
             <button id="dNextBtn" class="btn small ghost">▶</button>
@@ -796,7 +837,6 @@
           </div>
         </div>
 
-        <!-- 먼슬리 캘린더 그리드 (빈칸도 자유 메모 가능) -->
         <div class="d-cal-grid" id="dMonthlyView" style="display:none">
           <div class="d-cal-head">SUN</div><div class="d-cal-head">MON</div><div class="d-cal-head">TUE</div>
           <div class="d-cal-head">WED</div><div class="d-cal-head">THU</div><div class="d-cal-head">FRI</div><div class="d-cal-head">SAT</div>
@@ -829,6 +869,55 @@
         <span class="sticker-item">⭐</span>
         <span class="sticker-item">💯</span>
         <span class="sticker-item">🐥</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- [모달] 과목별 공부 밸런스 분석 (파이 차트 & 히트맵 잔디) -->
+  <div id="analyticsModalOverlay" style="display:none;position:fixed;inset:0;background:rgba(22,32,43,.65);z-index:300;align-items:center;justify-content:center;padding:16px;">
+    <div style="width:min(720px,100%);max-height:88vh;background:var(--card);border-radius:16px;padding:20px;display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,.25);overflow:hidden">
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid var(--rule);padding-bottom:10px">
+        <div>
+          <h3 style="margin:0;font-size:18px;font-weight:900;color:var(--jade)">📊 과목별 공부 밸런스 & 잔디 분석</h3>
+          <span style="font-size:12px;color:var(--ink-soft)">과목별 학습 편중을 진단하고 매일의 성취도를 확인하세요.</span>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <select id="analyticsRangeSelect" style="font-size:12px;padding:4px 8px;border-radius:6px;border:1px solid var(--rule);font-weight:bold;outline:none">
+            <option value="week">이번 주차</option>
+            <option value="month" selected>이번 달</option>
+            <option value="all">전체 누적</option>
+          </select>
+          <button class="btn small ghost" id="closeAnalyticsModal" style="font-size:16px">✕</button>
+        </div>
+      </div>
+      
+      <div style="flex:1;overflow-y:auto;padding:6px 0">
+        <!-- 상단: 잔디 히트맵 -->
+        <div class="chart-card" style="margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <h4 style="margin:0">🌱 최근 30일 학습 잔디 심기</h4>
+            <span style="font-size:11px;color:var(--ink-soft)" id="heatmapLegendHint">진할수록 완료율 높음</span>
+          </div>
+          <div class="heatmap-wrap" id="analyticsHeatmap"></div>
+        </div>
+
+        <!-- 하단: 과목별 비중 도넛 차트 & 상세 랭킹 -->
+        <div class="analytics-grid">
+          <div class="chart-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <h4>🍰 과목별 비중 (도넛 차트)</h4>
+            <div class="donut-wrap">
+              <svg viewBox="0 0 36 36" style="width:100%;height:100%;transform:rotate(-90deg);border-radius:50%" id="analyticsDonutSvg"></svg>
+              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;font-weight:bold;color:var(--ink-soft)" id="donutCenterText">
+                <span>총 할 일</span><b id="donutTotalCount" style="font-size:16px;color:var(--ink)">0개</b>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <h4>📋 과목별 상세 학습 점유율</h4>
+            <div class="cat-bar-list" id="analyticsBarList"></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1044,6 +1133,7 @@
     return 'HOME';
   }
 
+  // [스티커 렌더링 - 투명 PNG 보존 및 크기조절/회전/삭제 완벽 지원]
   function renderStickers() {
     const canvas = $('#stickerCanvas');
     if(!canvas) return;
@@ -1054,18 +1144,21 @@
     list.forEach(item => {
       const el = document.createElement('div');
       el.className = 'placed-sticker';
+      el.dataset.id = item.id;
       el.style.left = item.x + 'px';
       el.style.top = item.y + 'px';
       if(item.width) el.style.width = item.width + 'px';
       if(item.height) el.style.height = item.height + 'px';
+      const rot = item.rotation || 0;
+      el.style.transform = `rotate(${rot}deg)`;
 
       if(item.type === 'emoji') {
-        el.style.fontSize = (item.fontSize || 36) + 'px';
-        el.textContent = item.content;
+        el.style.fontSize = (item.fontSize || 38) + 'px';
+        el.innerHTML = `<span>${item.content}</span>`;
       } else if(item.type === 'image') {
-        el.innerHTML = `<img src="${item.content}"><button class="s-del">✕</button><div class="s-resizer">◢</div>`;
+        el.innerHTML = `<img src="${item.content}">`;
       } else if(item.type === 'sticky') {
-        el.innerHTML = `<div class="sticky-note ${item.color}" contenteditable="true">${item.content}</div><button class="s-del">✕</button><div class="s-resizer">◢</div>`;
+        el.innerHTML = `<div class="sticky-note ${item.color}" contenteditable="true">${item.content}</div>`;
         const noteDiv = el.querySelector('.sticky-note');
         noteDiv.oninput = () => {
           item.content = noteDiv.innerHTML;
@@ -1073,11 +1166,26 @@
         };
       }
 
-      if(item.type !== 'sticky') {
-        el.innerHTML += `<button class="s-del">✕</button><div class="s-resizer">◢</div>`;
-      }
+      const delBtn = document.createElement('button');
+      delBtn.className = 's-del';
+      delBtn.innerText = '✕';
+      delBtn.title = '삭제';
+      el.appendChild(delBtn);
 
-      el.querySelector('.s-del').onclick = (e) => {
+      const resizer = document.createElement('div');
+      resizer.className = 's-resizer';
+      resizer.innerText = '◢';
+      resizer.title = '크기 조절';
+      el.appendChild(resizer);
+
+      const rotator = document.createElement('div');
+      rotator.className = 's-rotator';
+      rotator.innerText = '↻';
+      rotator.title = '회전';
+      el.appendChild(rotator);
+
+      delBtn.onmousedown = e => e.stopPropagation();
+      delBtn.onclick = (e) => {
         e.stopPropagation();
         diaryData.pageStickers[pageKey] = diaryData.pageStickers[pageKey].filter(s => s.id !== item.id);
         renderStickers();
@@ -1086,10 +1194,11 @@
 
       let isDragging = false;
       let isResizing = false;
-      let startX, startY, startLeft, startTop, startW, startH;
+      let isRotating = false;
+      let startX, startY, startLeft, startTop, startW, startH, centerX, centerY, startAngle;
 
       el.onmousedown = (e) => {
-        if(e.target.classList.contains('s-del') || e.target.classList.contains('s-resizer') || e.target.closest('[contenteditable]')) return;
+        if(e.target.closest('.s-del, .s-resizer, .s-rotator, [contenteditable]')) return;
         document.querySelectorAll('.placed-sticker').forEach(s => s.classList.remove('selected'));
         el.classList.add('selected');
         isDragging = true;
@@ -1098,47 +1207,76 @@
         e.stopPropagation();
       };
 
-      const resizer = el.querySelector('.s-resizer');
-      if(resizer) {
-        resizer.onmousedown = (e) => {
-          isResizing = true;
-          startX = e.clientX; startY = e.clientY;
-          startW = el.offsetWidth; startH = el.offsetHeight;
-          e.stopPropagation();
-        };
-      }
+      resizer.onmousedown = (e) => {
+        isResizing = true;
+        startX = e.clientX; startY = e.clientY;
+        startW = el.offsetWidth; startH = el.offsetHeight;
+        e.stopPropagation();
+        e.preventDefault();
+      };
 
-      window.addEventListener('mousemove', (e) => {
+      rotator.onmousedown = (e) => {
+        isRotating = true;
+        const rect = el.getBoundingClientRect();
+        centerX = rect.left + rect.width / 2;
+        centerY = rect.top + rect.height / 2;
+        startAngle = (item.rotation || 0) * (Math.PI / 180);
+        e.stopPropagation();
+        e.preventDefault();
+      };
+
+      const onMouseMove = (e) => {
         if(isDragging) {
           item.x = Math.max(0, startLeft + (e.clientX - startX));
           item.y = Math.max(0, startTop + (e.clientY - startY));
           el.style.left = item.x + 'px';
           el.style.top = item.y + 'px';
         } else if(isResizing) {
-          item.width = Math.max(50, startW + (e.clientX - startX));
-          item.height = Math.max(50, startH + (e.clientY - startY));
+          item.width = Math.max(40, startW + (e.clientX - startX));
+          item.height = Math.max(40, startH + (e.clientY - startY));
           el.style.width = item.width + 'px';
           el.style.height = item.height + 'px';
+          if(item.type === 'emoji') {
+            item.fontSize = Math.max(16, Math.round(item.width * 0.7));
+            el.style.fontSize = item.fontSize + 'px';
+          }
+        } else if(isRotating) {
+          const rad = Math.atan2(e.clientY - centerY, e.clientX - centerX);
+          let deg = Math.round(rad * (180 / Math.PI)) + 90;
+          item.rotation = deg;
+          el.style.transform = `rotate(${deg}deg)`;
         }
-      });
+      };
 
-      window.addEventListener('mouseup', () => {
-        if(isDragging || isResizing) {
+      const onMouseUp = () => {
+        if(isDragging || isResizing || isRotating) {
           isDragging = false;
           isResizing = false;
+          isRotating = false;
+          window.removeEventListener('mousemove', onMouseMove);
+          window.removeEventListener('mouseup', onMouseUp);
           saveDiaryState();
         }
-      });
+      };
+
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mouseup', onMouseUp);
 
       canvas.appendChild(el);
     });
   }
 
+  window.addEventListener('mousedown', (e) => {
+    if(!e.target.closest('.placed-sticker') && !e.target.closest('.sticker-drawer') && !e.target.closest('.sticky-btn')) {
+      document.querySelectorAll('.placed-sticker').forEach(s => s.classList.remove('selected'));
+    }
+  });
+
   function addEmojiSticker(emoji) {
     const pageKey = getCurrentPageKey();
     if(!diaryData.pageStickers[pageKey]) diaryData.pageStickers[pageKey] = [];
     diaryData.pageStickers[pageKey].push({
-      id: uid(), type: 'emoji', content: emoji, x: 50 + Math.random() * 100, y: 50 + Math.random() * 100, fontSize: 38
+      id: uid(), type: 'emoji', content: emoji, x: 80 + Math.random() * 80, y: 80 + Math.random() * 80, width: 60, height: 60, fontSize: 42, rotation: 0
     });
     renderStickers();
     saveDiaryState();
@@ -1148,7 +1286,7 @@
     const pageKey = getCurrentPageKey();
     if(!diaryData.pageStickers[pageKey]) diaryData.pageStickers[pageKey] = [];
     diaryData.pageStickers[pageKey].push({
-      id: uid(), type: 'sticky', color, content: text, x: 80 + Math.random() * 60, y: 80 + Math.random() * 60, width: 160, height: 150
+      id: uid(), type: 'sticky', color, content: text, x: 80 + Math.random() * 60, y: 80 + Math.random() * 60, width: 160, height: 150, rotation: 0
     });
     renderStickers();
     saveDiaryState();
@@ -1158,19 +1296,44 @@
     item.onclick = () => addEmojiSticker(item.textContent);
   });
 
+  function shrinkImage(file, max, quality) {
+    return new Promise((res, rej) => {
+      const r = new FileReader(); r.onerror = () => rej(new Error('read'));
+      r.onload = () => {
+        const img = new Image(); img.onerror = () => rej(new Error('decode'));
+        img.onload = () => {
+          const s = Math.min(1, max / Math.max(img.width, img.height));
+          const c = document.createElement('canvas'); c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+          const ctx = c.getContext('2d');
+          ctx.clearRect(0, 0, c.width, c.height);
+          ctx.drawImage(img, 0, 0, c.width, c.height);
+          
+          const isPng = file.type === 'image/png' || (!file.type && file.name && file.name.endsWith('.png'));
+          if(isPng) {
+            res(c.toDataURL('image/png'));
+          } else {
+            res(c.toDataURL('image/jpeg', quality));
+          }
+        };
+        img.src = r.result;
+      };
+      r.readAsDataURL(file);
+    });
+  }
+
   const dUploadStickerBtn = $('#dUploadStickerBtn');
   if(dUploadStickerBtn) {
     dUploadStickerBtn.onclick = () => {
       pickFile(async f => {
-        const b64 = await shrinkImage(f, 250, 0.85);
+        const b64 = await shrinkImage(f, 400, 0.9);
         const pageKey = getCurrentPageKey();
         if(!diaryData.pageStickers[pageKey]) diaryData.pageStickers[pageKey] = [];
         diaryData.pageStickers[pageKey].push({
-          id: uid(), type: 'image', content: b64, x: 100, y: 100, width: 120, height: 120
+          id: uid(), type: 'image', content: b64, x: 100, y: 100, width: 120, height: 120, rotation: 0
         });
         renderStickers();
         saveDiaryState();
-        toast('이미지 스티커가 추가되었습니다!');
+        toast('스티커가 추가되었습니다! (클릭 시 크기 조절/회전/삭제 가능)');
       });
     };
   }
@@ -1404,6 +1567,147 @@
 
     renderSelectedQA();
   }
+
+  // [학습 밸런스 분석 모달: 파이 차트 & 잔디 히트맵]
+  const PALETTE = ['#2F6F5E', '#3D6EA5', '#D87080', '#AA52B6', '#8C6F28', '#205284', '#E67E22', '#16A085', '#7F8C8D'];
+  function openAnalyticsModal() {
+    $('#analyticsModalOverlay').style.display = 'flex';
+    renderAnalyticsData();
+  }
+
+  function renderAnalyticsData() {
+    const range = $('#analyticsRangeSelect').value;
+    const now = new Date();
+    
+    // 1. 기간별 대상 날짜 필터링
+    let filteredDays = [];
+    if(range === 'week') {
+      const y = diaryData.year, m = diaryData.month;
+      const baseDate = new Date(y, m - 1, 17 + (diaryData.currentWeekOffset * 7));
+      const startOfWeek = new Date(baseDate); startOfWeek.setDate(baseDate.getDate() - baseDate.getDay());
+      const endOfWeek = new Date(startOfWeek); endOfWeek.setDate(startOfWeek.getDate() + 6);
+      
+      const sIso = startOfWeek.toISOString().slice(0, 10);
+      const eIso = endOfWeek.toISOString().slice(0, 10);
+      filteredDays = state.days.filter(d => d.date >= sIso && d.date <= eIso);
+    } else if(range === 'month') {
+      const ymPrefix = `${viewYear}-${String(viewMonth).padStart(2,'0')}`;
+      filteredDays = state.days.filter(d => d.date && d.date.startsWith(ymPrefix));
+    } else {
+      filteredDays = state.days;
+    }
+
+    // 2. 과목별 데이터 집계
+    const catMap = {};
+    let totalItems = 0;
+    filteredDays.forEach(d => {
+      (d.items || []).forEach(it => {
+        const cat = (it.cat || '기타').trim();
+        if(!catMap[cat]) catMap[cat] = { count: 0, done: 0 };
+        catMap[cat].count++;
+        if(it.state === 'done') catMap[cat].done++;
+        totalItems++;
+      });
+    });
+
+    const catList = Object.entries(catMap).map(([name, data]) => ({
+      name, count: data.count, done: data.done, pct: totalItems ? Math.round((data.count / totalItems) * 100) : 0
+    })).sort((a,b) => b.count - a.count);
+
+    // 3. 도넛 차트(SVG) 렌더링
+    const donutSvg = $('#analyticsDonutSvg');
+    $('#donutTotalCount').textContent = `${totalItems}개`;
+    
+    if(totalItems === 0) {
+      donutSvg.innerHTML = '<circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#ECEEE9" stroke-width="3"></circle>';
+    } else {
+      let accumulatedPercent = 0;
+      donutSvg.innerHTML = catList.map((c, i) => {
+        const color = PALETTE[i % PALETTE.length];
+        const strokeDasharray = `${c.pct} ${100 - c.pct}`;
+        const strokeDashoffset = -accumulatedPercent;
+        accumulatedPercent += c.pct;
+        return `
+          <circle cx="18" cy="18" r="15.915" fill="transparent"
+                  stroke="${color}" stroke-width="3.2"
+                  stroke-dasharray="${strokeDasharray}"
+                  stroke-dashoffset="${strokeDashoffset}">
+            <title>${c.name}: ${c.count}개 (${c.pct}%)</title>
+          </circle>
+        `;
+      }).join('');
+    }
+
+    // 4. 과목별 바 리스트 렌더링
+    const barListEl = $('#analyticsBarList');
+    if(!catList.length) {
+      barListEl.innerHTML = '<div style="font-size:12px;color:var(--ink-soft);text-align:center;padding:20px">선택한 기간에 등록된 할 일이 없습니다.</div>';
+    } else {
+      barListEl.innerHTML = catList.map((c, i) => {
+        const color = PALETTE[i % PALETTE.length];
+        return `
+          <div class="cat-bar-item">
+            <div class="cat-bar-head">
+              <span style="display:flex;align-items:center;gap:6px">
+                <span style="width:10px;height:10px;border-radius:2px;background:${color}"></span>
+                <span>${esc(c.name)}</span>
+              </span>
+              <span style="color:var(--ink-soft)">${c.count}개 (${c.pct}%)</span>
+            </div>
+            <div class="cat-bar-bg">
+              <div class="cat-bar-fill" style="width:${c.pct}%;background:${color}"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 5. 최근 30일 잔디(Heatmap) 렌더링
+    const heatmapEl = $('#analyticsHeatmap');
+    heatmapEl.innerHTML = '';
+    const dayMap = {};
+    state.days.forEach(d => { if(d.date) dayMap[d.date] = d; });
+
+    for(let i = 29; i >= 0; i--) {
+      const dt = new Date();
+      dt.setDate(dt.getDate() - i);
+      const iso = dt.toISOString().slice(0, 10);
+      const targetDay = dayMap[iso];
+
+      let levelClass = '';
+      let titleMsg = `${iso}: 할 일 없음`;
+
+      if(targetDay && targetDay.items.length) {
+        const dCount = targetDay.items.length;
+        const dDone = targetDay.items.filter(x => x.state === 'done').length;
+        const ratio = dDone / dCount;
+        titleMsg = `${iso} (${targetDay.label}): ${dDone}/${dCount} 완료`;
+
+        if(ratio === 0) levelClass = '';
+        else if(ratio < 0.4) levelClass = 'lvl-1';
+        else if(ratio < 0.8) levelClass = 'lvl-2';
+        else if(ratio < 1) levelClass = 'lvl-3';
+        else levelClass = 'lvl-4';
+      }
+
+      const cell = document.createElement('div');
+      cell.className = `heatmap-cell ${levelClass}`;
+      cell.title = titleMsg;
+      cell.onclick = () => {
+        if(targetDay) {
+          $('#analyticsModalOverlay').style.display = 'none';
+          selected = targetDay.id;
+          openPlannerPanel();
+          $('#panel').scrollIntoView({ behavior: 'smooth' });
+        }
+      };
+      heatmapEl.appendChild(cell);
+    }
+  }
+
+  $('#openAnalyticsBtn').onclick = openAnalyticsModal;
+  $('#closeAnalyticsModal').onclick = () => { $('#analyticsModalOverlay').style.display = 'none'; };
+  $('#analyticsRangeSelect').onchange = renderAnalyticsData;
 
   function parseIcsDate(icsStr) {
     if(!icsStr) return null;
@@ -1654,22 +1958,6 @@
   $('#openQACollectorBtn').onclick = openQACollectorModal;
   $('#uploadCustomFontBtn').onclick = handleCustomFontUpload;
 
-  function shrinkImage(file, max, quality) {
-    return new Promise((res, rej) => {
-      const r = new FileReader(); r.onerror = () => rej(new Error('read'));
-      r.onload = () => {
-        const img = new Image(); img.onerror = () => rej(new Error('decode'));
-        img.onload = () => {
-          const s = Math.min(1, max / Math.max(img.width, img.height));
-          const c = document.createElement('canvas'); c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
-          c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-          res(c.toDataURL('image/jpeg', quality));
-        };
-        img.src = r.result;
-      };
-      r.readAsDataURL(file);
-    });
-  }
   function pickFile(cb) {
     const i = document.createElement('input'); i.type = 'file'; i.accept = 'image/*';
     i.onchange = () => { if(i.files && i.files[0]) cb(i.files[0]); }; i.click();
@@ -3121,7 +3409,6 @@
     const firstDay = new Date(y, m-1, 1).getDay();
     const lastDate = new Date(y, m, 0).getDate();
 
-    // 1. 앞쪽 빈칸 - 메모 지원
     for(let i=0; i<firstDay; i++){
       const e = document.createElement('div');
       e.className = 'd-cal-cell empty-slot';
@@ -3133,7 +3420,6 @@
       grid.appendChild(e);
     }
     
-    // 2. 당월 날짜 칸 - 일정 표시 및 메모 지원
     for(let d=1; d<=lastDate; d++){
       const cell = document.createElement('div');
       cell.className = 'd-cal-cell';
@@ -3157,7 +3443,6 @@
       grid.appendChild(cell);
     }
 
-    // 3. 뒤쪽 빈칸 - 메모 지원
     const totalFilled = firstDay + lastDate;
     const totalGridSlots = Math.ceil(totalFilled / 7) * 7;
     const trailingCount = totalGridSlots - totalFilled;
@@ -3181,7 +3466,7 @@
     });
   }
 
-  // [다이어리 위클리 렌더링 - 현재 화면(이번 주) 7개 날짜에 있는 과목만 수집 & 유령 과목 필터링 제거]
+  // [다이어리 위클리 렌더링 - 현재 화면(이번 주) 7개 날짜에 있는 과목만 수집]
   function renderDiaryWeekly() {
     const y = diaryData.year, m = diaryData.month;
     const baseDate = new Date(y, m - 1, 17 + (diaryData.currentWeekOffset * 7));
@@ -3191,7 +3476,6 @@
     const headerTitle = $('#dHeaderTitle');
     if(headerTitle) headerTitle.textContent = `WEEK: ${startOfWeek.getMonth()+1}.${startOfWeek.getDate()} ~ ${endOfWeek.getMonth()+1}.${endOfWeek.getDate()}`;
 
-    // 1. 현재 화면(SUNDAY ~ SATURDAY)에 렌더링될 실제 7개 날짜 목록 계산
     const currentWeekISOs = new Set();
     for(let i = 0; i < 7; i++){
       const dt = new Date(startOfWeek);
@@ -3200,7 +3484,6 @@
       currentWeekISOs.add(isoStr);
     }
 
-    // 2. 화면에 표시되는 7개 날짜 중 실제 플래너에 존재하는 할 일(items)의 과목만 수집
     const allCategories = new Set();
     state.days.forEach(d => {
       if(currentWeekISOs.has(d.date)) {
@@ -3212,14 +3495,12 @@
     });
     const sortedCats = Array.from(allCategories).sort();
 
-    // 3. 이번 주 7일에 없는 과목은 체크 상태(Set)에서도 자동 정리
     Array.from(selectedWeeklyCats).forEach(cat => {
       if(!allCategories.has(cat)) {
         selectedWeeklyCats.delete(cat);
       }
     });
 
-    // 일정 보이기/숨기기 버튼 레이블 업데이트
     const evToggleBtn = $('#weeklyEventToggleBtn');
     if(evToggleBtn) {
       evToggleBtn.textContent = diaryData.showWeeklyEvents !== false ? '⏰ 일정 숨기기' : '⏰ 일정 보기';
@@ -3227,7 +3508,6 @@
       evToggleBtn.style.borderColor = diaryData.showWeeklyEvents !== false ? '#3D6EA5' : '#C8D4E2';
     }
 
-    // 복수 선택 드롭다운 UI 갱신
     const btn = $('#multiCatDropdownBtn');
     const container = $('#multiCatItemsContainer');
     if(btn && container) {
@@ -3323,7 +3603,6 @@
       
       let taskHtml = '';
       if(matchedPlan && matchedPlan.items.length) {
-        // [이번 주 과목 필터링 적용]
         const filteredItems = selectedWeeklyCats.size === 0 
           ? matchedPlan.items 
           : matchedPlan.items.filter(it => selectedWeeklyCats.has((it.cat || '').trim()));
@@ -3480,7 +3759,6 @@
       saveDiaryState(); 
     };
     
-    // [위클리 일정 보이기/숨기기 토글 버튼 이벤트]
     const evToggleBtn = $('#weeklyEventToggleBtn');
     if(evToggleBtn) {
       evToggleBtn.onclick = () => {
@@ -3491,7 +3769,6 @@
       };
     }
 
-    // [먼슬리 일정 보이기/숨기기 토글 버튼 이벤트]
     const monthlyEvToggleBtn = $('#monthlyEventToggleBtn');
     if(monthlyEvToggleBtn) {
       monthlyEvToggleBtn.onclick = () => {
@@ -3502,7 +3779,6 @@
       };
     }
 
-    // 복수 과목 선택 드롭다운 토글 및 버튼 이벤트
     const dropBtn = $('#multiCatDropdownBtn');
     const dropMenu = $('#multiCatDropdownMenu');
     if(dropBtn && dropMenu) {
