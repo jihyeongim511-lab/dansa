@@ -382,14 +382,28 @@
   .book-right{padding:20px;position:relative;display:flex;flex-direction:column;overflow:hidden}
   .month-header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid var(--d-theme);padding-bottom:10px;margin-bottom:12px;flex-wrap:wrap;gap:8px}
   .m-title{font-size:20px;font-weight:900;color:var(--d-theme-dark);letter-spacing:1px}
-  .m-nav-btns{display:flex;gap:4px;align-items:center}
+  .m-nav-btns{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
   .m-nav-btns button{border:1px solid var(--rule);background:#fff;border-radius:6px;padding:4px 9px;font-size:11px;font-weight:700}
 
-  .weekly-filter-wrap{display:flex;align-items:center;gap:4px;font-size:11.5px;font-weight:800;color:var(--jade)}
-  .weekly-filter-select{
-    border:1.5px solid var(--jade);background:#fff;border-radius:6px;padding:3px 8px;font-size:11px;
-    font-weight:bold;color:var(--ink);outline:none;cursor:pointer
+  /* 다중 과목 선택 팝업 UI 스타일 */
+  .multi-cat-filter-wrap{position:relative;display:inline-block}
+  .multi-cat-btn{
+    border:1.5px solid var(--jade);background:#fff;border-radius:6px;padding:4px 9px;
+    font-size:11px;font-weight:bold;color:var(--jade);display:inline-flex;align-items:center;gap:4px;
+    cursor:pointer;transition:all .15s;
   }
+  .multi-cat-btn:hover{background:#FAFBF8}
+  .multi-cat-dropdown{
+    display:none;position:absolute;right:0;top:calc(100% + 4px);background:#fff;
+    border:1.5px solid var(--rule);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.12);
+    min-width:180px;max-height:260px;overflow-y:auto;padding:8px;z-index:90;
+  }
+  .multi-cat-dropdown.open{display:flex;flex-direction:column;gap:6px}
+  .multi-cat-tools{display:flex;justify-content:space-between;border-bottom:1px dashed var(--rule);padding-bottom:5px;margin-bottom:2px}
+  .multi-cat-tools button{border:none;background:none;font-size:10.5px;font-weight:bold;color:var(--jade);cursor:pointer;padding:0}
+  .multi-cat-tools button:hover{text-decoration:underline}
+  .multi-cat-item{display:flex;align-items:center;gap:6px;font-size:11.5px;cursor:pointer;padding:2px 0}
+  .multi-cat-item input{accent-color:var(--jade);cursor:pointer}
 
   .book-tabs{background:#ECE2DA;border-left:1px solid #D9CFC7;display:flex;flex-direction:column;padding-top:20px;gap:8px;align-items:center}
   .side-tab{writing-mode:vertical-lr;text-orientation:mixed;font-size:11px;font-weight:800;letter-spacing:2px;padding:14px 6px;border:none;background:#FAFBF8;color:var(--ink-soft);border-radius:0 8px 8px 0;cursor:pointer;transition:all .15s}
@@ -723,12 +737,16 @@
         <div class="month-header" id="diaryHeaderRow">
           <div class="m-title" id="dHeaderTitle">HOME DASHBOARD</div>
           <div class="m-nav-btns" id="dNavBtnsContainer">
-            <!-- 위클리 과목 필터 드롭다운 컨테이너 -->
-            <div id="weeklyFilterBox" class="weekly-filter-wrap" style="display:none">
-              <span>과목별 보기:</span>
-              <select id="weeklyCatFilter" class="weekly-filter-select">
-                <option value="ALL">전체 과목 보기</option>
-              </select>
+            <!-- 복수 과목 선택 체크박스 드롭다운 컨테이너 -->
+            <div id="weeklyFilterBox" class="multi-cat-filter-wrap" style="display:none">
+              <button class="multi-cat-btn" id="multiCatDropdownBtn">과목 선택 (전체) ▾</button>
+              <div class="multi-cat-dropdown" id="multiCatDropdownMenu">
+                <div class="multi-cat-tools">
+                  <button type="button" id="multiCatSelectAll">전체 선택</button>
+                  <button type="button" id="multiCatClearAll">선택 해제</button>
+                </div>
+                <div id="multiCatItemsContainer" style="display:flex;flex-direction:column;gap:4px"></div>
+              </div>
             </div>
             <button id="dPrevBtn" class="btn small ghost">◀</button>
             <button id="dNextBtn" class="btn small ghost">▶</button>
@@ -876,7 +894,7 @@
   let savedSelectionRange = null;
   let lastActiveQAField = null;
   let isEditingTitle = false;
-  let currentWeeklyFilter = 'ALL'; // 위클리 과목 필터 상태
+  let selectedWeeklyCats = new Set(); // 복수 선택된 과목 Set
   
   let viewYear = new Date().getFullYear();
   let viewMonth = new Date().getMonth() + 1;
@@ -3086,7 +3104,7 @@
     const firstDay = new Date(y, m-1, 1).getDay();
     const lastDate = new Date(y, m, 0).getDate();
 
-    // 1. 앞쪽 빈칸(이전달 영역) - 메모 지원
+    // 1. 앞쪽 빈칸 - 메모 지원
     for(let i=0; i<firstDay; i++){
       const e = document.createElement('div');
       e.className = 'd-cal-cell empty-slot';
@@ -3122,7 +3140,7 @@
       grid.appendChild(cell);
     }
 
-    // 3. 뒤쪽 빈칸(다음달 영역) - 메모 지원
+    // 3. 뒤쪽 빈칸 - 메모 지원
     const totalFilled = firstDay + lastDate;
     const totalGridSlots = Math.ceil(totalFilled / 7) * 7;
     const trailingCount = totalGridSlots - totalFilled;
@@ -3146,7 +3164,7 @@
     });
   }
 
-  // [다이어리 위클리 렌더링 - 과목별 보기 필터링 지원]
+  // [다이어리 위클리 렌더링 - 과목 복수 선택 필터링 지원]
   function renderDiaryWeekly() {
     const y = diaryData.year, m = diaryData.month;
     const baseDate = new Date(y, m - 1, 17 + (diaryData.currentWeekOffset * 7));
@@ -3156,31 +3174,52 @@
     const headerTitle = $('#dHeaderTitle');
     if(headerTitle) headerTitle.textContent = `WEEK: ${startOfWeek.getMonth()+1}.${startOfWeek.getDate()} ~ ${endOfWeek.getMonth()+1}.${endOfWeek.getDate()}`;
 
-    // 전체 과목 목록 집계 및 필터 드롭다운 업데이트
+    // 전체 과목 목록 수집
     const allCategories = new Set();
     state.days.forEach(d => {
       (d.items || []).forEach(it => {
         if(it.cat && it.cat.trim()) allCategories.add(it.cat.trim());
       });
     });
+    const sortedCats = Array.from(allCategories).sort();
 
-    const filterSelect = $('#weeklyCatFilter');
-    if(filterSelect) {
-      const prevVal = currentWeeklyFilter;
-      filterSelect.innerHTML = `<option value="ALL">전체 과목 보기</option>` + 
-        Array.from(allCategories).sort().map(cat => `<option value="${esc(cat)}">${esc(cat)}</option>`).join('');
-      
-      if(allCategories.has(prevVal)) {
-        filterSelect.value = prevVal;
+    // 복수 선택 드롭다운 UI 갱신
+    const btn = $('#multiCatDropdownBtn');
+    const container = $('#multiCatItemsContainer');
+    if(btn && container) {
+      if(selectedWeeklyCats.size === 0 || selectedWeeklyCats.size === sortedCats.length) {
+        btn.textContent = '과목 선택 (전체) ▾';
       } else {
-        currentWeeklyFilter = 'ALL';
-        filterSelect.value = 'ALL';
+        btn.textContent = `과목 선택 (${selectedWeeklyCats.size}개) ▾`;
       }
 
-      filterSelect.onchange = (e) => {
-        currentWeeklyFilter = e.target.value;
-        renderDiaryWeekly();
-      };
+      container.innerHTML = sortedCats.map(cat => {
+        const isChecked = selectedWeeklyCats.size === 0 || selectedWeeklyCats.has(cat);
+        return `
+          <label class="multi-cat-item">
+            <input type="checkbox" class="w-cat-chk" value="${esc(cat)}" ${isChecked ? 'checked' : ''}>
+            <span>${esc(cat)}</span>
+          </label>
+        `;
+      }).join('');
+
+      container.querySelectorAll('.w-cat-chk').forEach(chk => {
+        chk.onchange = () => {
+          const val = chk.value;
+          if(selectedWeeklyCats.size === 0) {
+            // 전체 선택 상태에서 하나를 해제하거나 체크하기 시작할 때
+            sortedCats.forEach(c => selectedWeeklyCats.add(c));
+          }
+          if(chk.checked) selectedWeeklyCats.add(val);
+          else selectedWeeklyCats.delete(val);
+
+          // 모두 체크되었거나 모두 해제되면 초기화
+          if(selectedWeeklyCats.size === sortedCats.length || selectedWeeklyCats.size === 0) {
+            selectedWeeklyCats.clear();
+          }
+          renderDiaryWeekly();
+        };
+      });
     }
 
     const weekGrid = $('#dWeeklyGrid'); 
@@ -3226,10 +3265,10 @@
       
       let taskHtml = '';
       if(matchedPlan && matchedPlan.items.length) {
-        // [과목별 필터링 적용]
-        const filteredItems = currentWeeklyFilter === 'ALL' 
+        // [다중 과목 선택 필터링 적용]
+        const filteredItems = selectedWeeklyCats.size === 0 
           ? matchedPlan.items 
-          : matchedPlan.items.filter(it => (it.cat || '').trim() === currentWeeklyFilter);
+          : matchedPlan.items.filter(it => selectedWeeklyCats.has((it.cat || '').trim()));
 
         if(filteredItems.length > 0) {
           taskHtml = filteredItems.map(it => `
@@ -3241,13 +3280,11 @@
             </li>
           `).join('');
         } else {
-          taskHtml = `<li class="no-task-hint" style="font-size:10px;color:#A2ACA2">'${esc(currentWeeklyFilter)}' 할 일 없음</li>`;
+          taskHtml = `<li class="no-task-hint" style="font-size:10px;color:#A2ACA2">선택한 과목의 할 일 없음</li>`;
         }
       } else {
         taskHtml = '<li class="no-task-hint" style="font-size:10px;color:#A2ACA2">할 일이 없습니다</li>';
       }
-
-      const defaultAddPlaceholder = currentWeeklyFilter === 'ALL' ? '[과목] 할 일 입력...' : `[${currentWeeklyFilter}] 할 일 입력...`;
 
       const col = document.createElement('div'); col.className = 'd-week-col';
       col.innerHTML = `
@@ -3256,10 +3293,10 @@
         <ul class="d-week-events">${evHtml}</ul>
         
         <div style="font-size:10px;font-weight:800;color:var(--jade);margin-top:4px;margin-bottom:2px">
-          ✅ 할 일 ${currentWeeklyFilter !== 'ALL' ? `<span style="font-size:9.5px;color:var(--d-theme-dark)">(${esc(currentWeeklyFilter)})</span>` : ''}
+          ✅ 할 일 ${selectedWeeklyCats.size > 0 ? `<span style="font-size:9.5px;color:var(--d-theme-dark)">(${selectedWeeklyCats.size}개 과목 필터)</span>` : ''}
         </div>
         <div class="d-week-task-addbox">
-          <input type="text" class="w-add-input" placeholder="${esc(defaultAddPlaceholder)}" data-date="${iso}">
+          <input type="text" class="w-add-input" placeholder="[과목] 할 일 입력..." data-date="${iso}">
           <button class="w-add-btn" data-date="${iso}">＋</button>
         </div>
         <ul class="d-week-tasks" data-date="${iso}">${taskHtml}</ul>
@@ -3327,7 +3364,7 @@
           state.days.push(targetDay);
         }
 
-        let cat = currentWeeklyFilter !== 'ALL' ? currentWeeklyFilter : '기타';
+        let cat = '기타';
         let text = textVal;
         const match = textVal.match(/^\[(.*?)\]\s*(.*)$/);
         if(match) {
@@ -3374,6 +3411,30 @@
     if(prevBtn) prevBtn.onclick = () => { if(diaryData.currentTab === 'WEEK') diaryData.currentWeekOffset--; else { diaryData.month--; if(diaryData.month<1){ diaryData.month=12; diaryData.year--; } } (diaryData.currentTab === 'WEEK') ? renderDiaryWeekly() : renderDiaryMonthly(); renderStickers(); saveDiaryState(); };
     if(nextBtn) nextBtn.onclick = () => { if(diaryData.currentTab === 'WEEK') diaryData.currentWeekOffset++; else { diaryData.month++; if(diaryData.month>12){ diaryData.month=1; diaryData.year++; } } (diaryData.currentTab === 'WEEK') ? renderDiaryWeekly() : renderDiaryMonthly(); renderStickers(); saveDiaryState(); };
     
+    // 복수 과목 선택 드롭다운 토글 및 버튼 이벤트
+    const dropBtn = $('#multiCatDropdownBtn');
+    const dropMenu = $('#multiCatDropdownMenu');
+    if(dropBtn && dropMenu) {
+      dropBtn.onclick = (e) => {
+        e.stopPropagation();
+        dropMenu.classList.toggle('open');
+      };
+      window.addEventListener('click', (e) => {
+        if(!dropMenu.contains(e.target) && e.target !== dropBtn) {
+          dropMenu.classList.remove('open');
+        }
+      });
+      $('#multiCatSelectAll').onclick = () => {
+        selectedWeeklyCats.clear();
+        renderDiaryWeekly();
+      };
+      $('#multiCatClearAll').onclick = () => {
+        selectedWeeklyCats.clear();
+        selectedWeeklyCats.add('__NONE__'); // 아무것도 선택 안 됨 표시
+        renderDiaryWeekly();
+      };
+    }
+
     const goalMonthSelect = $('#goalMonthSelect');
     if(goalMonthSelect) {
       if(diaryData.selectedGoalMonth) goalMonthSelect.value = diaryData.selectedGoalMonth;
@@ -3468,7 +3529,7 @@
           if(homeView) homeView.style.display = 'none';
           if(monthlyView) monthlyView.style.display = 'none';
           if(weeklyView) weeklyView.style.display = 'flex';
-          if(weeklyFilterBox) weeklyFilterBox.style.display = 'flex';
+          if(weeklyFilterBox) weeklyFilterBox.style.display = 'inline-block';
           if($('#dNavBtnsContainer')) $('#dNavBtnsContainer').style.display = 'flex';
           renderDiaryWeekly();
         }
@@ -3507,7 +3568,7 @@
       $('#dHomeView').style.display = 'none';
       $('#dMonthlyView').style.display = 'none';
       $('#dWeeklyView').style.display = 'flex';
-      if(weeklyFilterBox) weeklyFilterBox.style.display = 'flex';
+      if(weeklyFilterBox) weeklyFilterBox.style.display = 'inline-block';
       if($('#dNavBtnsContainer')) $('#dNavBtnsContainer').style.display = 'flex';
       renderDiaryWeekly();
     } else {
