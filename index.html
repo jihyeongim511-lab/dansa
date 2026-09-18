@@ -522,7 +522,7 @@
 
     <div class="memobox">
       <div class="mbhead">
-        <h3>메모장 <span class="mbsub">전역 공통 링크, 자료 위치, 잡다한 메모</span></h3>
+        <h3>메모장 <span class="mbsub">전역 공통 링크, 자료 위치, 잡다한 메모 (Ctrl+V 이미지 붙여넣기 지원)</span></h3>
         <div class="mbtools">
           <span class="saved" id="mSaved">저장됨</span>
           <button class="btn small ghost" id="mInsTable">표 삽입</button>
@@ -1047,6 +1047,63 @@
     i.onchange = () => { if(i.files && i.files[0]) cb(i.files[0]); }; i.click();
   }
 
+  // --- 클립보드 붙여넣기(Cmd+V / Ctrl+V) 전역 핸들러 ---
+  window.addEventListener('paste', async (e) => {
+    if (e.target.tagName === 'INPUT' && !e.target.classList.contains('swatch') && !e.target.classList.contains('ed-color')) return;
+    if (e.target.tagName === 'TEXTAREA') return;
+
+    const items = (e.clipboardData || e.originalEvent?.clipboardData)?.items;
+    if (!items) return;
+
+    let imageFile = null;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        imageFile = items[i].getAsFile();
+        break;
+      }
+    }
+
+    if (!imageFile) return;
+
+    // 1) 상단 메모장 활성화 시 메모장 안에 삽입
+    if (document.activeElement && document.activeElement.id === 'memoArea') {
+      e.preventDefault();
+      const base64 = await shrinkImage(imageFile, 600, 0.85);
+      document.execCommand('insertImage', false, base64);
+      await storage.set(MKEY, JSON.stringify({ html: $('#memoArea').innerHTML }));
+      toast('메모장에 이미지가 붙여넣어졌습니다!');
+      return;
+    }
+
+    // 2) Q&A 필기 영역 활성화 시 필기 칸에 삽입
+    if (document.activeElement && document.activeElement.classList.contains('qafield')) {
+      e.preventDefault();
+      const base64 = await shrinkImage(imageFile, 400, 0.85);
+      document.execCommand('insertImage', false, base64);
+      const rowEl = document.activeElement.closest('.qarow');
+      const d = cur();
+      const targetQ = d.qa.find(x => x.id === rowEl.dataset.id);
+      if (targetQ) {
+        targetQ[document.activeElement.dataset.f] = document.activeElement.innerHTML;
+        await saveState();
+      }
+      toast('필기 영역에 이미지가 붙여넣어졌습니다!');
+      return;
+    }
+
+    // 3) 그 외의 경우: 오늘의 인증 사진(photos)에 자동 등록 및 Supabase 실시간 저장
+    const d = cur();
+    if (d && $('#plannerContainer').style.display !== 'none') {
+      e.preventDefault();
+      const base64 = await shrinkImage(imageFile, 500, 0.85);
+      if (!d.photos) d.photos = [];
+      d.photos.push(base64);
+      await saveState();
+      openPlannerPanel();
+      toast('📋 클립보드 이미지가 오늘의 인증 사진에 등록되었습니다!');
+    }
+  });
+
   function mk(date, label, rest, pairs) {
     const items = (pairs||[]).map(p => ({ id:uid(), cat:p[0], text:p[1], kind:p[2]||'main', state:'none', color:'#16202B', bold:false }));
     if(!rest){ items.push({id:uid(), cat:'자가 테스트', text:'오늘 암기 항목 백지 인출', kind:'test', state:'none', color:'#16202B', bold:false}); }
@@ -1422,15 +1479,20 @@
         </div>
       </div>
 
-      <!-- 할 일 리스트 -->
+      <!-- 할 일 리스트 (수정 모드에서 글자 색상 및 굵기 수정 가능) -->
       <div style="margin-top:16px;padding-top:14px;border-top:1px dashed var(--rule)">
-        <h3 style="margin:0 0 6px;font-size:13px;font-weight:700">✅ 오늘 할 일 목록 <span style="font-size:11px;font-weight:normal;color:var(--ink-soft)">(수정 버튼을 누르거나 더블 클릭하여 수정)</span></h3>
+        <h3 style="margin:0 0 6px;font-size:13px;font-weight:700">✅ 오늘 할 일 목록 <span style="font-size:11px;font-weight:normal;color:var(--ink-soft)">(수정 버튼을 누르거나 더블 클릭하여 내용/색상 수정)</span></h3>
         <ul class="items">${d.items.map((it,idx)=>`
           <li class="${it.kind==='memo'?'memo':it.kind==='test'?'test':''}${it.state==='done'?' done':it.state==='partial'?' partial':''}" data-id="${it.id}">
             ${it._editing ? `
-              <div style="display:flex;gap:6px;flex:1;align-items:center;">
-                <input type="text" class="ed-cat" value="${esc(it.cat)}" style="width:90px;padding:4px 6px;border:1px solid var(--rule);border-radius:6px;font-size:13px;">
-                <input type="text" class="ed-text" value="${esc(it.text)}" style="flex:1;padding:4px 6px;border:1px solid var(--rule);border-radius:6px;font-size:13px;">
+              <div style="display:flex;gap:6px;flex:1;align-items:center;flex-wrap:wrap;">
+                <input type="text" class="ed-cat" value="${esc(it.cat)}" style="width:90px;padding:4px 6px;border:1px solid var(--rule);border-radius:6px;font-size:13px;" placeholder="과목">
+                <input type="text" class="ed-text" value="${esc(it.text)}" style="flex:1;min-width:130px;padding:4px 6px;border:1px solid var(--rule);border-radius:6px;font-size:13px;" placeholder="할 일 내용">
+                <div style="display:flex;gap:4px;align-items:center;background:#fff;padding:2px 6px;border-radius:6px;border:1px solid var(--rule)">
+                  <span style="font-size:11px;color:var(--ink-soft);font-weight:bold">색상:</span>
+                  <input type="color" class="ed-color" value="${it.color||'#16202B'}" title="글자 색상 선택" style="width:20px;height:20px;border:none;background:none;cursor:pointer;padding:0">
+                  <button type="button" class="btn small ghost ed-bold ${it.bold?'primary':''}" style="padding:1px 6px;font-weight:bold" title="굵게 토글">B</button>
+                </div>
                 <button class="btn small primary" data-act="save-edit">저장</button>
                 <button class="btn small ghost" data-act="cancel-edit">취소</button>
               </div>
@@ -1459,14 +1521,17 @@
       </div>
 
       <div class="photos">
-        <h3>📷 오늘의 인증 사진</h3>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <h3 style="margin:0">📷 오늘의 인증 사진</h3>
+          <span style="font-size:11px;color:var(--ink-soft);font-weight:bold">💡 스크린샷 후 Ctrl+V / Cmd+V 붙여넣기 지원</span>
+        </div>
         <div class="thumbs">
           ${(d.photos||[]).map((ph, pi)=>`
           <div class="thumb" data-idx="${pi}">
             <img src="${ph}">
             <button class="p-del">✕</button>
           </div>`).join('')}
-          <button class="addphoto" id="addPhotoBtn">＋</button>
+          <button class="addphoto" id="addPhotoBtn" title="파일 선택 또는 화면에서 붙여넣기">＋</button>
         </div>
       </div>
 
@@ -1477,7 +1542,7 @@
         <button class="btn ghost small" id="mN">지우기</button>
       </div>
 
-      <!-- 문제별 개별 접기/펼치기가 적용된 필기 영역 -->
+      <!-- 문제별 개별 접기/펼치기 필기 영역 -->
       <div class="notes">
         <div class="nhead">
           <div style="display:flex;align-items:center;gap:8px">
@@ -1656,6 +1721,7 @@
       saveState(); openPlannerPanel();
     };
     
+    // --- 할 일 수정 모드 (내용, 색상, 볼드체 포함) 리스너 ---
     panelEl.querySelectorAll('.items [data-act]').forEach(b => {
       b.onclick = () => {
         const li = b.closest('li'), idx = d.items.findIndex(x=>x.id === li.dataset.id); if(idx === -1) return;
@@ -1672,9 +1738,14 @@
         } else if(a==='save-edit') {
           const newCat = li.querySelector('.ed-cat').value.trim();
           const newTxt = li.querySelector('.ed-text').value.trim();
+          const newColor = li.querySelector('.ed-color').value;
+          const isBold = li.querySelector('.ed-bold').classList.contains('primary');
+          
           if(newTxt) {
             it.cat = newCat || '기타';
             it.text = newTxt;
+            it.color = newColor;
+            it.bold = isBold;
             delete it._editing;
           } else {
             toast('할 일 내용을 입력해주세요.');
@@ -1688,6 +1759,13 @@
           const tmp = d.items[idx+1]; d.items[idx+1] = it; d.items[idx] = tmp;
         }
         saveState(); renderPlannerCalendar(); openPlannerPanel();
+      };
+    });
+
+    panelEl.querySelectorAll('.items .ed-bold').forEach(btn => {
+      btn.onclick = () => {
+        btn.classList.toggle('primary');
+        btn.classList.toggle('ghost');
       };
     });
 
@@ -1733,7 +1811,7 @@
     $('#mF').onclick = () => { d.status='fail'; saveState(); renderPlannerCalendar(); openPlannerPanel(); };
     $('#mN').onclick = () => { d.status='none'; saveState(); renderPlannerCalendar(); openPlannerPanel(); };
 
-    // --- 문제별 개별 접기/펼치기 및 삭제 리스너 ---
+    // 문제별 접기/펼치기 및 삭제
     const qaBox = $('#qaBox');
     if(qaBox) {
       qaBox.querySelectorAll('.qarow').forEach(row => {
@@ -1745,16 +1823,14 @@
         const toggleBtn = row.querySelector('.q-toggle-btn');
         const delBtn = row.querySelector('.rdel-btn');
 
-        // 헤더 클릭 시 개별 토글
         header.onclick = e => {
-          if(e.target.closest('.rdel-btn')) return; // 삭제 버튼 클릭 시 제외
+          if(e.target.closest('.rdel-btn')) return;
           targetQ.collapsed = !targetQ.collapsed;
           row.classList.toggle('collapsed', targetQ.collapsed);
           toggleBtn.textContent = targetQ.collapsed ? '▼ 펼치기' : '▲ 접기';
           saveState();
         };
 
-        // 개별 문제 삭제
         delBtn.onclick = e => {
           e.stopPropagation();
           d.qa = d.qa.filter(x => x.id !== rId);
@@ -1763,7 +1839,6 @@
         };
       });
 
-      // 실시간 문제 미리보기 갱신
       qaBox.addEventListener('input', e => {
         if(e.target.matches('.qafield.q')) {
           const row = e.target.closest('.qarow');
@@ -1775,12 +1850,11 @@
       });
     }
 
-    // 전체 문제 일괄 접기/펼치기 토글
     const toggleAllQABtn = $('#toggleAllQABtn');
     if(toggleAllQABtn && qaBox) {
       toggleAllQABtn.onclick = () => {
         const hasOpen = d.qa.some(r => !r.collapsed);
-        const shouldCollapse = hasOpen; // 열려 있는 게 하나라도 있으면 모두 닫기
+        const shouldCollapse = hasOpen;
         d.qa.forEach(r => r.collapsed = shouldCollapse);
         saveState();
         openPlannerPanel();
@@ -2372,7 +2446,7 @@
               if(leftPane) leftPane.style.display = 'none'; if(rightPane) rightPane.style.gridColumn = 'span 2';
               $('#dHomeView').style.display = 'none'; $('#dMonthlyView').style.display = 'grid'; $('#dWeeklyView').style.display = 'none';
               if($('#dNavBtnsContainer')) $('#dNavBtnsContainer').style.display = 'flex';
-              renderDiaryMonthly();
+              renderDiaryWeekly();
             }
             renderStickers();
           }
