@@ -217,11 +217,30 @@
   .btn.mark-s.on{background:var(--jade);color:#fff;border-color:var(--jade)}
   .btn.mark-f.on{background:var(--seal);color:#fff;border-color:var(--seal)}
 
+  /* 필기 섹션 & 개별 문제 접기 카드 스타일 */
   .notes{margin-top:16px;padding-top:14px;border-top:1px dashed var(--rule)}
-  .notes .nhead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:8px}
-  .notes h3{margin:0;font-size:13px;font-weight:700}
-  .qa{display:flex;flex-direction:column;gap:10px;transition:all 0.2s ease}
-  .qarow{display:grid;grid-template-columns:1fr 1fr;gap:10px;position:relative}
+  .notes .nhead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+  .notes h3{margin:0;font-size:14px;font-weight:800}
+  
+  .qa{display:flex;flex-direction:column;gap:10px}
+  .qarow{
+    background:#FAFBF8;border:1.5px solid var(--rule);border-radius:10px;padding:8px 10px;
+    position:relative;display:flex;flex-direction:column;gap:8px;transition:all .15s ease;
+  }
+  .qarow:hover{border-color:#BAC7B8}
+  
+  .qarow-header{
+    display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;
+  }
+  .qarow-header .q-title{font-size:12px;font-weight:800;color:var(--jade);display:flex;align-items:center;gap:6px}
+  .qarow-header .q-preview{font-size:11.5px;font-weight:normal;color:var(--ink-soft);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:320px}
+  .qarow-header .q-tools{display:flex;align-items:center;gap:6px}
+  
+  .qarow-body{
+    display:grid;grid-template-columns:1fr 1fr;gap:10px;padding-top:4px;border-top:1px dashed #E2E7DF;
+  }
+  .qarow.collapsed .qarow-body{display:none}
+  
   .qafield{width:100%;min-height:78px;font-family:inherit;font-size:13.5px;line-height:1.6;color:var(--ink);border:1px solid var(--rule);border-radius:8px;padding:8px 10px;background:#fff;overflow-x:auto;outline:none}
   .qafield:focus{outline:2px solid var(--jade);outline-offset:1px}
   .qafield:empty:before{content:attr(data-ph);color:#9AA79A}
@@ -229,8 +248,8 @@
   .qafield.a{border-left:3px solid var(--jade)}
   .qa.hide .qafield.a{filter:blur(4.5px);transition:filter .2s}
   .qa.hide .qafield.a:focus{filter:none}
-  .qarow .rdel{position:absolute;top:-9px;right:-6px;width:22px;height:22px;border-radius:50%;border:1px solid var(--rule);background:#fff;color:var(--ink-soft);font-size:11px;line-height:1;display:flex;align-items:center;justify-content:center}
-  .qarow .rdel:hover{color:var(--seal);border-color:#E3C9C5}
+  .rdel-btn{border:none;background:none;color:var(--seal);font-size:12px;font-weight:bold;cursor:pointer;padding:2px 6px;border-radius:4px}
+  .rdel-btn:hover{background:#FDF2F2}
 
   .qa-table{width:100%;border-collapse:collapse;margin:6px 0}
   .qa-table td, .qa-table th{border:1px solid var(--rule);padding:4px 8px;min-height:24px}
@@ -303,7 +322,6 @@
   .d-goal-item .g-del{border:none;background:none;color:#B9C2B5;font-size:12px;padding:0 4px;line-height:1}
   .d-goal-item .g-del:hover{color:var(--seal)}
 
-  /* 디데이 카드 */
   .dday-card{
     background:var(--d-theme-soft);border:1.5px solid var(--d-theme);border-radius:12px;
     padding:14px;text-align:center;cursor:pointer;transition:transform .15s, box-shadow .15s;
@@ -403,7 +421,6 @@
   .search-res-item{padding:10px;border:1px solid var(--rule);border-radius:8px;cursor:pointer;background:#fff;margin-bottom:6px;transition:all 0.15s}
   .search-res-item:hover{background:#FAFBF8;border-color:var(--jade)}
 
-  /* 갤러리 모달 */
   .gallery-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(130px, 1fr));gap:12px;max-height:65vh;overflow-y:auto;padding:6px}
   .gallery-card{border:1px solid var(--rule);border-radius:8px;overflow:hidden;background:#fff;cursor:pointer}
   .gallery-card img{width:100%;height:110px;object-fit:cover;display:block}
@@ -424,10 +441,8 @@
     <div class="nav-tabs">
       <button class="nav-tab active" id="btnModePlanner">📋 학습 플래너 모드</button>
       <button class="nav-tab" id="btnModeDiary">📖 다이어리 모드</button>
-      <!-- 수동 전체 저장 버튼 -->
       <button class="btn save-btn" id="manualGlobalSaveBtn" title="모든 변경 사항을 저장소에 즉시 동기화합니다.">💾 전체 저장</button>
       
-      <!-- 구글 캘린더 전용 툴바 버튼들 -->
       <button class="btn cal-embed-btn" id="openGCalEmbedBtn" title="구글 캘린더를 팝업 창으로 바로 열어 확인합니다.">📅 캘린더 보기</button>
       <button class="btn cal-btn" id="syncGCalBtn" title="구글 캘린더 일정을 플래너 목록으로 자동 동기화합니다.">📥 일정 동기화</button>
       <button class="btn cal-file-btn" id="uploadIcsBtn" title="다운로드받은 ics 파일을 직접 올려 등록합니다.">📁 파일(ics)</button>
@@ -505,7 +520,6 @@
       <div class="moodlog" id="moodLog"></div>
     </section>
 
-    <!-- 메모장 -->
     <div class="memobox">
       <div class="mbhead">
         <h3>메모장 <span class="mbsub">전역 공통 링크, 자료 위치, 잡다한 메모</span></h3>
@@ -534,7 +548,6 @@
       <div class="grid" id="grid"></div>
     </div>
 
-    <!-- 성공/실패 도장 업로드 섹션 -->
     <div class="stampset">
       <div class="stampbox">
         <div class="pv" id="pvS">✓</div>
@@ -575,7 +588,6 @@
     <div class="book-spread">
       <div id="stickerCanvas"></div>
 
-      <!-- 왼쪽 페이지 -->
       <div class="book-left grid-paper" id="bookLeftPane">
         <div class="profile-badge">
           <span class="p-tag">MY DIARY</span>
@@ -585,7 +597,6 @@
           <input type="text" class="profile-bio" id="dProfileBio" value="오늘도 힘내서 합격하기 ✨" placeholder="한 줄 소개">
         </div>
 
-        <!-- 디데이 카드 -->
         <div class="dday-card" id="ddayCardWrap" title="클릭하여 목표 날짜를 변경하면 D-Day가 자동 계산됩니다.">
           <div class="dday-title" id="ddayTitleEdit">🎯 임용시험 D-DAY</div>
           <div class="dday-number" id="ddayNumEdit">D-105</div>
@@ -593,7 +604,6 @@
         </div>
       </div>
 
-      <!-- 오른쪽 페이지 -->
       <div class="book-right grid-paper" id="bookRightPane" style="grid-column: span 2;">
         <div class="diary-format-toolbar">
           <button class="diary-fmt-btn" id="dFmtBold"><b>B</b></button>
@@ -609,7 +619,6 @@
           </div>
         </div>
 
-        <!-- 1. HOME 탭 화면 -->
         <div id="dHomeView" class="home-page-layout">
           <div class="home-card">
             <div class="home-card-header">
@@ -646,19 +655,16 @@
           </div>
         </div>
 
-        <!-- 2. MONTH 탭 화면 -->
         <div class="d-cal-grid" id="dMonthlyView" style="display:none">
           <div class="d-cal-head">SUN</div><div class="d-cal-head">MON</div><div class="d-cal-head">TUE</div>
           <div class="d-cal-head">WED</div><div class="d-cal-head">THU</div><div class="d-cal-head">FRI</div><div class="d-cal-head">SAT</div>
         </div>
 
-        <!-- 3. WEEK 탭 화면 -->
         <div id="dWeeklyView" style="display:none">
           <div class="d-weekly-spread-grid" id="dWeeklyGrid"></div>
         </div>
       </div>
 
-      <!-- 사이드 탭 -->
       <div class="book-tabs">
         <button class="side-tab active" data-tab="HOME">HOME</button>
         <button class="side-tab" data-tab="WEEK">WEEK</button>
@@ -695,7 +701,6 @@
     </div>
   </div>
 
-  <!-- 사진 모아보기 모달 -->
   <div id="galleryModalOverlay" style="display:none;position:fixed;inset:0;background:rgba(22,32,43,.65);z-index:300;align-items:center;justify-content:center;padding:16px;">
     <div style="width:min(680px,100%);max-height:85vh;background:var(--card);border-radius:16px;padding:20px;display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,.25);">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;border-bottom:2px solid var(--rule);padding-bottom:10px">
@@ -715,7 +720,6 @@
   const KEY='plan-v1', SKEY='stamps-v1', CKEY='clip-v1', MKEY='memo-v1', APPKEY='app-settings-v1', DKEY='diary-v1';
   const $ = s => document.querySelector(s);
   
-  // 구글 캘린더 전용 주소 설정
   const GOOGLE_EMBED_URL = "https://calendar.google.com/calendar/embed?src=dansagae525%40gmail.com&ctz=Asia%2FSeoul";
   const GOOGLE_PUBLIC_ICAL_URL = "https://calendar.google.com/calendar/ical/dansagae525%40gmail.com/public/basic.ics";
   const GOOGLE_PRIVATE_ICAL_URL = "https://calendar.google.com/calendar/ical/dansagae525%40gmail.com/private-2f442def1c2f816de819739e4f58ded7/basic.ics";
@@ -863,9 +867,6 @@
     };
   }
 
-  // ----------------------------------------------------
-  // 구글 캘린더 임베드 팝업창 열기
-  // ----------------------------------------------------
   function openGoogleCalendarModal() {
     const modal = createModal(`
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
@@ -881,9 +882,6 @@
     modal.box.querySelector('#closeGCalEmbedModal').onclick = () => modal.close();
   }
 
-  // ----------------------------------------------------
-  // 구글 캘린더 iCal (.ics) 일정 파싱 및 플래너 등록 (중복 허용)
-  // ----------------------------------------------------
   function parseIcsDate(icsStr) {
     if(!icsStr) return null;
     const cleanStr = icsStr.replace(/Z$/, '');
@@ -993,8 +991,6 @@
 
   async function syncGoogleCalendar() {
     toast('구글 캘린더 일정을 가져오는 중입니다...');
-    
-    // 1. 공개 iCal 주소 시도 -> 2. 비공개 iCal 주소 시도
     const targets = [GOOGLE_PUBLIC_ICAL_URL, GOOGLE_PRIVATE_ICAL_URL];
     for(const tUrl of targets) {
       try {
@@ -1003,8 +999,6 @@
         return;
       } catch(e) {}
     }
-    
-    // 만약 프록시 차단으로 읽어오지 못한 경우 바로 임베드 뷰를 열어줌
     toast('외부 접속 차단으로 캘린더 화면을 바로 엽니다. 일정을 확인하고 추가해보세요!');
     openGoogleCalendarModal();
   }
@@ -1056,7 +1050,7 @@
   function mk(date, label, rest, pairs) {
     const items = (pairs||[]).map(p => ({ id:uid(), cat:p[0], text:p[1], kind:p[2]||'main', state:'none', color:'#16202B', bold:false }));
     if(!rest){ items.push({id:uid(), cat:'자가 테스트', text:'오늘 암기 항목 백지 인출', kind:'test', state:'none', color:'#16202B', bold:false}); }
-    return {id:uid(), date, label, rest:!!rest, status:'none', events:[], photos:[], qa:[{id:uid(),q:'',a:''}], studyMinutes:0, timerStart:null, availableMinutes:600, trackerSlots:[], items};
+    return {id:uid(), date, label, rest:!!rest, status:'none', events:[], photos:[], qa:[{id:uid(),q:'',a:'',collapsed:false}], studyMinutes:0, timerStart:null, availableMinutes:600, trackerSlots:[], items};
   }
 
   function seed(){
@@ -1073,7 +1067,8 @@
     if(!state.title) state.title = '학습 플랜';
     if(!Array.isArray(state.days)) state.days = seed().days;
     state.days.forEach(d => {
-      if(!Array.isArray(d.qa)) d.qa = [{id:uid(), q:'', a:''}];
+      if(!Array.isArray(d.qa)) d.qa = [{id:uid(), q:'', a:'', collapsed:false}];
+      d.qa.forEach(r => { if(typeof r.collapsed !== 'boolean') r.collapsed = false; });
       if(!Array.isArray(d.events)) d.events = [];
       if(!Array.isArray(d.photos)) d.photos = [];
       if(!Array.isArray(d.items)) d.items = [];
@@ -1482,12 +1477,12 @@
         <button class="btn ghost small" id="mN">지우기</button>
       </div>
 
-      <!-- 접기/펼치기 토글이 포함된 필기 영역 -->
+      <!-- 문제별 개별 접기/펼치기가 적용된 필기 영역 -->
       <div class="notes">
         <div class="nhead">
           <div style="display:flex;align-items:center;gap:8px">
             <h3>공부한 내용 필기</h3>
-            <button class="btn small ghost" id="toggleCollapseNotesBtn">🔼 필기 영역 접기</button>
+            <button class="btn small ghost" id="toggleAllQABtn">모두 접기/펼치기</button>
           </div>
           <div style="display:flex;gap:6px;flex-wrap:wrap">
             <button class="btn small ghost" id="toggleHideBtn">👁 답 가리기 토글</button>
@@ -1497,29 +1492,43 @@
           </div>
         </div>
         <div class="qa" id="qaBox">
-          ${d.qa.map(r=>`
-          <div class="qarow" data-id="${r.id}">
-            <div style="display:flex;flex-direction:column;gap:4px">
-              <div class="formatbar" style="background:#f4f6f2;padding:2px 6px;border-radius:4px;display:flex;gap:4px;align-items:center">
-                <button class="fmtbtn qa-fmt" data-act="bold" title="볼드체">B</button>
-                <input type="color" class="swatch qa-color" value="#16202B" title="글자 색상" style="width:16px;height:16px;border:none;background:none;cursor:pointer">
+          ${d.qa.map((r, qIdx)=> {
+            const previewText = stripHTML(r.q).trim() || '내용 없음';
+            return `
+            <div class="qarow ${r.collapsed ? 'collapsed' : ''}" data-id="${r.id}">
+              <div class="qarow-header" data-toggle="collapse">
+                <div class="q-title">
+                  <span style="background:var(--jade);color:#fff;padding:1px 6px;border-radius:4px;font-size:11px">Q${qIdx+1}</span>
+                  <span class="q-preview">${previewText}</span>
+                </div>
+                <div class="q-tools">
+                  <button class="btn small ghost q-toggle-btn" style="padding:2px 7px;font-size:11px">${r.collapsed ? '▼ 펼치기' : '▲ 접기'}</button>
+                  <button class="rdel-btn" data-act="del-qa" title="이 문제 삭제">✕</button>
+                </div>
               </div>
-              <div class="qafield q" contenteditable="true" data-f="q" data-ph="문제/키워드...">${r.q}</div>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:4px">
-              <div class="formatbar" style="background:#f4f6f2;padding:2px 6px;border-radius:4px;display:flex;gap:4px;align-items:center">
-                <button class="fmtbtn qa-fmt" data-act="bold" title="볼드체">B</button>
-                <input type="color" class="swatch qa-color" value="#16202B" title="글자 색상" style="width:16px;height:16px;border:none;background:none;cursor:pointer">
+              <div class="qarow-body">
+                <div style="display:flex;flex-direction:column;gap:4px">
+                  <div class="formatbar" style="background:#f4f6f2;padding:2px 6px;border-radius:4px;display:flex;gap:4px;align-items:center">
+                    <button class="fmtbtn qa-fmt" data-act="bold" title="볼드체">B</button>
+                    <input type="color" class="swatch qa-color" value="#16202B" title="글자 색상" style="width:16px;height:16px;border:none;background:none;cursor:pointer">
+                  </div>
+                  <div class="qafield q" contenteditable="true" data-f="q" data-ph="문제/키워드...">${r.q}</div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:4px">
+                  <div class="formatbar" style="background:#f4f6f2;padding:2px 6px;border-radius:4px;display:flex;gap:4px;align-items:center">
+                    <button class="fmtbtn qa-fmt" data-act="bold" title="볼드체">B</button>
+                    <input type="color" class="swatch qa-color" value="#16202B" title="글자 색상" style="width:16px;height:16px;border:none;background:none;cursor:pointer">
+                  </div>
+                  <div class="qafield a" contenteditable="true" data-f="a" data-ph="정답/설명...">${r.a}</div>
+                  <div class="table-tools">
+                    <button class="btn small ghost add-row-btn" style="font-size:10px;padding:2px 4px">➕ 행 추가</button>
+                    <button class="btn small ghost add-col-btn" style="font-size:10px;padding:2px 4px">➕ 열 추가</button>
+                    <button class="btn small danger ghost del-tbl-btn" style="font-size:10px;padding:2px 4px">🗑 표 삭제</button>
+                  </div>
+                </div>
               </div>
-              <div class="qafield a" contenteditable="true" data-f="a" data-ph="정답/설명...">${r.a}</div>
-              <div class="table-tools">
-                <button class="btn small ghost add-row-btn" style="font-size:10px;padding:2px 4px">➕ 행 추가</button>
-                <button class="btn small ghost add-col-btn" style="font-size:10px;padding:2px 4px">➕ 열 추가</button>
-                <button class="btn small danger ghost del-tbl-btn" style="font-size:10px;padding:2px 4px">🗑 표 삭제</button>
-              </div>
-            </div>
-            <button class="rdel">✕</button>
-          </div>`).join('')}
+            </div>`;
+          }).join('')}
         </div>
       </div>
     `;
@@ -1724,14 +1733,57 @@
     $('#mF').onclick = () => { d.status='fail'; saveState(); renderPlannerCalendar(); openPlannerPanel(); };
     $('#mN').onclick = () => { d.status='none'; saveState(); renderPlannerCalendar(); openPlannerPanel(); };
 
-    // 필기 접기/펼치기 토글
+    // --- 문제별 개별 접기/펼치기 및 삭제 리스너 ---
     const qaBox = $('#qaBox');
-    const collapseNotesBtn = $('#toggleCollapseNotesBtn');
-    if(collapseNotesBtn && qaBox) {
-      collapseNotesBtn.onclick = () => {
-        const isHidden = qaBox.style.display === 'none';
-        qaBox.style.display = isHidden ? 'flex' : 'none';
-        collapseNotesBtn.textContent = isHidden ? '🔼 필기 영역 접기' : '🔽 필기 영역 펼치기';
+    if(qaBox) {
+      qaBox.querySelectorAll('.qarow').forEach(row => {
+        const rId = row.dataset.id;
+        const targetQ = d.qa.find(x => x.id === rId);
+        if(!targetQ) return;
+
+        const header = row.querySelector('.qarow-header');
+        const toggleBtn = row.querySelector('.q-toggle-btn');
+        const delBtn = row.querySelector('.rdel-btn');
+
+        // 헤더 클릭 시 개별 토글
+        header.onclick = e => {
+          if(e.target.closest('.rdel-btn')) return; // 삭제 버튼 클릭 시 제외
+          targetQ.collapsed = !targetQ.collapsed;
+          row.classList.toggle('collapsed', targetQ.collapsed);
+          toggleBtn.textContent = targetQ.collapsed ? '▼ 펼치기' : '▲ 접기';
+          saveState();
+        };
+
+        // 개별 문제 삭제
+        delBtn.onclick = e => {
+          e.stopPropagation();
+          d.qa = d.qa.filter(x => x.id !== rId);
+          if(!d.qa.length) d.qa = [{id:uid(), q:'', a:'', collapsed:false}];
+          saveState(); openPlannerPanel();
+        };
+      });
+
+      // 실시간 문제 미리보기 갱신
+      qaBox.addEventListener('input', e => {
+        if(e.target.matches('.qafield.q')) {
+          const row = e.target.closest('.qarow');
+          const previewEl = row.querySelector('.q-preview');
+          if(previewEl) {
+            previewEl.textContent = stripHTML(e.target.innerHTML).trim() || '내용 없음';
+          }
+        }
+      });
+    }
+
+    // 전체 문제 일괄 접기/펼치기 토글
+    const toggleAllQABtn = $('#toggleAllQABtn');
+    if(toggleAllQABtn && qaBox) {
+      toggleAllQABtn.onclick = () => {
+        const hasOpen = d.qa.some(r => !r.collapsed);
+        const shouldCollapse = hasOpen; // 열려 있는 게 하나라도 있으면 모두 닫기
+        d.qa.forEach(r => r.collapsed = shouldCollapse);
+        saveState();
+        openPlannerPanel();
       };
     }
 
@@ -1838,16 +1890,9 @@
           if(r) { r[e.target.dataset.f] = e.target.innerHTML; saveState(); }
         }
       });
-      qaBox.querySelectorAll('.rdel').forEach(b => {
-        b.onclick = () => {
-          d.qa = d.qa.filter(x => x.id !== b.closest('.qarow').dataset.id);
-          if(!d.qa.length) d.qa = [{id:uid(),q:'',a:''}];
-          saveState(); openPlannerPanel();
-        };
-      });
     }
     const addQA = $('#addQA');
-    if(addQA) addQA.onclick = () => { d.qa.push({id:uid(),q:'',a:''}); saveState(); openPlannerPanel(); };
+    if(addQA) addQA.onclick = () => { d.qa.push({id:uid(), q:'', a:'', collapsed:false}); saveState(); openPlannerPanel(); };
   }
 
   // 상단 메모장 기능
@@ -2327,7 +2372,7 @@
               if(leftPane) leftPane.style.display = 'none'; if(rightPane) rightPane.style.gridColumn = 'span 2';
               $('#dHomeView').style.display = 'none'; $('#dMonthlyView').style.display = 'grid'; $('#dWeeklyView').style.display = 'none';
               if($('#dNavBtnsContainer')) $('#dNavBtnsContainer').style.display = 'flex';
-              renderDiaryWeekly();
+              renderDiaryMonthly();
             }
             renderStickers();
           }
