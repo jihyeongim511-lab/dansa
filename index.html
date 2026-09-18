@@ -746,7 +746,7 @@
         <span class="sticker-item">✨</span>
         <span class="sticker-item">🐱</span>
         <span class="sticker-item">🍰</span>
-        <span class="stampbox">☕</span>
+        <span class="sticker-item">☕</span>
         <span class="sticker-item">🌱</span>
         <span class="sticker-item">💖</span>
         <span class="sticker-item">⭐</span>
@@ -865,6 +865,150 @@
     if(diaryData.currentTab === 'MONTH') return `MONTH-${diaryData.year}-${diaryData.month}`;
     if(diaryData.currentTab === 'WEEK') return `WEEK-${diaryData.year}-${diaryData.month}-${diaryData.currentWeekOffset}`;
     return 'HOME';
+  }
+
+  function renderStickers() {
+    const canvas = $('#stickerCanvas');
+    if(!canvas) return;
+    canvas.innerHTML = '';
+    const pageKey = getCurrentPageKey();
+    const list = diaryData.pageStickers[pageKey] || [];
+
+    list.forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'placed-sticker';
+      el.style.left = item.x + 'px';
+      el.style.top = item.y + 'px';
+      if(item.width) el.style.width = item.width + 'px';
+      if(item.height) el.style.height = item.height + 'px';
+
+      if(item.type === 'emoji') {
+        el.style.fontSize = (item.fontSize || 36) + 'px';
+        el.textContent = item.content;
+      } else if(item.type === 'image') {
+        el.innerHTML = `<img src="${item.content}"><button class="s-del">✕</button><div class="s-resizer">◢</div>`;
+      } else if(item.type === 'sticky') {
+        el.innerHTML = `<div class="sticky-note ${item.color}" contenteditable="true">${item.content}</div><button class="s-del">✕</button><div class="s-resizer">◢</div>`;
+        const noteDiv = el.querySelector('.sticky-note');
+        noteDiv.oninput = () => {
+          item.content = noteDiv.innerHTML;
+          saveDiaryState();
+        };
+      }
+
+      if(item.type !== 'sticky') {
+        el.innerHTML += `<button class="s-del">✕</button><div class="s-resizer">◢</div>`;
+      }
+
+      el.querySelector('.s-del').onclick = (e) => {
+        e.stopPropagation();
+        diaryData.pageStickers[pageKey] = diaryData.pageStickers[pageKey].filter(s => s.id !== item.id);
+        renderStickers();
+        saveDiaryState();
+      };
+
+      // Drag and resize handlers
+      let isDragging = false;
+      let isResizing = false;
+      let startX, startY, startLeft, startTop, startW, startH;
+
+      el.onmousedown = (e) => {
+        if(e.target.classList.contains('s-del') || e.target.classList.contains('s-resizer') || e.target.closest('[contenteditable]')) return;
+        document.querySelectorAll('.placed-sticker').forEach(s => s.classList.remove('selected'));
+        el.classList.add('selected');
+        isDragging = true;
+        startX = e.clientX; startY = e.clientY;
+        startLeft = item.x; startTop = item.y;
+        e.stopPropagation();
+      };
+
+      const resizer = el.querySelector('.s-resizer');
+      if(resizer) {
+        resizer.onmousedown = (e) => {
+          isResizing = true;
+          startX = e.clientX; startY = e.clientY;
+          startW = el.offsetWidth; startH = el.offsetHeight;
+          e.stopPropagation();
+        };
+      }
+
+      window.addEventListener('mousemove', (e) => {
+        if(isDragging) {
+          item.x = Math.max(0, startLeft + (e.clientX - startX));
+          item.y = Math.max(0, startTop + (e.clientY - startY));
+          el.style.left = item.x + 'px';
+          el.style.top = item.y + 'px';
+        } else if(isResizing) {
+          item.width = Math.max(50, startW + (e.clientX - startX));
+          item.height = Math.max(50, startH + (e.clientY - startY));
+          el.style.width = item.width + 'px';
+          el.style.height = item.height + 'px';
+        }
+      });
+
+      window.addEventListener('mouseup', () => {
+        if(isDragging || isResizing) {
+          isDragging = false;
+          isResizing = false;
+          saveDiaryState();
+        }
+      });
+
+      canvas.appendChild(el);
+    });
+  }
+
+  function addEmojiSticker(emoji) {
+    const pageKey = getCurrentPageKey();
+    if(!diaryData.pageStickers[pageKey]) diaryData.pageStickers[pageKey] = [];
+    diaryData.pageStickers[pageKey].push({
+      id: uid(), type: 'emoji', content: emoji, x: 50 + Math.random() * 100, y: 50 + Math.random() * 100, fontSize: 38
+    });
+    renderStickers();
+    saveDiaryState();
+  }
+
+  function addStickyNote(color, text) {
+    const pageKey = getCurrentPageKey();
+    if(!diaryData.pageStickers[pageKey]) diaryData.pageStickers[pageKey] = [];
+    diaryData.pageStickers[pageKey].push({
+      id: uid(), type: 'sticky', color, content: text, x: 80 + Math.random() * 60, y: 80 + Math.random() * 60, width: 160, height: 150
+    });
+    renderStickers();
+    saveDiaryState();
+  }
+
+  document.querySelectorAll('.sticker-item').forEach(item => {
+    item.onclick = () => addEmojiSticker(item.textContent);
+  });
+
+  const dUploadStickerBtn = $('#dUploadStickerBtn');
+  if(dUploadStickerBtn) {
+    dUploadStickerBtn.onclick = () => {
+      pickFile(async f => {
+        const b64 = await shrinkImage(f, 250, 0.85);
+        const pageKey = getCurrentPageKey();
+        if(!diaryData.pageStickers[pageKey]) diaryData.pageStickers[pageKey] = [];
+        diaryData.pageStickers[pageKey].push({
+          id: uid(), type: 'image', content: b64, x: 100, y: 100, width: 120, height: 120
+        });
+        renderStickers();
+        saveDiaryState();
+        toast('이미지 스티커가 추가되었습니다!');
+      });
+    };
+  }
+
+  const dClearStickersBtn = $('#dClearStickersBtn');
+  if(dClearStickersBtn) {
+    dClearStickersBtn.onclick = () => {
+      if(confirm('현재 페이지의 모든 스티커를 삭제하시겠습니까?')) {
+        const pageKey = getCurrentPageKey();
+        diaryData.pageStickers[pageKey] = [];
+        renderStickers();
+        saveDiaryState();
+      }
+    };
   }
 
   function calculateDDay(targetDateStr) {
@@ -991,7 +1135,7 @@
     modal.box.style.width = 'min(760px, 95vw)';
     const box = modal.box;
 
-    box.querySelector('#closeGCalEmbedModal')?.onclick || (box.querySelector('#closeQACollModal').onclick = () => modal.close());
+    box.querySelector('#closeQACollModal').onclick = () => modal.close();
     
     box.querySelector('#qaSelAll').onclick = () => box.querySelectorAll('.qa-date-chk').forEach(c => c.checked = true);
     box.querySelector('#qaSelClear').onclick = () => box.querySelectorAll('.qa-date-chk').forEach(c => c.checked = false);
@@ -1370,20 +1514,6 @@
     }
   });
 
-  const mHiliteColor = $('#mHiliteColor');
-  if(mHiliteColor) {
-    mHiliteColor.oninput = e => {
-      document.execCommand('hiliteColor', false, e.target.value);
-      storage.set(MKEY, JSON.stringify({ html: $('#memoArea').innerHTML }));
-    };
-  }
-  const mHiliteClear = $('#mHiliteClear');
-  if(mHiliteClear) {
-    mHiliteClear.onclick = () => {
-      document.execCommand('hiliteColor', false, 'transparent');
-      storage.set(MKEY, JSON.stringify({ html: $('#memoArea').innerHTML }));
-    };
-  }
   const mBulletBtn = $('#mBulletBtn');
   if(mBulletBtn) {
     mBulletBtn.onclick = () => {
@@ -2166,7 +2296,6 @@
       field.onfocus = () => { lastActiveQAField = field; };
     });
 
-    // 문제별 접기/펼치기 이벤트 수정 (각각 개별 작동)
     const qaBox = $('#qaBox');
     if(qaBox) {
       qaBox.querySelectorAll('.qarow').forEach(row => {
