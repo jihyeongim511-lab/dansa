@@ -401,13 +401,7 @@
     font-size:9.5px;color:#244B73;padding:2px 3px;margin-top:2px;border-radius:3px;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700;
   }
-  .d-task-badge{
-    display:block;background:var(--d-theme-soft);border-left:2px solid var(--d-theme-dark);
-    font-size:9.5px;color:var(--ink);padding:1.5px 3px;margin-top:1px;border-radius:3px;
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  }
-  .d-task-badge.done{text-decoration:line-through;opacity:0.6}
-  .d-cal-text{margin-top:3px;font-size:10px;line-height:1.3;color:var(--ink);outline:none;word-break:break-all}
+  .d-cal-text{margin-top:4px;font-size:10px;line-height:1.3;color:var(--ink);outline:none;word-break:break-all}
 
   #dWeeklyView{display:none;flex:1;flex-direction:column;gap:10px;overflow:auto}
   .d-weekly-spread-grid{display:grid;grid-template-columns:repeat(4, 1fr);gap:10px;flex:1}
@@ -420,7 +414,6 @@
   .d-week-events{list-style:none;padding:0;margin:0 0 6px;display:flex;flex-direction:column;gap:2px}
   .d-week-ev-item{font-size:11px;color:#284B70;background:#F0F5FA;padding:2px 5px;border-radius:4px;display:flex;justify-content:space-between}
 
-  /* 개선된 위클리 할 일 아이템 및 추가 박스 */
   .d-week-tasks{list-style:none;padding:0;margin:0 0 6px;display:flex;flex-direction:column;gap:3px;max-height:160px;overflow-y:auto}
   .d-week-task-item{display:flex;align-items:center;gap:5px;font-size:11.5px;padding:2px 0}
   .d-week-task-item input[type="checkbox"]{margin-top:0;accent-color:var(--d-theme-dark);cursor:pointer}
@@ -765,6 +758,7 @@
           </div>
         </div>
 
+        <!-- 먼슬리 캘린더 그리드 (일정 및 메모만 표시) -->
         <div class="d-cal-grid" id="dMonthlyView" style="display:none">
           <div class="d-cal-head">SUN</div><div class="d-cal-head">MON</div><div class="d-cal-head">TUE</div>
           <div class="d-cal-head">WED</div><div class="d-cal-head">THU</div><div class="d-cal-head">FRI</div><div class="d-cal-head">SAT</div>
@@ -939,7 +933,7 @@
     };
   }
 
-  // [플래너 제목 수정 완벽 바인딩]
+  // [플래너 제목 수정]
   const titleView = $('#titleView');
   const titleEdit = $('#titleEdit');
   const titleEditBtn = $('#titleEditBtn');
@@ -1571,7 +1565,6 @@
           return;
         }
 
-        // Supabase 업로드 병행 (실패해도 로컬 저장 유지)
         let publicUrl = null;
         try {
           const fileName = `font_${Date.now()}_${file.name}`;
@@ -3049,6 +3042,7 @@
     }
   }
 
+  // [다이어리 먼슬리 렌더링 - 할 일 제거하고 일정만 깔끔하게 표시]
   function renderDiaryMonthly() {
     const y = diaryData.year, m = diaryData.month;
     const headerTitle = $('#dHeaderTitle');
@@ -3068,19 +3062,32 @@
       const dateKey = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
 
       const matchedPlan = state.days.find(pd => pd.date === dateKey);
-      let eventBadges = '', taskBadges = '';
+      let eventBadges = '';
 
-      if(matchedPlan){
-        if(matchedPlan.events.length) eventBadges = matchedPlan.events.slice(0, 1).map(ev => `<span class="d-event-badge">⏰ ${ev.time} ${ev.title}</span>`).join('');
-        if(matchedPlan.items.length) taskBadges = matchedPlan.items.slice(0, 2).map(it => `<span class="d-task-badge ${it.state==='done'?'done':''}">✓ ${it.cat}: ${it.text}</span>`).join('');
+      // 할 일(taskBadges)은 숨기고 일정(eventBadges)만 렌더링
+      if(matchedPlan && matchedPlan.events && matchedPlan.events.length){
+        const sortedEvents = [...matchedPlan.events].sort((a,b)=>a.time.localeCompare(b.time));
+        eventBadges = sortedEvents.map(ev => `
+          <span class="d-event-badge" title="${ev.time} ${esc(ev.title)}">⏰ ${ev.time} ${esc(ev.title)}</span>
+        `).join('');
       }
-      cell.innerHTML = `<div class="d-cal-num">${d}</div>${eventBadges}${taskBadges}<div class="d-cal-text" contenteditable="true" data-k="${dateKey}">${diaryData.cellTexts[dateKey] || ''}</div>`;
+
+      cell.innerHTML = `
+        <div class="d-cal-num">${d}</div>
+        ${eventBadges}
+        <div class="d-cal-text" contenteditable="true" data-k="${dateKey}" placeholder="메모...">${diaryData.cellTexts[dateKey] || ''}</div>
+      `;
       grid.appendChild(cell);
     }
-    grid.querySelectorAll('.d-cal-text').forEach(t=>{ t.oninput = () => { diaryData.cellTexts[t.dataset.k] = t.innerText; saveDiaryState(); }; });
+    grid.querySelectorAll('.d-cal-text').forEach(t=>{ 
+      t.oninput = () => { 
+        diaryData.cellTexts[t.dataset.k] = t.innerText; 
+        saveDiaryState(); 
+      }; 
+    });
   }
 
-  // [다이어리 위클리 렌더링 - 전체 할 일 수정/추가/삭제 완벽 지원]
+  // [다이어리 위클리 렌더링]
   function renderDiaryWeekly() {
     const y = diaryData.year, m = diaryData.month;
     const baseDate = new Date(y, m - 1, 17 + (diaryData.currentWeekOffset * 7));
@@ -3097,7 +3104,6 @@
     const weekKey = `${startOfWeek.getFullYear()}-${startOfWeek.getMonth()+1}-${startOfWeek.getDate()}`;
     if(!diaryData.weeklyGoalsMap[weekKey]) diaryData.weeklyGoalsMap[weekKey] = ['임용 교육과정 1회독 완료하기', '백지인출 3회 실천'];
 
-    // 위클리 목표 카드
     const goalCol = document.createElement('div'); goalCol.className = 'd-week-col';
     goalCol.innerHTML = `
       <div class="d-week-col-head"><span class="d-week-dayname" style="color:var(--jade)">WEEKLY GOAL</span><span class="d-week-date">🎯</span></div>
@@ -3125,7 +3131,6 @@
     });
     weekGrid.appendChild(goalCol);
 
-    // 각 요일별 컬럼 생성
     for(let i=0; i<7; i++){
       const curDt = new Date(startOfWeek); curDt.setDate(startOfWeek.getDate() + i);
       const iso = `${curDt.getFullYear()}-${String(curDt.getMonth()+1).padStart(2,'0')}-${String(curDt.getDate()).padStart(2,'0')}`;
@@ -3165,7 +3170,6 @@
       weekGrid.appendChild(col);
     }
     
-    // [위클리 할 일 이벤트 바인딩: 체크, 인라인 수정, 삭제]
     weekGrid.querySelectorAll('.d-week-task-item').forEach(itemEl => {
       const iso = itemEl.dataset.date;
       const itemId = itemEl.dataset.id;
@@ -3174,7 +3178,6 @@
       const targetItem = dayObj.items.find(x => x.id === itemId);
       if(!targetItem) return;
 
-      // 1. 체크박스 상태 토글
       const chk = itemEl.querySelector('input[type="checkbox"]');
       chk.onchange = () => {
         targetItem.state = chk.checked ? 'done' : 'none';
@@ -3183,7 +3186,6 @@
         renderPlannerCalendar();
       };
 
-      // 2. 내용 직접 수정 (실시간 플래너 동기화)
       const txtEl = itemEl.querySelector('.w-txt');
       txtEl.onblur = () => {
         const val = txtEl.innerText.trim();
@@ -3201,7 +3203,6 @@
         }
       };
 
-      // 3. 삭제
       const delBtn = itemEl.querySelector('.w-del');
       delBtn.onclick = () => {
         dayObj.items = dayObj.items.filter(x => x.id !== itemId);
@@ -3212,7 +3213,6 @@
       };
     });
 
-    // [위클리 할 일 새 항목 추가 이벤트]
     weekGrid.querySelectorAll('.d-week-task-addbox').forEach(box => {
       const input = box.querySelector('.w-add-input');
       const addBtn = box.querySelector('.w-add-btn');
@@ -3228,7 +3228,6 @@
           state.days.push(targetDay);
         }
 
-        // "[과목] 할 일" 패턴 자동 파싱
         let cat = '기타';
         let text = textVal;
         const match = textVal.match(/^\[(.*?)\]\s*(.*)$/);
@@ -3263,7 +3262,6 @@
       };
     });
 
-    // 위클리 메모
     weekGrid.querySelectorAll('.d-week-memo').forEach(c => {
       c.oninput = () => {
         diaryData.weekTexts[c.dataset.k] = c.innerText;
