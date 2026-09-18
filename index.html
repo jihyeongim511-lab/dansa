@@ -380,10 +380,16 @@
   .dday-date{font-size:11px;color:var(--ink-soft);margin-top:3px;margin-bottom:8px}
 
   .book-right{padding:20px;position:relative;display:flex;flex-direction:column;overflow:hidden}
-  .month-header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid var(--d-theme);padding-bottom:10px;margin-bottom:12px}
+  .month-header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid var(--d-theme);padding-bottom:10px;margin-bottom:12px;flex-wrap:wrap;gap:8px}
   .m-title{font-size:20px;font-weight:900;color:var(--d-theme-dark);letter-spacing:1px}
-  .m-nav-btns{display:flex;gap:4px}
+  .m-nav-btns{display:flex;gap:4px;align-items:center}
   .m-nav-btns button{border:1px solid var(--rule);background:#fff;border-radius:6px;padding:4px 9px;font-size:11px;font-weight:700}
+
+  .weekly-filter-wrap{display:flex;align-items:center;gap:4px;font-size:11.5px;font-weight:800;color:var(--jade)}
+  .weekly-filter-select{
+    border:1.5px solid var(--jade);background:#fff;border-radius:6px;padding:3px 8px;font-size:11px;
+    font-weight:bold;color:var(--ink);outline:none;cursor:pointer
+  }
 
   .book-tabs{background:#ECE2DA;border-left:1px solid #D9CFC7;display:flex;flex-direction:column;padding-top:20px;gap:8px;align-items:center}
   .side-tab{writing-mode:vertical-lr;text-orientation:mixed;font-size:11px;font-weight:800;letter-spacing:2px;padding:14px 6px;border:none;background:#FAFBF8;color:var(--ink-soft);border-radius:0 8px 8px 0;cursor:pointer;transition:all .15s}
@@ -394,7 +400,9 @@
   .d-cal-head:first-child{color:var(--seal)}
   .d-cal-cell{min-height:105px;border-right:1px solid #EFEAE3;border-bottom:1px solid #EFEAE3;padding:4px;position:relative;background:transparent;overflow:hidden}
   .d-cal-cell:nth-child(7n){border-right:none}
+  .d-cal-cell.empty-slot{background:#FAF9F6}
   .d-cal-num{font-size:11px;font-weight:800;color:var(--ink-soft)}
+  .d-cal-num.empty-tag{color:#B8C2B8;font-size:9.5px;font-weight:700;letter-spacing:0.5px}
   
   .d-event-badge{
     display:block;background:#EBF3FA;border-left:2px solid #3D6EA5;
@@ -402,6 +410,7 @@
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700;
   }
   .d-cal-text{margin-top:4px;font-size:10px;line-height:1.3;color:var(--ink);outline:none;word-break:break-all}
+  .d-cal-text:empty:before{content:attr(placeholder);color:#C6CFC6}
 
   #dWeeklyView{display:none;flex:1;flex-direction:column;gap:10px;overflow:auto}
   .d-weekly-spread-grid{display:grid;grid-template-columns:repeat(4, 1fr);gap:10px;flex:1}
@@ -511,7 +520,6 @@
     </div>
 
     <div class="top-custom-bar">
-      <!-- 전역 글자 크기 조정기 -->
       <div class="font-size-box">
         <span>🔍 글자크기:</span>
         <button class="btn small ghost" id="decAppFontSize" style="padding:2px 7px;font-weight:bold" title="글자 축소">A-</button>
@@ -526,7 +534,6 @@
         <button class="btn small ghost" id="incAppFontSize" style="padding:2px 7px;font-weight:bold" title="글자 확대">A+</button>
       </div>
 
-      <!-- 폰트 선택기 및 내 폰트 추가 버튼 -->
       <div class="font-picker-box">
         <span>🔤 글꼴:</span>
         <select class="font-select" id="fontSelector">
@@ -539,7 +546,6 @@
         <button class="btn small font-upload-btn" id="uploadCustomFontBtn" title="내 컴퓨터의 .ttf, .woff, .woff2, .otf 폰트 파일을 올려 등록합니다">📁 내 폰트 추가</button>
       </div>
 
-      <!-- 배경 색상 바 -->
       <div class="bg-theme-bar">
         <span>🎨 바탕:</span>
         <span class="bg-swatch" style="background:#ECEFE9" data-bg="#ECEFE9" title="기본 세이지 그레이"></span>
@@ -717,6 +723,13 @@
         <div class="month-header" id="diaryHeaderRow">
           <div class="m-title" id="dHeaderTitle">HOME DASHBOARD</div>
           <div class="m-nav-btns" id="dNavBtnsContainer">
+            <!-- 위클리 과목 필터 드롭다운 컨테이너 -->
+            <div id="weeklyFilterBox" class="weekly-filter-wrap" style="display:none">
+              <span>과목별 보기:</span>
+              <select id="weeklyCatFilter" class="weekly-filter-select">
+                <option value="ALL">전체 과목 보기</option>
+              </select>
+            </div>
             <button id="dPrevBtn" class="btn small ghost">◀</button>
             <button id="dNextBtn" class="btn small ghost">▶</button>
           </div>
@@ -758,7 +771,7 @@
           </div>
         </div>
 
-        <!-- 먼슬리 캘린더 그리드 (일정 및 메모만 표시) -->
+        <!-- 먼슬리 캘린더 그리드 (빈칸도 자유 메모 가능) -->
         <div class="d-cal-grid" id="dMonthlyView" style="display:none">
           <div class="d-cal-head">SUN</div><div class="d-cal-head">MON</div><div class="d-cal-head">TUE</div>
           <div class="d-cal-head">WED</div><div class="d-cal-head">THU</div><div class="d-cal-head">FRI</div><div class="d-cal-head">SAT</div>
@@ -863,6 +876,7 @@
   let savedSelectionRange = null;
   let lastActiveQAField = null;
   let isEditingTitle = false;
+  let currentWeeklyFilter = 'ALL'; // 위클리 과목 필터 상태
   
   let viewYear = new Date().getFullYear();
   let viewMonth = new Date().getMonth() + 1;
@@ -1399,6 +1413,7 @@
     return null;
   }
 
+  // [캘린더 일정 파싱 및 중복 필터링]
   async function parseAndLoadIcsText(icsText) {
     const rawEvents = icsText.split('BEGIN:VEVENT');
     if (rawEvents.length <= 1) {
@@ -1406,6 +1421,8 @@
     }
 
     let addedCount = 0;
+    let skippedCount = 0;
+
     for(let i = 1; i < rawEvents.length; i++) {
       const block = rawEvents[i].split('END:VEVENT')[0];
       
@@ -1433,6 +1450,15 @@
         state.days.push(targetDay);
       }
 
+      const isDuplicate = targetDay.events.some(ev => 
+        ev.time === startInfo.time && ev.title.trim() === title.trim()
+      );
+
+      if(isDuplicate) {
+        skippedCount++;
+        continue;
+      }
+
       targetDay.events.push({
         id: uid(),
         time: startInfo.time,
@@ -1446,7 +1472,12 @@
     await saveState();
     renderPlannerCalendar();
     if(selected) openPlannerPanel();
-    toast(`구글 캘린더에서 총 ${addedCount}개의 일정을 등록했습니다!`);
+
+    let resultMsg = `총 ${addedCount}개의 새 일정을 등록했습니다!`;
+    if(skippedCount > 0) {
+      resultMsg += ` (중복된 ${skippedCount}개 일정 제외)`;
+    }
+    toast(resultMsg);
   }
 
   async function fetchWithFallback(targetUrl) {
@@ -1504,7 +1535,7 @@
     input.click();
   }
 
-  // [확실한 폰트 로드 및 등록 (FontFace API + DataURL Base64 지원)]
+  // [폰트 로드 및 등록]
   async function applyFontFaceDirectly(fontName, fontSource, origName) {
     try {
       const font = new FontFace(fontName, `url(${fontSource})`);
@@ -3042,7 +3073,7 @@
     }
   }
 
-  // [다이어리 먼슬리 렌더링 - 할 일 제거하고 일정만 깔끔하게 표시]
+  // [다이어리 먼슬리 렌더링 - 빈칸도 자유 메모 가능]
   function renderDiaryMonthly() {
     const y = diaryData.year, m = diaryData.month;
     const headerTitle = $('#dHeaderTitle');
@@ -3055,16 +3086,27 @@
     const firstDay = new Date(y, m-1, 1).getDay();
     const lastDate = new Date(y, m, 0).getDate();
 
-    for(let i=0; i<firstDay; i++){ const e = document.createElement('div'); e.className = 'd-cal-cell'; grid.appendChild(e); }
+    // 1. 앞쪽 빈칸(이전달 영역) - 메모 지원
+    for(let i=0; i<firstDay; i++){
+      const e = document.createElement('div');
+      e.className = 'd-cal-cell empty-slot';
+      const slotKey = `EMPTY-PREV-${y}-${m}-${i}`;
+      e.innerHTML = `
+        <div class="d-cal-num empty-tag">MEMO</div>
+        <div class="d-cal-text" contenteditable="true" data-k="${slotKey}" placeholder="메모...">${diaryData.cellTexts[slotKey] || ''}</div>
+      `;
+      grid.appendChild(e);
+    }
     
+    // 2. 당월 날짜 칸 - 일정 표시 및 메모 지원
     for(let d=1; d<=lastDate; d++){
-      const cell = document.createElement('div'); cell.className = 'd-cal-cell';
+      const cell = document.createElement('div');
+      cell.className = 'd-cal-cell';
       const dateKey = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
 
       const matchedPlan = state.days.find(pd => pd.date === dateKey);
       let eventBadges = '';
 
-      // 할 일(taskBadges)은 숨기고 일정(eventBadges)만 렌더링
       if(matchedPlan && matchedPlan.events && matchedPlan.events.length){
         const sortedEvents = [...matchedPlan.events].sort((a,b)=>a.time.localeCompare(b.time));
         eventBadges = sortedEvents.map(ev => `
@@ -3079,6 +3121,23 @@
       `;
       grid.appendChild(cell);
     }
+
+    // 3. 뒤쪽 빈칸(다음달 영역) - 메모 지원
+    const totalFilled = firstDay + lastDate;
+    const totalGridSlots = Math.ceil(totalFilled / 7) * 7;
+    const trailingCount = totalGridSlots - totalFilled;
+
+    for(let j=0; j<trailingCount; j++){
+      const e = document.createElement('div');
+      e.className = 'd-cal-cell empty-slot';
+      const slotKey = `EMPTY-NEXT-${y}-${m}-${j}`;
+      e.innerHTML = `
+        <div class="d-cal-num empty-tag">MEMO</div>
+        <div class="d-cal-text" contenteditable="true" data-k="${slotKey}" placeholder="메모...">${diaryData.cellTexts[slotKey] || ''}</div>
+      `;
+      grid.appendChild(e);
+    }
+
     grid.querySelectorAll('.d-cal-text').forEach(t=>{ 
       t.oninput = () => { 
         diaryData.cellTexts[t.dataset.k] = t.innerText; 
@@ -3087,7 +3146,7 @@
     });
   }
 
-  // [다이어리 위클리 렌더링]
+  // [다이어리 위클리 렌더링 - 과목별 보기 필터링 지원]
   function renderDiaryWeekly() {
     const y = diaryData.year, m = diaryData.month;
     const baseDate = new Date(y, m - 1, 17 + (diaryData.currentWeekOffset * 7));
@@ -3096,6 +3155,33 @@
 
     const headerTitle = $('#dHeaderTitle');
     if(headerTitle) headerTitle.textContent = `WEEK: ${startOfWeek.getMonth()+1}.${startOfWeek.getDate()} ~ ${endOfWeek.getMonth()+1}.${endOfWeek.getDate()}`;
+
+    // 전체 과목 목록 집계 및 필터 드롭다운 업데이트
+    const allCategories = new Set();
+    state.days.forEach(d => {
+      (d.items || []).forEach(it => {
+        if(it.cat && it.cat.trim()) allCategories.add(it.cat.trim());
+      });
+    });
+
+    const filterSelect = $('#weeklyCatFilter');
+    if(filterSelect) {
+      const prevVal = currentWeeklyFilter;
+      filterSelect.innerHTML = `<option value="ALL">전체 과목 보기</option>` + 
+        Array.from(allCategories).sort().map(cat => `<option value="${esc(cat)}">${esc(cat)}</option>`).join('');
+      
+      if(allCategories.has(prevVal)) {
+        filterSelect.value = prevVal;
+      } else {
+        currentWeeklyFilter = 'ALL';
+        filterSelect.value = 'ALL';
+      }
+
+      filterSelect.onchange = (e) => {
+        currentWeeklyFilter = e.target.value;
+        renderDiaryWeekly();
+      };
+    }
 
     const weekGrid = $('#dWeeklyGrid'); 
     if(!weekGrid) return;
@@ -3140,17 +3226,28 @@
       
       let taskHtml = '';
       if(matchedPlan && matchedPlan.items.length) {
-        taskHtml = matchedPlan.items.map(it => `
-          <li class="d-week-task-item ${it.state==='done'?'done':''}" data-date="${iso}" data-id="${it.id}">
-            <input type="checkbox" ${it.state==='done'?'checked':''}>
-            <span class="w-cat">[${esc(it.cat)}]</span>
-            <span class="w-txt" contenteditable="true" title="클릭하여 수정">${esc(it.text)}</span>
-            <button class="w-del" title="삭제">✕</button>
-          </li>
-        `).join('');
+        // [과목별 필터링 적용]
+        const filteredItems = currentWeeklyFilter === 'ALL' 
+          ? matchedPlan.items 
+          : matchedPlan.items.filter(it => (it.cat || '').trim() === currentWeeklyFilter);
+
+        if(filteredItems.length > 0) {
+          taskHtml = filteredItems.map(it => `
+            <li class="d-week-task-item ${it.state==='done'?'done':''}" data-date="${iso}" data-id="${it.id}">
+              <input type="checkbox" ${it.state==='done'?'checked':''}>
+              <span class="w-cat">[${esc(it.cat)}]</span>
+              <span class="w-txt" contenteditable="true" title="클릭하여 수정">${esc(it.text)}</span>
+              <button class="w-del" title="삭제">✕</button>
+            </li>
+          `).join('');
+        } else {
+          taskHtml = `<li class="no-task-hint" style="font-size:10px;color:#A2ACA2">'${esc(currentWeeklyFilter)}' 할 일 없음</li>`;
+        }
       } else {
         taskHtml = '<li class="no-task-hint" style="font-size:10px;color:#A2ACA2">할 일이 없습니다</li>';
       }
+
+      const defaultAddPlaceholder = currentWeeklyFilter === 'ALL' ? '[과목] 할 일 입력...' : `[${currentWeeklyFilter}] 할 일 입력...`;
 
       const col = document.createElement('div'); col.className = 'd-week-col';
       col.innerHTML = `
@@ -3158,9 +3255,11 @@
         <div style="font-size:10px;font-weight:800;color:#3D6EA5;margin-bottom:2px">⏰ 일정</div>
         <ul class="d-week-events">${evHtml}</ul>
         
-        <div style="font-size:10px;font-weight:800;color:var(--jade);margin-top:4px;margin-bottom:2px">✅ 할 일</div>
+        <div style="font-size:10px;font-weight:800;color:var(--jade);margin-top:4px;margin-bottom:2px">
+          ✅ 할 일 ${currentWeeklyFilter !== 'ALL' ? `<span style="font-size:9.5px;color:var(--d-theme-dark)">(${esc(currentWeeklyFilter)})</span>` : ''}
+        </div>
         <div class="d-week-task-addbox">
-          <input type="text" class="w-add-input" placeholder="[과목] 할 일 입력..." data-date="${iso}">
+          <input type="text" class="w-add-input" placeholder="${esc(defaultAddPlaceholder)}" data-date="${iso}">
           <button class="w-add-btn" data-date="${iso}">＋</button>
         </div>
         <ul class="d-week-tasks" data-date="${iso}">${taskHtml}</ul>
@@ -3228,11 +3327,11 @@
           state.days.push(targetDay);
         }
 
-        let cat = '기타';
+        let cat = currentWeeklyFilter !== 'ALL' ? currentWeeklyFilter : '기타';
         let text = textVal;
         const match = textVal.match(/^\[(.*?)\]\s*(.*)$/);
         if(match) {
-          cat = match[1].trim() || '기타';
+          cat = match[1].trim() || cat;
           text = match[2].trim() || textVal;
         }
 
@@ -3342,6 +3441,7 @@
         const homeView = $('#dHomeView');
         const monthlyView = $('#dMonthlyView');
         const weeklyView = $('#dWeeklyView');
+        const weeklyFilterBox = $('#weeklyFilterBox');
         
         if(diaryData.currentTab === 'HOME') {
           if(leftPane) leftPane.style.display = 'flex';
@@ -3349,6 +3449,7 @@
           if(homeView) homeView.style.display = 'flex';
           if(monthlyView) monthlyView.style.display = 'none';
           if(weeklyView) weeklyView.style.display = 'none';
+          if(weeklyFilterBox) weeklyFilterBox.style.display = 'none';
           $('#dHeaderTitle').textContent = 'HOME DASHBOARD';
           if($('#dNavBtnsContainer')) $('#dNavBtnsContainer').style.display = 'none';
           renderHomeDashboard();
@@ -3358,6 +3459,7 @@
           if(homeView) homeView.style.display = 'none';
           if(monthlyView) monthlyView.style.display = 'grid';
           if(weeklyView) weeklyView.style.display = 'none';
+          if(weeklyFilterBox) weeklyFilterBox.style.display = 'none';
           if($('#dNavBtnsContainer')) $('#dNavBtnsContainer').style.display = 'flex';
           renderDiaryMonthly();
         } else if(diaryData.currentTab === 'WEEK') {
@@ -3366,6 +3468,7 @@
           if(homeView) homeView.style.display = 'none';
           if(monthlyView) monthlyView.style.display = 'none';
           if(weeklyView) weeklyView.style.display = 'flex';
+          if(weeklyFilterBox) weeklyFilterBox.style.display = 'flex';
           if($('#dNavBtnsContainer')) $('#dNavBtnsContainer').style.display = 'flex';
           renderDiaryWeekly();
         }
@@ -3386,6 +3489,7 @@
     
     const leftPane = $('#bookLeftPane');
     const rightPane = $('#bookRightPane');
+    const weeklyFilterBox = $('#weeklyFilterBox');
 
     if(diaryData.currentTab === 'HOME') {
       if(leftPane) leftPane.style.display = 'flex';
@@ -3393,6 +3497,7 @@
       $('#dHomeView').style.display = 'flex';
       $('#dMonthlyView').style.display = 'none';
       $('#dWeeklyView').style.display = 'none';
+      if(weeklyFilterBox) weeklyFilterBox.style.display = 'none';
       $('#dHeaderTitle').textContent = 'HOME DASHBOARD';
       if($('#dNavBtnsContainer')) $('#dNavBtnsContainer').style.display = 'none';
       renderHomeDashboard();
@@ -3402,6 +3507,7 @@
       $('#dHomeView').style.display = 'none';
       $('#dMonthlyView').style.display = 'none';
       $('#dWeeklyView').style.display = 'flex';
+      if(weeklyFilterBox) weeklyFilterBox.style.display = 'flex';
       if($('#dNavBtnsContainer')) $('#dNavBtnsContainer').style.display = 'flex';
       renderDiaryWeekly();
     } else {
@@ -3410,6 +3516,7 @@
       $('#dHomeView').style.display = 'none';
       $('#dMonthlyView').style.display = 'grid';
       $('#dWeeklyView').style.display = 'none';
+      if(weeklyFilterBox) weeklyFilterBox.style.display = 'none';
       if($('#dNavBtnsContainer')) $('#dNavBtnsContainer').style.display = 'flex';
       renderDiaryWeekly();
     }
