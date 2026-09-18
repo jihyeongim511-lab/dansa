@@ -468,6 +468,7 @@
   .placed-sticker{
     position:absolute;pointer-events:auto;cursor:grab;user-select:none;touch-action:none;
     display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;
+    transform-origin:center center;
   }
   .placed-sticker:active{cursor:grabbing}
   .placed-sticker.selected{outline:2px dashed var(--d-theme-dark);outline-offset:3px}
@@ -486,8 +487,8 @@
   }
   .placed-sticker.selected .s-resizer{display:flex}
   .placed-sticker .s-rotator{
-    display:none;position:absolute;top:-22px;left:50%;transform:translateX(-50%);width:20px;height:20px;
-    background:var(--jade);color:#fff;border-radius:50%;cursor:crosshair;
+    display:none;position:absolute;top:-24px;left:50%;transform:translateX(-50%);width:20px;height:20px;
+    background:var(--jade);color:#fff;border-radius:50%;cursor:grab;
     font-size:11px;align-items:center;justify-content:center;line-height:1;z-index:110;
     user-select:none;border:1.5px solid #fff;box-shadow:0 2px 5px rgba(0,0,0,0.2);
   }
@@ -1133,7 +1134,7 @@
     return 'HOME';
   }
 
-  // [스티커 렌더링 - 투명 PNG 보존 및 크기조절/회전/삭제 완벽 지원]
+  // [스티커 렌더링 - 위치 이동/크기 조절/회전/삭제 완벽 개선 버전]
   function renderStickers() {
     const canvas = $('#stickerCanvas');
     if(!canvas) return;
@@ -1147,13 +1148,13 @@
       el.dataset.id = item.id;
       el.style.left = item.x + 'px';
       el.style.top = item.y + 'px';
-      if(item.width) el.style.width = item.width + 'px';
-      if(item.height) el.style.height = item.height + 'px';
-      const rot = item.rotation || 0;
-      el.style.transform = `rotate(${rot}deg)`;
+      el.style.width = (item.width || 80) + 'px';
+      el.style.height = (item.height || 80) + 'px';
+      el.style.transform = `rotate(${item.rotation || 0}deg)`;
 
       if(item.type === 'emoji') {
-        el.style.fontSize = (item.fontSize || 38) + 'px';
+        const fSize = item.fontSize || Math.round((item.width || 80) * 0.7);
+        el.style.fontSize = fSize + 'px';
         el.innerHTML = `<span>${item.content}</span>`;
       } else if(item.type === 'image') {
         el.innerHTML = `<img src="${item.content}">`;
@@ -1192,75 +1193,98 @@
         saveDiaryState();
       };
 
-      let isDragging = false;
-      let isResizing = false;
-      let isRotating = false;
-      let startX, startY, startLeft, startTop, startW, startH, centerX, centerY, startAngle;
-
+      // 1. 위치 드래그 이동
       el.onmousedown = (e) => {
         if(e.target.closest('.s-del, .s-resizer, .s-rotator, [contenteditable]')) return;
         document.querySelectorAll('.placed-sticker').forEach(s => s.classList.remove('selected'));
         el.classList.add('selected');
-        isDragging = true;
-        startX = e.clientX; startY = e.clientY;
-        startLeft = item.x; startTop = item.y;
-        e.stopPropagation();
-      };
+        
+        const startX = e.clientX;
+        const startY = e.clientY;
+        const initLeft = item.x;
+        const initTop = item.y;
 
-      resizer.onmousedown = (e) => {
-        isResizing = true;
-        startX = e.clientX; startY = e.clientY;
-        startW = el.offsetWidth; startH = el.offsetHeight;
-        e.stopPropagation();
-        e.preventDefault();
-      };
-
-      rotator.onmousedown = (e) => {
-        isRotating = true;
-        const rect = el.getBoundingClientRect();
-        centerX = rect.left + rect.width / 2;
-        centerY = rect.top + rect.height / 2;
-        startAngle = (item.rotation || 0) * (Math.PI / 180);
-        e.stopPropagation();
-        e.preventDefault();
-      };
-
-      const onMouseMove = (e) => {
-        if(isDragging) {
-          item.x = Math.max(0, startLeft + (e.clientX - startX));
-          item.y = Math.max(0, startTop + (e.clientY - startY));
+        const onMouseMove = (me) => {
+          item.x = Math.max(0, initLeft + (me.clientX - startX));
+          item.y = Math.max(0, initTop + (me.clientY - startY));
           el.style.left = item.x + 'px';
           el.style.top = item.y + 'px';
-        } else if(isResizing) {
-          item.width = Math.max(40, startW + (e.clientX - startX));
-          item.height = Math.max(40, startH + (e.clientY - startY));
-          el.style.width = item.width + 'px';
-          el.style.height = item.height + 'px';
-          if(item.type === 'emoji') {
-            item.fontSize = Math.max(16, Math.round(item.width * 0.7));
-            el.style.fontSize = item.fontSize + 'px';
-          }
-        } else if(isRotating) {
-          const rad = Math.atan2(e.clientY - centerY, e.clientX - centerX);
-          let deg = Math.round(rad * (180 / Math.PI)) + 90;
-          item.rotation = deg;
-          el.style.transform = `rotate(${deg}deg)`;
-        }
-      };
+        };
 
-      const onMouseUp = () => {
-        if(isDragging || isResizing || isRotating) {
-          isDragging = false;
-          isResizing = false;
-          isRotating = false;
+        const onMouseUp = () => {
           window.removeEventListener('mousemove', onMouseMove);
           window.removeEventListener('mouseup', onMouseUp);
           saveDiaryState();
-        }
+        };
+
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
+        e.stopPropagation();
       };
 
-      window.addEventListener('mousemove', onMouseMove);
-      window.addEventListener('mouseup', onMouseUp);
+      // 2. 크기 조절 (Resize)
+      resizer.onmousedown = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+
+        const startX = e.clientX;
+        const startY = e.clientY;
+        const initW = item.width || el.offsetWidth;
+        const initH = item.height || el.offsetHeight;
+
+        const onResizeMove = (me) => {
+          const dx = me.clientX - startX;
+          const dy = me.clientY - startY;
+
+          const newW = Math.max(35, initW + dx);
+          const newH = Math.max(35, initH + dy);
+
+          item.width = newW;
+          item.height = newH;
+          el.style.width = newW + 'px';
+          el.style.height = newH + 'px';
+
+          if(item.type === 'emoji') {
+            item.fontSize = Math.max(16, Math.round(newW * 0.7));
+            el.style.fontSize = item.fontSize + 'px';
+          }
+        };
+
+        const onResizeUp = () => {
+          window.removeEventListener('mousemove', onResizeMove);
+          window.removeEventListener('mouseup', onResizeUp);
+          saveDiaryState();
+        };
+
+        window.addEventListener('mousemove', onResizeMove);
+        window.addEventListener('mouseup', onResizeUp);
+      };
+
+      // 3. 회전 조절 (Rotate)
+      rotator.onmousedown = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+
+        const rect = el.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        const onRotateMove = (me) => {
+          const rad = Math.atan2(me.clientY - centerY, me.clientX - centerX);
+          let deg = Math.round(rad * (180 / Math.PI)) + 90;
+          item.rotation = deg;
+          el.style.transform = `rotate(${deg}deg)`;
+        };
+
+        const onRotateUp = () => {
+          window.removeEventListener('mousemove', onRotateMove);
+          window.removeEventListener('mouseup', onRotateUp);
+          saveDiaryState();
+        };
+
+        window.addEventListener('mousemove', onRotateMove);
+        window.addEventListener('mouseup', onRotateUp);
+      };
 
       canvas.appendChild(el);
     });
@@ -1577,7 +1601,6 @@
 
   function renderAnalyticsData() {
     const range = $('#analyticsRangeSelect').value;
-    const now = new Date();
     
     // 1. 기간별 대상 날짜 필터링
     let filteredDays = [];
