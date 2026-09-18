@@ -76,10 +76,10 @@
   .btn.save-btn:hover{background:#265A4C}
   .btn.cal-btn{background:#285994;color:#fff;border-color:#285994;font-weight:700}
   .btn.cal-btn:hover{background:#1E4473}
-  .btn.cal-file-btn{background:#EBF2FB;color:#285994;border-color:#C6D8EB;font-weight:700}
-  .btn.cal-file-btn:hover{background:#DEEDFB}
-  .btn.cal-link-btn{background:#FAFBF8;color:#4A5A66;border-color:var(--rule)}
-  .btn.cal-link-btn:hover{background:#EEF2EB}
+  .btn.cal-embed-btn{background:#EBF3FA;color:#205284;border-color:#BACFE5;font-weight:700}
+  .btn.cal-embed-btn:hover{background:#DEEDFB}
+  .btn.cal-file-btn{background:#FAFBF8;color:#4A5A66;border-color:var(--rule)}
+  .btn.cal-file-btn:hover{background:#EEF2EB}
   .btn.small{padding:4px 9px;font-size:12px;border-radius:6px}
   
   .toolbar-date-picker{display:inline-flex;align-items:center;gap:4px;background:#fff;padding:3px 6px;border-radius:8px;border:1px solid var(--rule)}
@@ -220,7 +220,7 @@
   .notes{margin-top:16px;padding-top:14px;border-top:1px dashed var(--rule)}
   .notes .nhead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:8px}
   .notes h3{margin:0;font-size:13px;font-weight:700}
-  .qa{display:flex;flex-direction:column;gap:10px}
+  .qa{display:flex;flex-direction:column;gap:10px;transition:all 0.2s ease}
   .qarow{display:grid;grid-template-columns:1fr 1fr;gap:10px;position:relative}
   .qafield{width:100%;min-height:78px;font-family:inherit;font-size:13.5px;line-height:1.6;color:var(--ink);border:1px solid var(--rule);border-radius:8px;padding:8px 10px;background:#fff;overflow-x:auto;outline:none}
   .qafield:focus{outline:2px solid var(--jade);outline-offset:1px}
@@ -427,10 +427,10 @@
       <!-- 수동 전체 저장 버튼 -->
       <button class="btn save-btn" id="manualGlobalSaveBtn" title="모든 변경 사항을 저장소에 즉시 동기화합니다.">💾 전체 저장</button>
       
-      <!-- 구글 캘린더 동기화 및 파일 업로드 버튼 -->
-      <button class="btn cal-btn" id="syncGCalBtn" title="구글 캘린더에서 웹 링크를 통해 일정을 불러옵니다.">📥 구글 캘린더 동기화</button>
-      <button class="btn cal-file-btn" id="uploadIcsBtn" title="다운로드받은 basic.ics 파일을 직접 올려 100% 확실하게 일정을 넣습니다.">📁 캘린더 파일(ics) 불러오기</button>
-      <a href="https://calendar.google.com/calendar/u/2?cid=ZGFuc2FnYWU1MjVAZ21haWwuY29t" target="_blank" rel="noopener noreferrer" class="btn cal-link-btn" title="공유된 구글 캘린더 열기">📅 구글 캘린더 열기 ↗</a>
+      <!-- 구글 캘린더 전용 툴바 버튼들 -->
+      <button class="btn cal-embed-btn" id="openGCalEmbedBtn" title="구글 캘린더를 팝업 창으로 바로 열어 확인합니다.">📅 캘린더 보기</button>
+      <button class="btn cal-btn" id="syncGCalBtn" title="구글 캘린더 일정을 플래너 목록으로 자동 동기화합니다.">📥 일정 동기화</button>
+      <button class="btn cal-file-btn" id="uploadIcsBtn" title="다운로드받은 ics 파일을 직접 올려 등록합니다.">📁 파일(ics)</button>
     </div>
 
     <div class="bg-theme-bar">
@@ -715,8 +715,10 @@
   const KEY='plan-v1', SKEY='stamps-v1', CKEY='clip-v1', MKEY='memo-v1', APPKEY='app-settings-v1', DKEY='diary-v1';
   const $ = s => document.querySelector(s);
   
-  // 구글 캘린더 iCal 비공개 주소 설정
-  const GOOGLE_ICAL_URL = "https://calendar.google.com/calendar/ical/dansagae525%40gmail.com/private-2f442def1c2f816de819739e4f58ded7/basic.ics";
+  // 구글 캘린더 전용 주소 설정
+  const GOOGLE_EMBED_URL = "https://calendar.google.com/calendar/embed?src=dansagae525%40gmail.com&ctz=Asia%2FSeoul";
+  const GOOGLE_PUBLIC_ICAL_URL = "https://calendar.google.com/calendar/ical/dansagae525%40gmail.com/public/basic.ics";
+  const GOOGLE_PRIVATE_ICAL_URL = "https://calendar.google.com/calendar/ical/dansagae525%40gmail.com/private-2f442def1c2f816de819739e4f58ded7/basic.ics";
 
   const SUPABASE_URL = 'https://szqlrwnsflfbmafwefac.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_Ib67bVHkQHq1r2w1yyBFDg_cTj1N5qd';
@@ -793,7 +795,6 @@
     return 'HOME';
   }
 
-  // D-Day 계산 함수
   function calculateDDay(targetDateStr) {
     if(!targetDateStr) return { num: 'D-Day', diffDays: 0 };
     const today = new Date();
@@ -863,6 +864,24 @@
   }
 
   // ----------------------------------------------------
+  // 구글 캘린더 임베드 팝업창 열기
+  // ----------------------------------------------------
+  function openGoogleCalendarModal() {
+    const modal = createModal(`
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <h3 style="margin:0;font-size:16px;font-weight:800;color:var(--jade)">📅 구글 캘린더</h3>
+        <div style="display:flex;gap:6px">
+          <a href="${GOOGLE_EMBED_URL}" target="_blank" rel="noopener noreferrer" class="btn small cal-embed-btn">새 창에서 열기 ↗</a>
+          <button class="btn small ghost" id="closeGCalEmbedModal">✕</button>
+        </div>
+      </div>
+      <iframe src="${GOOGLE_EMBED_URL}" style="border:none;width:100%;height:580px;border-radius:10px;background:#fff" frameborder="0" scrolling="no"></iframe>
+    `);
+    modal.box.style.width = 'min(920px, 96vw)';
+    modal.box.querySelector('#closeGCalEmbedModal').onclick = () => modal.close();
+  }
+
+  // ----------------------------------------------------
   // 구글 캘린더 iCal (.ics) 일정 파싱 및 플래너 등록 (중복 허용)
   // ----------------------------------------------------
   function parseIcsDate(icsStr) {
@@ -900,7 +919,6 @@
     return null;
   }
 
-  // 텍스트 형태의 iCal 데이터를 플래너 상태(state.days)에 파싱 및 저장하는 공통 함수
   async function parseAndLoadIcsText(icsText) {
     const rawEvents = icsText.split('BEGIN:VEVENT');
     if (rawEvents.length <= 1) {
@@ -935,7 +953,6 @@
         state.days.push(targetDay);
       }
 
-      // 중복 체크 없이 그대로 추가
       targetDay.events.push({
         id: uid(),
         time: startInfo.time,
@@ -952,7 +969,6 @@
     toast(`구글 캘린더에서 총 ${addedCount}개의 일정을 등록했습니다!`);
   }
 
-  // 프록시 다중 시도 함수
   async function fetchWithFallback(targetUrl) {
     const proxies = [
       url => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
@@ -972,22 +988,27 @@
         }
       } catch (e) {}
     }
-    throw new Error('모든 프록시 서버 연결 실패');
+    throw new Error('프록시 연결 실패');
   }
 
-  // 1. 웹 주소를 통한 자동 동기화
   async function syncGoogleCalendar() {
     toast('구글 캘린더 일정을 가져오는 중입니다...');
-    try {
-      const text = await fetchWithFallback(GOOGLE_ICAL_URL);
-      await parseAndLoadIcsText(text);
-    } catch(err) {
-      console.error('캘린더 동기화 에러:', err);
-      toast('구글의 외부 접근 차단으로 직접 가져오지 못했습니다. 옆의 [📁 캘린더 파일(ics) 불러오기]를 이용해주세요!');
+    
+    // 1. 공개 iCal 주소 시도 -> 2. 비공개 iCal 주소 시도
+    const targets = [GOOGLE_PUBLIC_ICAL_URL, GOOGLE_PRIVATE_ICAL_URL];
+    for(const tUrl of targets) {
+      try {
+        const text = await fetchWithFallback(tUrl);
+        await parseAndLoadIcsText(text);
+        return;
+      } catch(e) {}
     }
+    
+    // 만약 프록시 차단으로 읽어오지 못한 경우 바로 임베드 뷰를 열어줌
+    toast('외부 접속 차단으로 캘린더 화면을 바로 엽니다. 일정을 확인하고 추가해보세요!');
+    openGoogleCalendarModal();
   }
 
-  // 2. 다운로드받은 ics 파일 직접 선택해서 즉시 100% 반영하는 기능
   function handleIcsFileUpload() {
     const input = document.createElement('input');
     input.type = 'file';
@@ -1007,6 +1028,7 @@
     input.click();
   }
 
+  $('#openGCalEmbedBtn').onclick = openGoogleCalendarModal;
   $('#syncGCalBtn').onclick = syncGoogleCalendar;
   $('#uploadIcsBtn').onclick = handleIcsFileUpload;
 
@@ -1080,7 +1102,6 @@
     try { await storage.set(DKEY, JSON.stringify(diaryData)); } catch(e) { console.error(e); }
   }
 
-  // 전체 데이터 통합 수동 저장
   async function triggerGlobalManualSave() {
     try {
       const memoEl = $('#memoArea');
@@ -1356,9 +1377,9 @@
         <div class="sched-head">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <h3>⏰ 이 날의 일정 (캘린더 연동)</h3>
-            <button class="btn small cal-btn" id="panelSyncGCalBtn">📥 캘린더 동기화</button>
-            <button class="btn small cal-file-btn" id="panelUploadIcsBtn">📁 파일(ics) 불러오기</button>
-            <a href="https://calendar.google.com/calendar/u/2?cid=ZGFuc2FnYWU1MjVAZ21haWwuY29t" target="_blank" rel="noopener noreferrer" class="btn small cal-link-btn">📅 캘린더 열기 ↗</a>
+            <button class="btn small cal-embed-btn" id="panelOpenGCalEmbedBtn">📅 캘린더 보기</button>
+            <button class="btn small cal-btn" id="panelSyncGCalBtn">📥 일정 동기화</button>
+            <button class="btn small cal-file-btn" id="panelUploadIcsBtn">📁 파일(ics)</button>
           </div>
           <span class="sched-date">${d.events.length}개 · ${fmtDur(scheduledMinutes(d))}</span>
         </div>
@@ -1461,9 +1482,13 @@
         <button class="btn ghost small" id="mN">지우기</button>
       </div>
 
+      <!-- 접기/펼치기 토글이 포함된 필기 영역 -->
       <div class="notes">
         <div class="nhead">
-          <h3>공부한 내용 필기</h3>
+          <div style="display:flex;align-items:center;gap:8px">
+            <h3>공부한 내용 필기</h3>
+            <button class="btn small ghost" id="toggleCollapseNotesBtn">🔼 필기 영역 접기</button>
+          </div>
           <div style="display:flex;gap:6px;flex-wrap:wrap">
             <button class="btn small ghost" id="toggleHideBtn">👁 답 가리기 토글</button>
             <button class="btn small ghost" id="addTableBtn">📊 표 삽입</button>
@@ -1504,6 +1529,8 @@
       toast('이 날의 모든 내용이 저장되었습니다.');
     };
 
+    const panelOpenEmbedBtn = $('#panelOpenGCalEmbedBtn');
+    if(panelOpenEmbedBtn) panelOpenEmbedBtn.onclick = openGoogleCalendarModal;
     const panelSyncBtn = $('#panelSyncGCalBtn');
     if(panelSyncBtn) panelSyncBtn.onclick = syncGoogleCalendar;
     const panelUploadBtn = $('#panelUploadIcsBtn');
@@ -1697,8 +1724,18 @@
     $('#mF').onclick = () => { d.status='fail'; saveState(); renderPlannerCalendar(); openPlannerPanel(); };
     $('#mN').onclick = () => { d.status='none'; saveState(); renderPlannerCalendar(); openPlannerPanel(); };
 
-    const toggleHideBtn = $('#toggleHideBtn');
+    // 필기 접기/펼치기 토글
     const qaBox = $('#qaBox');
+    const collapseNotesBtn = $('#toggleCollapseNotesBtn');
+    if(collapseNotesBtn && qaBox) {
+      collapseNotesBtn.onclick = () => {
+        const isHidden = qaBox.style.display === 'none';
+        qaBox.style.display = isHidden ? 'flex' : 'none';
+        collapseNotesBtn.textContent = isHidden ? '🔼 필기 영역 접기' : '🔽 필기 영역 펼치기';
+      };
+    }
+
+    const toggleHideBtn = $('#toggleHideBtn');
     if(toggleHideBtn && qaBox) {
       toggleHideBtn.onclick = () => { qaBox.classList.toggle('hide'); };
     }
@@ -1895,9 +1932,9 @@
 
   function createModal(htmlContent) {
     const overlay = document.createElement('div');
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9000;display:flex;align-items:center;justify-content:center;padding:16px;';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;display:flex;align-items:center;justify-content:center;padding:16px;';
     const box = document.createElement('div');
-    box.style.cssText = 'width:min(500px,100%);max-height:90vh;overflow:auto;background:var(--card);border-radius:12px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.2);';
+    box.style.cssText = 'width:min(500px,100%);max-height:90vh;overflow:auto;background:var(--card);border-radius:14px;padding:20px;box-shadow:0 12px 40px rgba(0,0,0,.25);';
     box.innerHTML = htmlContent;
     overlay.appendChild(box); document.body.appendChild(overlay);
     overlay.onclick = e => { if(e.target === overlay) overlay.remove(); };
@@ -1978,7 +2015,7 @@
         <li class="d-goal-item ${b.done ? 'done' : ''}" data-id="${b.id}">
           <input type="checkbox" ${b.done ? 'checked' : ''}>
           <span class="g-text" contenteditable="true">${b.text}</span>
-          <button class="d-goal-item g-del">✕</button>
+          <button class="g-del">✕</button>
         </li>`).join('');
       bucketList.querySelectorAll('.d-goal-item').forEach(li => {
         const b = diaryData.buckets.find(x => x.id === li.dataset.id);
@@ -2131,7 +2168,6 @@
     }
     if(pImg) pImg.onclick = () => pickFile(async f => { const d = await shrinkImage(f, 200, .85); diaryData.profileImg = d; pImg.innerHTML = `<img src="${d}">`; saveDiaryState(); });
 
-    // D-Day 카드 클릭 시 모달 오픈
     const ddayCard = $('#ddayCardWrap');
     if(ddayCard) {
       ddayCard.onclick = () => openDDaySettingsModal();
@@ -2291,7 +2327,7 @@
               if(leftPane) leftPane.style.display = 'none'; if(rightPane) rightPane.style.gridColumn = 'span 2';
               $('#dHomeView').style.display = 'none'; $('#dMonthlyView').style.display = 'grid'; $('#dWeeklyView').style.display = 'none';
               if($('#dNavBtnsContainer')) $('#dNavBtnsContainer').style.display = 'flex';
-              renderDiaryMonthly();
+              renderDiaryWeekly();
             }
             renderStickers();
           }
