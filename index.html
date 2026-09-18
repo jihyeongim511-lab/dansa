@@ -859,7 +859,7 @@
   }
 
   // ----------------------------------------------------
-  // 구글 캘린더 iCal (.ics) 일정 파싱 및 플래너 자동 등록 로직
+  // 구글 캘린더 iCal (.ics) 일정 파싱 및 플래너 등록 (중복 허용 + 다중 프록시 폴백)
   // ----------------------------------------------------
   function parseIcsDate(icsStr) {
     if(!icsStr) return null;
@@ -897,33 +897,49 @@
     return null;
   }
 
+  async function fetchWithFallback(targetUrl) {
+    const proxies = [
+      url => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
+      url => 'https://corsproxy.io/?' + encodeURIComponent(url),
+      url => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(url)
+    ];
+
+    for (const makeProxy of proxies) {
+      try {
+        const proxyUrl = makeProxy(targetUrl);
+        const res = await fetch(proxyUrl, { cache: 'no-store' });
+        if (res.ok) {
+          const text = await res.text();
+          if (text.includes('BEGIN:VCALENDAR')) {
+            return text;
+          }
+        }
+      } catch (e) {
+        // 다음 프록시 시도
+      }
+    }
+    throw new Error('모든 프록시 서버 연결 실패');
+  }
+
   async function syncGoogleCalendar() {
     toast('구글 캘린더 일정을 가져오는 중입니다...');
     try {
-      // 브라우저 CORS 제한 우회를 위한 고속 프록시 연결
-      const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(GOOGLE_ICAL_URL);
-      const res = await fetch(proxyUrl);
-      if(!res.ok) throw new Error('Network response not ok');
-      const text = await res.text();
+      const text = await fetchWithFallback(GOOGLE_ICAL_URL);
 
-      // iCal VEVENT 파싱
       const rawEvents = text.split('BEGIN:VEVENT');
       let addedCount = 0;
 
       for(let i = 1; i < rawEvents.length; i++) {
         const block = rawEvents[i].split('END:VEVENT')[0];
         
-        // SUMMARY (제목)
         const summaryMatch = block.match(/SUMMARY:(.*?)(\r?\n)/);
         const title = summaryMatch ? summaryMatch[1].trim() : '구글 캘린더 일정';
 
-        // DTSTART (시작일시)
         const dtstartMatch = block.match(/DTSTART(?:;[^:]+)?:(\d{8}(?:T\d{6}Z?)?)/);
         if(!dtstartMatch) continue;
         const startInfo = parseIcsDate(dtstartMatch[1]);
         if(!startInfo) continue;
 
-        // DTEND (종료일시를 통한 소요시간 계산)
         const dtendMatch = block.match(/DTEND(?:;[^:]+)?:(\d{8}(?:T\d{6}Z?)?)/);
         let duration = 60;
         if(dtendMatch && !startInfo.isAllDay) {
@@ -934,34 +950,30 @@
           }
         }
 
-        // 플래너의 state.days에 병합
         let targetDay = state.days.find(d => d.date === startInfo.date);
         if(!targetDay) {
           targetDay = mk(startInfo.date, `${startInfo.date.slice(5)} 일정`, false, []);
           state.days.push(targetDay);
         }
 
-        // 중복 방지 (동일 시간 + 동일 일정명이 없을 때만 등록)
-        const isDuplicate = targetDay.events.some(e => e.time === startInfo.time && e.title === title);
-        if(!isDuplicate) {
-          targetDay.events.push({
-            id: uid(),
-            time: startInfo.time,
-            duration: duration,
-            title: title,
-            done: false
-          });
-          addedCount++;
-        }
+        // 기존 일정과 중복 검사 없이 그대로 무조건 추가
+        targetDay.events.push({
+          id: uid(),
+          time: startInfo.time,
+          duration: duration,
+          title: title,
+          done: false
+        });
+        addedCount++;
       }
 
       await saveState();
       renderPlannerCalendar();
       if(selected) openPlannerPanel();
-      toast(`구글 캘린더에서 총 ${addedCount}개의 새 일정을 등록했습니다!`);
+      toast(`구글 캘린더에서 총 ${addedCount}개의 일정을 등록했습니다!`);
     } catch(err) {
       console.error('캘린더 동기화 에러:', err);
-      toast('구글 캘린더 일정을 가져오지 못했습니다. 잠시 후 다시 시도해주세요.');
+      toast('구글 서버 또는 프록시 응답 지연으로 가져오지 못했습니다. 잠시 후 다시 눌러주세요.');
     }
   }
 
@@ -2245,7 +2257,7 @@
               if(leftPane) leftPane.style.display = 'none'; if(rightPane) rightPane.style.gridColumn = 'span 2';
               $('#dHomeView').style.display = 'none'; $('#dMonthlyView').style.display = 'grid'; $('#dWeeklyView').style.display = 'none';
               if($('#dNavBtnsContainer')) $('#dNavBtnsContainer').style.display = 'flex';
-              renderDiaryMonthly();
+              renderDiaryWeekly();
             }
             renderStickers();
           }
