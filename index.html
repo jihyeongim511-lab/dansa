@@ -561,6 +561,41 @@
     #qaCollPrintArea, #qaCollPrintArea * { visibility: visible; }
     #qaCollPrintArea { position: absolute; left: 0; top: 0; width: 100%; background: #fff !important; }
   }
+
+  /* 에빙하우스 복습 주기 탭 */
+  .review-wrap{max-width:900px;margin:0 auto 40px;padding:0 4px}
+  .review-intro{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;margin-bottom:16px}
+  .review-intro h2{margin:0 0 6px;font-size:17px}
+  .review-intro p{margin:0;font-size:13px;color:var(--ink-soft);line-height:1.6}
+  .review-add-box{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:12px 14px;margin-bottom:16px}
+  .review-add-box input[type="text"]{flex:2;min-width:200px;border:1px solid var(--rule);border-radius:8px;padding:8px 10px;font-size:13px;outline:none}
+  .review-add-box input[type="date"]{border:1px solid var(--rule);border-radius:8px;padding:7px 8px;font-size:13px;outline:none}
+  .review-add-box input:focus{border-color:var(--jade)}
+  .review-today-box{margin-bottom:16px}
+  .review-today-card{background:#FFF7E2;border:1.5px solid var(--gold);border-radius:12px;padding:12px 14px;margin-bottom:8px}
+  .review-today-card.empty{background:var(--card);border:1px solid var(--rule);color:var(--ink-soft);font-size:13px;text-align:center}
+  .review-today-title{font-weight:800;font-size:13px;color:var(--gold);margin-bottom:6px}
+  .review-today-item{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:4px 0;border-bottom:1px dashed #EADFB8}
+  .review-today-item:last-child{border-bottom:none}
+  .review-today-item button{border:1px solid var(--jade);background:#fff;color:var(--jade);font-size:11px;font-weight:700;border-radius:6px;padding:3px 8px;cursor:pointer}
+  .review-today-item button:hover{background:var(--jade);color:#fff}
+  .review-list{display:flex;flex-direction:column;gap:10px}
+  .review-card{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:14px 16px}
+  .review-card-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+  .review-card-subject{font-weight:800;font-size:14px}
+  .review-card-date{font-size:11.5px;color:var(--ink-soft)}
+  .review-card-del{border:none;background:none;color:var(--seal);font-size:12px;cursor:pointer;font-weight:700}
+  .review-checkpoints{display:flex;gap:8px;flex-wrap:wrap}
+  .review-checkpoint{flex:1;min-width:84px;border:1px solid var(--rule);border-radius:8px;padding:7px 6px;text-align:center;font-size:11.5px;cursor:pointer;transition:all .15s;background:#fff}
+  .review-checkpoint:hover{border-color:#BAC4B8}
+  .review-checkpoint.done{background:#EAF4EF;border-color:var(--jade);color:var(--jade);text-decoration:line-through;opacity:.8}
+  .review-checkpoint.overdue{border-color:var(--seal);background:#FDF1F0;color:var(--seal);font-weight:700}
+  .review-checkpoint.today{border-color:var(--gold);background:#FFF7E2;color:var(--gold);font-weight:800}
+  .review-checkpoint .rc-label{font-weight:700;display:block;margin-bottom:2px}
+  .review-checkpoint .rc-date{font-variant-numeric:tabular-nums;display:block}
+  .review-progress{margin-top:10px;height:6px;background:#DCE2D9;border-radius:99px;overflow:hidden}
+  .review-progress-fill{height:100%;background:var(--jade);transition:width .3s ease}
+  .review-empty-hint{text-align:center;color:var(--ink-soft);font-size:13px;padding:30px 10px;background:var(--card);border:1px dashed var(--rule);border-radius:12px}
 </style>
 </head>
 <body>
@@ -570,6 +605,7 @@
     <div class="nav-tabs">
       <button class="nav-tab active" id="btnModePlanner">📋 학습 플래너 모드</button>
       <button class="nav-tab" id="btnModeDiary">📖 다이어리 모드</button>
+      <button class="nav-tab" id="btnModeReview">🧠 복습 주기</button>
       <button class="btn save-btn" id="manualGlobalSaveBtn" title="모든 변경 사항을 저장소에 즉시 동기화합니다.">💾 전체 저장</button>
       
       <button class="btn qa-collect-btn" id="openQACollectorBtn" title="원하는 날짜들의 문제와 정답만 모아서 봅니다.">📚 문제 모아보기</button>
@@ -877,6 +913,26 @@
     </div>
   </div>
 
+  <!-- [3] 에빙하우스 망각곡선 기반 복습 주기 섹션 -->
+  <div id="reviewContainer" style="display:none">
+    <div class="review-wrap">
+      <div class="review-intro">
+        <h2>🧠 에빙하우스 망각곡선 기반 자동 복습 주기</h2>
+        <p>학습한 날짜를 입력하면 <b>1일 · 3일 · 7일 · 14일 · 30일</b> 후 복습 시점을 자동으로 계산해드려요. 망각곡선 이론상 이 시점마다 복습하면 장기기억으로 가장 잘 전환됩니다.</p>
+      </div>
+
+      <div class="review-add-box">
+        <input type="text" id="reviewNewSubject" placeholder="학습한 과목/내용 입력 (예: 교육학개론 3단원)">
+        <input type="date" id="reviewNewDate">
+        <button class="btn primary" id="reviewCalcBtn">복습 주기 계산</button>
+      </div>
+
+      <div class="review-today-box" id="reviewTodayBox"></div>
+
+      <div class="review-list" id="reviewListBox"></div>
+    </div>
+  </div>
+
   <!-- [모달] 과목별 공부 밸런스 분석 (파이 차트 & 히트맵 잔디) -->
   <div id="analyticsModalOverlay" style="display:none;position:fixed;inset:0;background:rgba(22,32,43,.65);z-index:300;align-items:center;justify-content:center;padding:16px;">
     <div style="width:min(720px,100%);max-height:88vh;background:var(--card);border-radius:16px;padding:20px;display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,.25);overflow:hidden">
@@ -954,7 +1010,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 (async function initApp() {
-  const KEY='plan-v1', SKEY='stamps-v1', CKEY='clip-v1', MKEY='memo-v1', APPKEY='app-settings-v1', DKEY='diary-v1', FKEY='custom-font-v1', SCALEKEY='app-font-scale-v1';
+  const KEY='plan-v1', SKEY='stamps-v1', CKEY='clip-v1', MKEY='memo-v1', APPKEY='app-settings-v1', DKEY='diary-v1', FKEY='custom-font-v1', SCALEKEY='app-font-scale-v1', REVIEWKEY='ebbinghaus-review-v1';
   const $ = s => document.querySelector(s);
   
   const GOOGLE_EMBED_URL = "https://calendar.google.com/calendar/embed?src=dansagae525%40gmail.com&ctz=Asia%2FSeoul";
@@ -1023,6 +1079,8 @@
   };
 
   const uid = () => Math.random().toString(36).slice(2,9);
+  let reviewItems = []; // 에빙하우스 복습 주기 항목: [{id, subject, studyDate, checkpoints:[{days,date,done}]}]
+  const REVIEW_INTERVALS = [1, 3, 7, 14, 30]; // 1-3-7-14-30일 복습 주기
   function toast(msg) {
     const el = $('#toast');
     if(!el) return;
@@ -1152,9 +1210,150 @@
 
   if($('#dExportImgBtn')) $('#dExportImgBtn').onclick = exportDiaryAsImage;
   if($('#dExportPdfBtn')) $('#dExportPdfBtn').onclick = exportDiaryAsPdf;
+  if($('#reviewCalcBtn')) $('#reviewCalcBtn').onclick = addReviewItem;
+  if($('#reviewNewSubject')) $('#reviewNewSubject').onkeydown = e => { if(e.key === 'Enter') addReviewItem(); };
 
   function parse(d) { const [y,m,dd]=d.split('-').map(Number); return new Date(y, m-1, dd); }
+  function isoLocal(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
   function esc(s) { return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+  // ── 에빙하우스 망각곡선 기반 복습 주기 ──────────────────────────────
+  function calcReviewCheckpoints(studyIso) {
+    return REVIEW_INTERVALS.map(days => {
+      const d = parse(studyIso);
+      d.setDate(d.getDate() + days);
+      return { days, date: isoLocal(d), done: false };
+    });
+  }
+
+  async function saveReviewItems() {
+    try { await storage.set(REVIEWKEY, JSON.stringify(reviewItems)); } catch(e) { console.error('복습 데이터 저장 에러:', e); }
+  }
+
+  function dowLabel(iso) {
+    return ['일','월','화','수','목','금','토'][parse(iso).getDay()];
+  }
+
+  function renderReviewToday() {
+    const box = $('#reviewTodayBox');
+    if(!box) return;
+    const todayIso = isoLocal(new Date());
+    const dueList = [];
+    reviewItems.forEach(item => {
+      item.checkpoints.forEach(cp => {
+        if(!cp.done && cp.date <= todayIso) {
+          dueList.push({ item, cp, overdue: cp.date < todayIso });
+        }
+      });
+    });
+    dueList.sort((a,b) => a.cp.date.localeCompare(b.cp.date));
+
+    if(dueList.length === 0) {
+      box.innerHTML = `<div class="review-today-card empty">오늘 복습할 항목이 없습니다. 위에서 새 학습 내용을 추가해보세요 ✨</div>`;
+      return;
+    }
+    box.innerHTML = `
+      <div class="review-today-card">
+        <div class="review-today-title">🔔 지금 복습해야 할 항목 (${dueList.length}개)</div>
+        ${dueList.map(({item, cp, overdue}) => `
+          <div class="review-today-item">
+            <span>${esc(item.subject)} · <b>${cp.days}일 후 복습</b>${overdue ? ` <span style="color:var(--seal)">(지남: ${cp.date})</span>` : ''}</span>
+            <button data-id="${item.id}" data-days="${cp.days}" class="review-today-done-btn">복습 완료</button>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    box.querySelectorAll('.review-today-done-btn').forEach(btn => {
+      btn.onclick = () => toggleReviewCheckpoint(btn.dataset.id, Number(btn.dataset.days), true);
+    });
+  }
+
+  function renderReviewList() {
+    const box = $('#reviewListBox');
+    if(!box) return;
+    if(reviewItems.length === 0) {
+      box.innerHTML = `<div class="review-empty-hint">아직 등록된 학습 항목이 없어요.<br>위 입력창에 과목/내용과 학습한 날짜를 넣고 [복습 주기 계산]을 눌러보세요.</div>`;
+      return;
+    }
+    const todayIso = isoLocal(new Date());
+    const sorted = [...reviewItems].sort((a,b) => b.studyDate.localeCompare(a.studyDate));
+    box.innerHTML = sorted.map(item => {
+      const doneCount = item.checkpoints.filter(c => c.done).length;
+      const pct = Math.round(doneCount / item.checkpoints.length * 100);
+      return `
+        <div class="review-card" data-id="${item.id}">
+          <div class="review-card-head">
+            <div>
+              <span class="review-card-subject">${esc(item.subject)}</span>
+              <span class="review-card-date"> · 학습일 ${item.studyDate} (${dowLabel(item.studyDate)})</span>
+            </div>
+            <button class="review-card-del" data-id="${item.id}">삭제</button>
+          </div>
+          <div class="review-checkpoints">
+            ${item.checkpoints.map(cp => {
+              let cls = '';
+              if(cp.done) cls = 'done';
+              else if(cp.date < todayIso) cls = 'overdue';
+              else if(cp.date === todayIso) cls = 'today';
+              return `
+                <div class="review-checkpoint ${cls}" data-id="${item.id}" data-days="${cp.days}">
+                  <span class="rc-label">${cp.days}일 후</span>
+                  <span class="rc-date">${cp.date.slice(5)} (${dowLabel(cp.date)})</span>
+                </div>
+              `;
+            }).join('')}
+          </div>
+          <div class="review-progress"><div class="review-progress-fill" style="width:${pct}%"></div></div>
+        </div>
+      `;
+    }).join('');
+
+    box.querySelectorAll('.review-checkpoint').forEach(el => {
+      el.onclick = () => toggleReviewCheckpoint(el.dataset.id, Number(el.dataset.days));
+    });
+    box.querySelectorAll('.review-card-del').forEach(btn => {
+      btn.onclick = () => {
+        if(!confirm('이 학습 항목의 복습 일정을 삭제할까요?')) return;
+        reviewItems = reviewItems.filter(i => i.id !== btn.dataset.id);
+        saveReviewItems();
+        renderReviewToday();
+        renderReviewList();
+        toast('삭제되었습니다.');
+      };
+    });
+  }
+
+  function toggleReviewCheckpoint(itemId, days, forceDone) {
+    const item = reviewItems.find(i => i.id === itemId);
+    if(!item) return;
+    const cp = item.checkpoints.find(c => c.days === days);
+    if(!cp) return;
+    cp.done = forceDone ? true : !cp.done;
+    saveReviewItems();
+    renderReviewToday();
+    renderReviewList();
+    if(cp.done) toast('복습 완료로 표시했습니다 👍');
+  }
+
+  function addReviewItem() {
+    const subjectInput = $('#reviewNewSubject');
+    const dateInput = $('#reviewNewDate');
+    const subject = subjectInput.value.trim();
+    const studyDate = dateInput.value || isoLocal(new Date());
+    if(!subject) { toast('학습한 과목/내용을 입력해주세요.'); subjectInput.focus(); return; }
+    reviewItems.push({
+      id: uid(),
+      subject,
+      studyDate,
+      checkpoints: calcReviewCheckpoints(studyDate)
+    });
+    subjectInput.value = '';
+    saveReviewItems();
+    renderReviewToday();
+    renderReviewList();
+    toast('복습 주기를 계산했어요! 1·3·7·14·30일 후 알려드릴게요 📅');
+  }
+
   function fmtDur(m) { m=Math.max(0,Math.round(m)); const h=Math.floor(m/60), mm=m%60; return h<=0?`${mm}분`:mm>0?`${h}시간 ${mm}분`:`${h}시간`; }
   function fmtDurShort(m) { m=Math.max(0,Math.round(m)); const h=Math.floor(m/60), mm=m%60; return h<=0?`${mm}분`:mm>0?`${h}h${mm}m`:`${h}h`; }
   function liveMinutes(d) { return (d.trackerSlots ? d.trackerSlots.length * 10 : d.studyMinutes) + (d.timerStart ? (Date.now()-d.timerStart)/60000 : 0); }
@@ -4062,13 +4261,13 @@
   }
 
   $('#btnModePlanner').onclick = () => {
-    $('#btnModePlanner').classList.add('active'); $('#btnModeDiary').classList.remove('active');
-    $('#plannerContainer').style.display = 'block'; $('#diaryContainer').style.display = 'none';
+    $('#btnModePlanner').classList.add('active'); $('#btnModeDiary').classList.remove('active'); $('#btnModeReview').classList.remove('active');
+    $('#plannerContainer').style.display = 'block'; $('#diaryContainer').style.display = 'none'; $('#reviewContainer').style.display = 'none';
     renderPlannerCalendar();
   };
   $('#btnModeDiary').onclick = () => {
-    $('#btnModeDiary').classList.add('active'); $('#btnModePlanner').classList.remove('active');
-    $('#plannerContainer').style.display = 'none'; $('#diaryContainer').style.display = 'block';
+    $('#btnModeDiary').classList.add('active'); $('#btnModePlanner').classList.remove('active'); $('#btnModeReview').classList.remove('active');
+    $('#plannerContainer').style.display = 'none'; $('#diaryContainer').style.display = 'block'; $('#reviewContainer').style.display = 'none';
     
     const leftPane = $('#bookLeftPane');
     const rightPane = $('#bookRightPane');
@@ -4108,6 +4307,14 @@
     }
     renderStickers();
   };
+  $('#btnModeReview').onclick = () => {
+    $('#btnModeReview').classList.add('active'); $('#btnModePlanner').classList.remove('active'); $('#btnModeDiary').classList.remove('active');
+    $('#plannerContainer').style.display = 'none'; $('#diaryContainer').style.display = 'none'; $('#reviewContainer').style.display = 'block';
+    if($('#reviewNewDate') && !$('#reviewNewDate').value) $('#reviewNewDate').value = isoLocal(new Date());
+    renderReviewToday();
+    renderReviewList();
+  };
+
 
   try {
     const appRes = await storage.get(APPKEY);
@@ -4144,6 +4351,12 @@
     const tRes = await storage.get('mood-tracker-v1');
     if(tRes && tRes.value) moodRecords = JSON.parse(tRes.value);
     $('#moodDate').value = new Date().toISOString().slice(0,10);
+
+    const rvRes = await storage.get(REVIEWKEY);
+    if(rvRes && rvRes.value) { try { reviewItems = JSON.parse(rvRes.value) || []; } catch(e) { reviewItems = []; } }
+    if($('#reviewNewDate')) $('#reviewNewDate').value = isoLocal(new Date());
+    renderReviewToday();
+    renderReviewList();
     
     ensureShape();
     initDiaryEvents();
