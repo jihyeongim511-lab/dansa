@@ -4498,7 +4498,7 @@
     const sortedCats = Array.from(allCategories).sort();
 
     Array.from(selectedWeeklyCats).forEach(cat => {
-      if(!allCategories.has(cat)) {
+      if(cat !== '__NONE__' && !allCategories.has(cat)) {
         selectedWeeklyCats.delete(cat);
       }
     });
@@ -4517,7 +4517,9 @@
         btn.textContent = '과목 없음';
         container.innerHTML = '<div style="font-size:11px;color:#9AA79A;padding:4px">등록된 과목이 없습니다</div>';
       } else {
-        if(selectedWeeklyCats.size === 0 || selectedWeeklyCats.size === sortedCats.length) {
+        if(selectedWeeklyCats.has('__NONE__')) {
+          btn.textContent = '과목 선택 (0개) ▾';
+        } else if(selectedWeeklyCats.size === 0 || selectedWeeklyCats.size === sortedCats.length) {
           btn.textContent = '과목 선택 (전체) ▾';
         } else {
           btn.textContent = `과목 선택 (${selectedWeeklyCats.size}개) ▾`;
@@ -4536,14 +4538,19 @@
         container.querySelectorAll('.w-cat-chk').forEach(chk => {
           chk.onchange = () => {
             const val = chk.value;
-            if(selectedWeeklyCats.size === 0) {
+            const wasNoneMode = selectedWeeklyCats.has('__NONE__');
+            if(wasNoneMode) {
+              selectedWeeklyCats.delete('__NONE__');
+            } else if(selectedWeeklyCats.size === 0) {
               sortedCats.forEach(c => selectedWeeklyCats.add(c));
             }
             if(chk.checked) selectedWeeklyCats.add(val);
             else selectedWeeklyCats.delete(val);
 
-            if(selectedWeeklyCats.size === sortedCats.length || selectedWeeklyCats.size === 0) {
+            if(selectedWeeklyCats.size === sortedCats.length) {
               selectedWeeklyCats.clear();
+            } else if(selectedWeeklyCats.size === 0) {
+              selectedWeeklyCats.add('__NONE__');
             }
             renderDiaryWeekly();
           };
@@ -4631,7 +4638,7 @@
         ${evSectionHtml}
         
         <div style="font-size:10px;font-weight:800;color:var(--jade);margin-top:4px;margin-bottom:2px">
-          ✅ 할 일 ${selectedWeeklyCats.size > 0 ? `<span style="font-size:9.5px;color:var(--d-theme-dark)">(${selectedWeeklyCats.size}개 과목 필터)</span>` : ''}
+          ✅ 할 일 ${selectedWeeklyCats.size > 0 ? `<span style="font-size:9.5px;color:var(--d-theme-dark)">(${selectedWeeklyCats.has('__NONE__') ? 0 : selectedWeeklyCats.size}개 과목 필터)</span>` : ''}
         </div>
         <div class="d-week-task-addbox no-export">
           <input type="text" class="w-add-input" placeholder="[과목] 할 일 입력..." data-date="${iso}">
