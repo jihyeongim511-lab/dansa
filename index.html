@@ -327,6 +327,26 @@
   .moodentry{display:grid;grid-template-columns:70px 1fr auto;gap:8px;align-items:center;padding:7px 9px;border-bottom:1px solid #EEF1EC;font-size:12px}
 
 
+  .home-today-card{background:#fff;border:1.5px solid var(--d-theme);border-radius:12px;padding:12px;box-shadow:0 3px 8px rgba(0,0,0,0.03)}
+  .home-today-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+  .home-today-title{font-size:11px;font-weight:800;color:var(--d-theme-dark);letter-spacing:1px}
+  .home-today-date{border:1px solid var(--rule);background:#FAFBF8;border-radius:6px;padding:4px 7px;font-size:11px;color:var(--ink);outline:none}
+  .home-focus-row{display:flex;gap:6px;align-items:center;margin-bottom:9px}
+  .home-focus-row input{flex:1;min-width:0;border:1px solid var(--rule);border-radius:7px;padding:6px 8px;font-size:11.5px;outline:none;background:#FAFBF8}
+  .home-focus-row input:focus{border-color:var(--d-theme-dark);background:#fff}
+  .home-stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:9px}
+  .home-stat-box{background:var(--d-theme-soft);border-radius:8px;padding:6px 7px;min-width:0}
+  .home-stat-box .lbl{display:block;font-size:9px;color:var(--ink-soft);font-weight:700}
+  .home-stat-box .val{display:block;font-size:14px;font-weight:900;color:var(--ink);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .home-progress-wrap{margin:7px 0 8px}
+  .home-progress-label{display:flex;justify-content:space-between;font-size:9.5px;color:var(--ink-soft);font-weight:700;margin-bottom:4px}
+  .home-progress{height:7px;background:#ECEEE9;border-radius:99px;overflow:hidden}
+  .home-progress-fill{height:100%;background:var(--d-theme-dark);border-radius:99px;transition:width .3s ease}
+  .home-summary{font-size:10.5px;line-height:1.5;color:var(--ink-soft);background:#FAFBF8;border:1px dashed var(--rule);border-radius:8px;padding:7px 8px;margin-top:8px}
+  .home-note-row{display:flex;gap:6px;margin-top:8px}
+  .home-note-row input{flex:1;min-width:0;border:1px solid var(--rule);border-radius:7px;padding:6px 8px;font-size:11px;outline:none}
+  .home-note-row button{flex:none}
+  .home-streak{margin-top:7px;font-size:9.5px;color:var(--ink-soft);text-align:right}
   .home-mood-card{background:#fff;border:1.5px solid var(--d-theme);border-radius:12px;padding:12px;box-shadow:0 3px 8px rgba(0,0,0,0.03)}
   .home-mood-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
   .home-mood-title{font-size:11px;font-weight:800;color:var(--d-theme-dark);letter-spacing:1px}
@@ -377,7 +397,19 @@
   .profile-img-wrap img{width:100%;height:100%;object-fit:cover}
   .profile-bio{font-size:12px;color:var(--ink-soft);border:none;background:transparent;text-align:center;width:100%;outline:none;font-weight:600}
 
-  .home-page-layout{display:flex;flex-direction:column;gap:12px;height:100%}
+  /* HOME 양면 레이아웃: 왼쪽은 목표/계획, 오른쪽은 오늘의 기록/무드로 균형 있게 배치 */
+  .home-page-layout{display:flex;flex-direction:column;gap:12px;height:100%;min-height:0}
+  .home-left-tools{display:flex;flex-direction:column;gap:12px;flex:1;min-height:0}
+  .home-right-tools{display:flex;flex-direction:column;gap:12px;flex:1;min-height:0}
+  .home-left-tools .home-card,.home-right-tools .home-card,.home-right-tools .home-today-card,.home-right-tools .home-mood-card{flex:none}
+  .home-left-tools .d-goals-list{max-height:180px}
+  .home-right-tools .home-today-card,.home-right-tools .home-mood-card{width:100%;box-sizing:border-box}
+  @media(min-width:861px){
+    #dHomeView.home-page-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:stretch}
+    #dHomeView .home-left-tools,#dHomeView .home-right-tools{min-height:0}
+    #dHomeView .home-right-tools{justify-content:space-between}
+    #dHomeView .home-mood-card{flex:1;min-height:0}
+  }
   .home-card{background:#fff;border:1.5px solid var(--d-theme);border-radius:12px;padding:12px;box-shadow:0 3px 8px rgba(0,0,0,0.03)}
   .home-card-header{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:800;color:var(--d-theme-dark);letter-spacing:1px;margin-bottom:8px;text-transform:uppercase}
   .d-goal-add-box{display:flex;gap:4px;margin-bottom:8px}
@@ -400,8 +432,6 @@
     content:"📅 클릭하여 목표일 설정";position:absolute;bottom:4px;right:8px;
     font-size:9.5px;color:var(--d-theme-dark);font-weight:700;opacity:0.8;
   }
-  /* HOME을 PNG/PDF로 저장할 때만 D-Day의 편집 안내 문구를 숨김 */
-  .book-spread.export-hide-dday-hint .dday-card::after{display:none !important;}
   .dday-title{font-size:12px;font-weight:800;color:var(--d-theme-dark);margin-bottom:4px}
   .dday-number{font-size:24px;font-weight:900;color:var(--ink);letter-spacing:-0.5px}
   .dday-date{font-size:11px;color:var(--ink-soft);margin-top:3px;margin-bottom:8px}
@@ -854,9 +884,29 @@
           <div class="dday-number" id="ddayNumEdit">D-105</div>
           <div class="dday-date" id="ddayDateEdit">2026. 12. 31. 까지</div>
         </div>
+
+        <div class="home-left-tools">
+          <div class="home-card">
+            <div class="home-card-header">
+              <span>MONTHLY GOALS</span>
+              <select id="goalMonthSelect" style="font-size:11px;padding:2px 6px;border-radius:4px;border:1px solid var(--rule);outline:none;font-weight:bold;color:var(--d-theme-dark)">
+                <option value="9">9월 목표</option><option value="10">10월 목표</option><option value="11">11월 목표</option><option value="12">12월 목표</option>
+                <option value="1">1월 목표</option><option value="2">2월 목표</option><option value="3">3월 목표</option><option value="4">4월 목표</option><option value="5">5월 목표</option><option value="6">6월 목표</option><option value="7">7월 목표</option><option value="8">8월 목표</option>
+              </select>
+            </div>
+            <div class="d-goal-add-box no-export"><input type="text" id="dNewGoalInput" placeholder="선택한 달의 새 목표 입력..."><button class="btn small primary" id="dAddGoalBtn">추가</button></div>
+            <ul class="d-goals-list" id="dGoalList"></ul>
+          </div>
+
+          <div class="home-card" style="margin-top:auto">
+            <div class="home-card-header">BUCKET LIST</div>
+            <div class="d-goal-add-box no-export"><input type="text" id="dNewBucketInput" placeholder="새 버킷리스트 입력..."><button class="btn small primary" id="dAddBucketBtn">추가</button></div>
+            <ul class="d-goals-list" id="dBucketList"></ul>
+          </div>
+        </div>
       </div>
 
-      <div class="book-right grid-paper" id="bookRightPane" style="grid-column: span 2;">
+      <div class="book-right grid-paper" id="bookRightPane">
         <div class="diary-format-toolbar no-export">
           <button class="diary-fmt-btn" id="dFmtBold"><b>B</b></button>
           <span style="font-size:11px;font-weight:bold;margin-left:4px">글자색:</span>
@@ -889,49 +939,31 @@
         </div>
 
         <div id="dHomeView" class="home-page-layout">
-          <div class="home-card">
-            <div class="home-card-header">
-              <span>MONTHLY GOALS</span>
-              <select id="goalMonthSelect" style="font-size:11px;padding:2px 6px;border-radius:4px;border:1px solid var(--rule);outline:none;font-weight:bold;color:var(--d-theme-dark)">
-                <option value="9">9월 목표</option>
-                <option value="10">10월 목표</option>
-                <option value="11">11월 목표</option>
-                <option value="12">12월 목표</option>
-                <option value="1">1월 목표</option>
-                <option value="2">2월 목표</option>
-                <option value="3">3월 목표</option>
-                <option value="4">4월 목표</option>
-                <option value="5">5월 목표</option>
-                <option value="6">6월 목표</option>
-                <option value="7">7월 목표</option>
-                <option value="8">8월 목표</option>
-              </select>
+          <div class="home-right-tools">
+            <div class="home-today-card" id="homeTodayDashboard">
+              <div class="home-today-head">
+                <span class="home-today-title">☀️ TODAY · DAILY DASHBOARD</span>
+                <input class="home-today-date" id="homeTodayDate" type="date" title="오늘 대시보드 날짜 선택">
+              </div>
+              <div class="home-focus-row no-export"><input id="homeFocusInput" type="text" placeholder="오늘의 한 줄 목표를 적어보세요…"><button class="btn small primary" id="homeFocusSaveBtn">저장</button></div>
+              <div class="home-stat-grid">
+                <div class="home-stat-box"><span class="lbl">📚 공부시간</span><span class="val" id="homeStudyStat">0분</span></div>
+                <div class="home-stat-box"><span class="lbl">✅ 할 일</span><span class="val" id="homeTaskStat">0 / 0</span></div>
+                <div class="home-stat-box"><span class="lbl">🌿 무드 기록</span><span class="val" id="homeMoodStat">0회</span></div>
+                <div class="home-stat-box"><span class="lbl">🎯 가용시간 대비</span><span class="val" id="homeAvailStat">0%</span></div>
+              </div>
+              <div class="home-progress-wrap"><div class="home-progress-label"><span>오늘 할 일 진행률</span><span id="homeTaskPct">0%</span></div><div class="home-progress"><div class="home-progress-fill" id="homeTaskFill"></div></div></div>
+              <div class="home-summary" id="homeDailySummary">오늘의 기록을 모아 한 줄로 정리해드려요.</div>
+              <div class="home-note-row no-export"><input id="homeNoteInput" type="text" placeholder="오늘의 한 줄 기록…"><button class="btn small" id="homeNoteSaveBtn">기록</button></div>
+              <div class="home-streak" id="homeStreak">🔥 공부/기록 연속 0일</div>
             </div>
-            <div class="d-goal-add-box no-export">
-              <input type="text" id="dNewGoalInput" placeholder="선택한 달의 새 목표 입력 후 추가...">
-              <button class="btn small primary" id="dAddGoalBtn">추가</button>
-            </div>
-            <ul class="d-goals-list" id="dGoalList"></ul>
-          </div>
 
-
-          <div class="home-mood-card" id="homeMoodDashboard">
-            <div class="home-mood-head">
-              <span class="home-mood-title">🌿 MOOD FLOW · 24 HOURS</span>
-              <input class="home-mood-date" id="moodDashDate" type="date" title="무드 통계를 볼 날짜 선택">
+            <div class="home-mood-card" id="homeMoodDashboard">
+              <div class="home-mood-head"><span class="home-mood-title">🌿 MOOD FLOW · 24 HOURS</span><input class="home-mood-date" id="moodDashDate" type="date" title="무드 통계를 볼 날짜 선택"></div>
+              <div class="home-mood-summary" id="moodDashSummary"></div>
+              <div id="moodDashTimelineWrap"></div>
+              <div class="home-mood-legend" id="moodDashLegend"></div>
             </div>
-            <div class="home-mood-summary" id="moodDashSummary"></div>
-            <div id="moodDashTimelineWrap"></div>
-            <div class="home-mood-legend" id="moodDashLegend"></div>
-          </div>
-
-          <div class="home-card" style="margin-top:auto">
-            <div class="home-card-header">BUCKET LIST</div>
-            <div class="d-goal-add-box no-export">
-              <input type="text" id="dNewBucketInput" placeholder="새 버킷리스트 입력 후 추가...">
-              <button class="btn small primary" id="dAddBucketBtn">추가</button>
-            </div>
-            <ul class="d-goals-list" id="dBucketList"></ul>
           </div>
         </div>
 
@@ -1158,6 +1190,8 @@
         { id: 'g2', text: '기출 분석 2회독 완성', done: false }
       ]
     },
+    dailyFocusMap: {},
+    dailyNoteMap: {},
     buckets: [
       { id: 'b1', text: '합격 후 제주도 여행 가기', done: false },
       { id: 'b2', text: '디저트 카페 도장깨기', done: false }
@@ -1347,10 +1381,6 @@
     const selected = Array.from(document.querySelectorAll('.placed-sticker.selected'));
     selected.forEach(el => el.classList.remove('selected'));
 
-    // HOME 내보내기(PNG/PDF)에서는 D-Day 카드의 '클릭하여 목표일 설정' 안내 문구를 숨김
-    const hideDdayHint = diaryData && diaryData.currentTab === 'HOME';
-    if(hideDdayHint) target.classList.add('export-hide-dday-hint');
-
     // 이미지 스티커가 찌그러지지 않도록 캡처용으로 임시 교체
     const restoreStickerImgs = patchStickerImagesForExport(target);
 
@@ -1366,7 +1396,6 @@
     } finally {
       restoreStickerImgs();
       selected.forEach(el => el.classList.add('selected'));
-      if(hideDdayHint) target.classList.remove('export-hide-dday-hint');
     }
     return { canvas, label: currentDiaryTabLabel() };
   }
@@ -4131,6 +4160,73 @@
       .join('');
   }
 
+  function getHomeDate() {
+    return $('#homeTodayDate')?.value || moodLocalDate();
+  }
+
+  function getDayForHome(date) {
+    return (state && Array.isArray(state.days) ? state.days : []).find(d => d.date === date) || null;
+  }
+
+  function renderHomeTodayDashboard() {
+    const dateEl = $('#homeTodayDate');
+    const focusEl = $('#homeFocusInput');
+    const noteEl = $('#homeNoteInput');
+    if(!dateEl) return;
+    if(!dateEl.value) dateEl.value = moodLocalDate();
+    const date = dateEl.value;
+    if(!diaryData.dailyFocusMap) diaryData.dailyFocusMap = {};
+    if(!diaryData.dailyNoteMap) diaryData.dailyNoteMap = {};
+    if(focusEl && document.activeElement !== focusEl) focusEl.value = diaryData.dailyFocusMap[date] || '';
+    if(noteEl && document.activeElement !== noteEl) noteEl.value = diaryData.dailyNoteMap[date] || '';
+
+    const d = getDayForHome(date);
+    const study = d ? liveMinutes(d) : 0;
+    const avail = d ? Number(d.availableMinutes) || 0 : 0;
+    const items = d && Array.isArray(d.items) ? d.items : [];
+    const done = items.filter(i => i.state === 'done').length;
+    const partial = items.filter(i => i.state === 'partial').length;
+    const taskScore = done + partial * 0.5;
+    const taskPct = items.length ? Math.round(taskScore / items.length * 100) : 0;
+    const moodCount = (Array.isArray(moodRecords) ? moodRecords : []).filter(r => r && r.date === date).length;
+    const availPct = avail > 0 ? Math.min(100, Math.round(study / avail * 100)) : 0;
+
+    const studyEl = $('#homeStudyStat'), taskEl = $('#homeTaskStat'), moodEl = $('#homeMoodStat'), availEl = $('#homeAvailStat');
+    if(studyEl) studyEl.textContent = fmtDur(study);
+    if(taskEl) taskEl.textContent = `${done + partial} / ${items.length}`;
+    if(moodEl) moodEl.textContent = `${moodCount}회`;
+    if(availEl) availEl.textContent = `${availPct}%`;
+    if($('#homeTaskPct')) $('#homeTaskPct').textContent = `${taskPct}%`;
+    if($('#homeTaskFill')) $('#homeTaskFill').style.width = `${taskPct}%`;
+
+    const summary = $('#homeDailySummary');
+    if(summary) {
+      const focus = diaryData.dailyFocusMap[date];
+      const note = diaryData.dailyNoteMap[date];
+      const pieces = [];
+      if(focus) pieces.push(`🎯 ${esc(focus)}`);
+      if(items.length) pieces.push(`할 일 ${done}개 완료${partial ? ` · 부분 ${partial}개` : ''}`);
+      if(study > 0) pieces.push(`공부 ${fmtDur(study)}`);
+      if(moodCount > 0) pieces.push(`무드 ${moodCount}회 기록`);
+      if(note) pieces.push(`💬 ${esc(note)}`);
+      summary.innerHTML = pieces.length ? pieces.join(' · ') : '아직 기록이 많지 않아요. 오늘의 목표나 공부시간을 남겨보세요 🌱';
+    }
+
+    let streak = 0;
+    const days = [...(state?.days || [])].sort((a,b) => String(b.date).localeCompare(String(a.date)));
+    const today = moodLocalDate();
+    let cursor = new Date(`${today}T00:00:00`);
+    for(let i=0; i<365; i++) {
+      const key = isoLocal(cursor);
+      const dd = (state?.days || []).find(x => x.date === key);
+      const hasMood = (moodRecords || []).some(r => r && r.date === key);
+      const active = dd && (liveMinutes(dd) > 0 || (dd.items||[]).some(x => x.state === 'done' || x.state === 'partial'));
+      if(active || hasMood) streak++; else if(i > 0) break;
+      cursor.setDate(cursor.getDate() - 1);
+    }
+    if($('#homeStreak')) $('#homeStreak').textContent = `🔥 공부/기록 연속 ${streak}일`;
+  }
+
   function renderHomeDashboard() {
     const selMonth = $('#goalMonthSelect').value;
     diaryData.selectedGoalMonth = selMonth;
@@ -4142,7 +4238,7 @@
       goalList.innerHTML = diaryData.monthlyGoalsMap[selMonth].map(g => `
         <li class="d-goal-item ${g.done ? 'done' : ''}" data-id="${g.id}">
           <input type="checkbox" ${g.done ? 'checked' : ''}>
-          <span class="g-text" contenteditable="true">${g.text}</span>
+          <span class="g-text" contenteditable="true">${esc(g.text)}</span>
           <button class="d-goal-item g-del">✕</button>
         </li>`).join('');
       goalList.querySelectorAll('.d-goal-item').forEach(li => {
@@ -4163,7 +4259,7 @@
       bucketList.innerHTML = (diaryData.buckets || []).map(b => `
         <li class="d-goal-item ${b.done ? 'done' : ''}" data-id="${b.id}">
           <input type="checkbox" ${b.done ? 'checked' : ''}>
-          <span class="g-text" contenteditable="true">${b.text}</span>
+          <span class="g-text" contenteditable="true">${esc(b.text)}</span>
           <button class="g-del">✕</button>
         </li>`).join('');
       bucketList.querySelectorAll('.d-goal-item').forEach(li => {
@@ -4174,8 +4270,7 @@
         li.querySelector('.g-del').onclick = () => { diaryData.buckets = diaryData.buckets.filter(x => x.id !== b.id); renderHomeDashboard(); saveDiaryState(); };
       });
     }
-
-    // 홈 대시보드의 무드 통계도 함께 갱신합니다.
+    renderHomeTodayDashboard();
     renderHomeMoodDashboard();
   }
 
@@ -4592,6 +4687,30 @@
         renderDiaryWeekly();
       };
     }
+
+    const homeTodayDate = $('#homeTodayDate');
+    if(homeTodayDate) {
+      homeTodayDate.value = homeTodayDate.value || moodLocalDate();
+      homeTodayDate.onchange = () => { renderHomeTodayDashboard(); renderHomeMoodDashboard(); };
+    }
+    const homeFocusSaveBtn = $('#homeFocusSaveBtn');
+    if(homeFocusSaveBtn) homeFocusSaveBtn.onclick = () => {
+      const date = getHomeDate();
+      if(!diaryData.dailyFocusMap) diaryData.dailyFocusMap = {};
+      diaryData.dailyFocusMap[date] = ($('#homeFocusInput')?.value || '').trim();
+      saveDiaryState(); renderHomeTodayDashboard(); toast('오늘의 한 줄 목표를 저장했어요.');
+    };
+    const homeFocusInput = $('#homeFocusInput');
+    if(homeFocusInput) homeFocusInput.onkeydown = e => { if(e.key === 'Enter'){ e.preventDefault(); homeFocusSaveBtn?.click(); } };
+    const homeNoteSaveBtn = $('#homeNoteSaveBtn');
+    if(homeNoteSaveBtn) homeNoteSaveBtn.onclick = () => {
+      const date = getHomeDate();
+      if(!diaryData.dailyNoteMap) diaryData.dailyNoteMap = {};
+      diaryData.dailyNoteMap[date] = ($('#homeNoteInput')?.value || '').trim();
+      saveDiaryState(); renderHomeTodayDashboard(); toast('오늘의 한 줄 기록을 저장했어요.');
+    };
+    const homeNoteInput = $('#homeNoteInput');
+    if(homeNoteInput) homeNoteInput.onkeydown = e => { if(e.key === 'Enter'){ e.preventDefault(); homeNoteSaveBtn?.click(); } };
 
     const goalMonthSelect = $('#goalMonthSelect');
     if(goalMonthSelect) {
