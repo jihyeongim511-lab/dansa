@@ -349,7 +349,7 @@
   .home-streak{margin-top:7px;font-size:9.5px;color:var(--ink-soft);text-align:right}
   /* ===== 휴식 → 복귀 로그 ===== */
   .home-rest-card{background:#fff;border:1.5px solid var(--d-theme);border-radius:12px;padding:12px;box-shadow:0 3px 8px rgba(0,0,0,0.03)}
-  .home-right-tools .home-rest-card{flex:none;width:100%;box-sizing:border-box}
+  .home-left-tools .home-rest-card,.home-right-tools .home-rest-card{flex:none;width:100%;box-sizing:border-box}
   .rest-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
   .rest-title{font-size:11px;font-weight:800;color:var(--d-theme-dark);letter-spacing:1px}
   .rest-select{border:1px solid var(--rule);background:#FAFBF8;border-radius:6px;padding:3px 6px;font-size:11px;color:var(--ink);outline:none}
@@ -439,7 +439,8 @@
     #dHomeView.home-page-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:stretch}
     #dHomeView .home-left-tools,#dHomeView .home-right-tools{min-height:0}
     #dHomeView .home-right-tools{justify-content:space-between}
-    #dHomeView .home-mood-card{flex:1;min-height:0}
+    #dHomeView .home-mood-card{flex:1;min-height:0;display:flex;flex-direction:column}
+    #dHomeView #moodDashTimelineWrap{flex:1;display:flex;flex-direction:column;justify-content:center}
   }
   .home-card{background:#fff;border:1.5px solid var(--d-theme);border-radius:12px;padding:12px;box-shadow:0 3px 8px rgba(0,0,0,0.03)}
   .home-card-header{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:800;color:var(--d-theme-dark);letter-spacing:1px;margin-bottom:8px;text-transform:uppercase}
@@ -942,6 +943,21 @@
             <ul class="d-goals-list" id="dGoalList"></ul>
           </div>
 
+          <div class="home-rest-card" id="homeRestCard">
+            <div class="rest-head">
+              <span class="rest-title">☕ REST → RETURN LOG</span>
+              <select class="rest-select no-export" id="restRangeSelect" title="인사이트 집계 기간">
+                <option value="7">최근 7일</option>
+                <option value="30" selected>최근 30일</option>
+                <option value="0">전체</option>
+              </select>
+            </div>
+            <div id="restControls"></div>
+            <div class="rest-insight" id="restInsight"></div>
+            <div class="rest-bars" id="restBars"></div>
+            <details class="rest-log no-export"><summary>최근 휴식 기록</summary><div id="restLogList"></div></details>
+          </div>
+
           <div class="home-card" style="margin-top:auto">
             <div class="home-card-header">BUCKET LIST</div>
             <div class="d-goal-add-box no-export"><input type="text" id="dNewBucketInput" placeholder="새 버킷리스트 입력..."><button class="btn small primary" id="dAddBucketBtn">추가</button></div>
@@ -1007,21 +1023,6 @@
               <div class="home-mood-summary" id="moodDashSummary"></div>
               <div id="moodDashTimelineWrap"></div>
               <div class="home-mood-legend" id="moodDashLegend"></div>
-            </div>
-
-            <div class="home-rest-card" id="homeRestCard">
-              <div class="rest-head">
-                <span class="rest-title">☕ REST → RETURN LOG</span>
-                <select class="rest-select no-export" id="restRangeSelect" title="인사이트 집계 기간">
-                  <option value="7">최근 7일</option>
-                  <option value="30" selected>최근 30일</option>
-                  <option value="0">전체</option>
-                </select>
-              </div>
-              <div id="restControls"></div>
-              <div class="rest-insight" id="restInsight"></div>
-              <div class="rest-bars" id="restBars"></div>
-              <details class="rest-log no-export"><summary>최근 휴식 기록</summary><div id="restLogList"></div></details>
             </div>
           </div>
         </div>
