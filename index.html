@@ -540,6 +540,13 @@
     z-index:110;box-shadow:0 2px 5px rgba(0,0,0,0.2);
   }
   .placed-sticker.selected .s-del{display:flex}
+  .placed-sticker .s-copy{
+    display:none;position:absolute;top:-10px;left:-10px;width:22px;height:22px;
+    border-radius:50%;background:var(--jade);color:#fff;font-size:11px;font-weight:bold;
+    line-height:1;border:2px solid #fff;cursor:pointer;align-items:center;justify-content:center;
+    z-index:110;box-shadow:0 2px 5px rgba(0,0,0,0.2);
+  }
+  .placed-sticker.selected .s-copy{display:flex}
   .placed-sticker .s-resizer{
     display:none;position:absolute;bottom:-8px;right:-8px;width:20px;height:20px;
     background:var(--d-theme-dark);color:#fff;border-radius:4px;cursor:nwse-resize;
@@ -1909,6 +1916,12 @@
       delBtn.title = '삭제';
       el.appendChild(delBtn);
 
+      const copyBtn = document.createElement('button');
+      copyBtn.className = 's-copy';
+      copyBtn.innerText = '⧉';
+      copyBtn.title = '복사해서 붙여넣기';
+      el.appendChild(copyBtn);
+
       const resizer = document.createElement('div');
       resizer.className = 's-resizer';
       resizer.innerText = '◢';
@@ -1927,6 +1940,19 @@
         diaryData.pageStickers[pageKey] = diaryData.pageStickers[pageKey].filter(s => s.id !== item.id);
         renderStickers();
         saveDiaryState();
+      };
+
+      copyBtn.onmousedown = e => e.stopPropagation();
+      copyBtn.onclick = (e) => {
+        e.stopPropagation();
+        const clone = Object.assign({}, item, { id: uid(), x: item.x + 24, y: item.y + 24 });
+        diaryData.pageStickers[pageKey].push(clone);
+        renderStickers();
+        saveDiaryState();
+        // 방금 복사된 스티커를 바로 선택 상태로 만들어준다
+        const newEl = canvas.querySelector(`[data-id="${clone.id}"]`);
+        if(newEl) newEl.classList.add('selected');
+        toast('스티커를 복사했어요!');
       };
 
       // 1. 선택 + 위치 드래그 이동
