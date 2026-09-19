@@ -435,6 +435,9 @@
   /* PDF/PNG로 저장(캡처)할 때는 "클릭하여 목표일 설정" 같은 조작 안내 문구를 숨긴다 */
   body.exporting .dday-card::after{ content:none; }
   body.exporting .add-hint{ display:none !important; }
+  /* html2canvas는 letter-spacing(자간)이 있으면 글자가 뒤로 갈수록 아래/왼쪽으로 밀려 겹쳐 보이는
+     버그가 있어, 캡처하는 순간에만 자간을 초기화해서 이 현상을 막는다 */
+  body.exporting *{ letter-spacing:normal !important; }
   .dday-title{font-size:12px;font-weight:800;color:var(--d-theme-dark);margin-bottom:4px}
   .dday-number{font-size:24px;font-weight:900;color:var(--ink);letter-spacing:-0.5px}
   .dday-date{font-size:11px;color:var(--ink-soft);margin-top:3px;margin-bottom:8px}
@@ -1369,6 +1372,39 @@
     return () => restores.forEach(fn => fn());
   }
 
+  // html2canvas는 <select>, <input type="date">같은 브라우저 기본 폼 컨트롤을 제대로 그리지 못해
+  // 안의 글자가 아래/왼쪽으로 밀려 보이므로, 캡처 직전에만 겉모습이 같은 일반 텍스트로 잠시 바꿔서 캡처한다.
+  function patchFormFieldsForExport(root) {
+    const restores = [];
+    const swap = (el, text) => {
+      const rect = el.getBoundingClientRect();
+      const cs = getComputedStyle(el);
+      const span = document.createElement('span');
+      span.className = el.className;
+      span.textContent = text;
+      span.style.cssText = `
+        display:inline-flex;align-items:center;box-sizing:border-box;
+        width:${rect.width}px;height:${rect.height}px;
+        font-family:${cs.fontFamily};font-size:${cs.fontSize};font-weight:${cs.fontWeight};
+        letter-spacing:normal;color:${cs.color};background:${cs.backgroundColor};
+        border:${cs.border};border-radius:${cs.borderRadius};padding:${cs.padding};
+      `;
+      const parent = el.parentNode;
+      const next = el.nextSibling;
+      parent.removeChild(el);
+      parent.insertBefore(span, next);
+      restores.push(() => { parent.insertBefore(el, span); parent.removeChild(span); });
+    };
+    Array.from(root.querySelectorAll('select')).forEach(sel => {
+      const opt = sel.options[sel.selectedIndex];
+      swap(sel, opt ? opt.text : '');
+    });
+    Array.from(root.querySelectorAll('input[type="date"]')).forEach(inp => {
+      swap(inp, inp.value || '');
+    });
+    return () => restores.slice().reverse().forEach(fn => fn());
+  }
+
   async function captureDiaryCanvas() {
     if(typeof html2canvas === 'undefined') {
       toast('내보내기 기능을 불러오지 못했습니다. 인터넷 연결을 확인해주세요.');
@@ -1387,6 +1423,9 @@
     // 이미지 스티커가 찌그러지지 않도록 캡처용으로 임시 교체
     const restoreStickerImgs = patchStickerImagesForExport(target);
 
+    // select/date input처럼 html2canvas가 못 그리는 폼 컨트롤을 텍스트로 임시 교체
+    const restoreFormFields = patchFormFieldsForExport(target);
+
     // "클릭하여 목표일 설정"처럼 조작을 안내하는 UI 힌트 문구들을 캡처 중에는 숨긴다
     document.body.classList.add('exporting');
 
@@ -1400,6 +1439,7 @@
         ignoreElements: el => el.classList && el.classList.contains('no-export')
       });
     } finally {
+      restoreFormFields();
       restoreStickerImgs();
       selected.forEach(el => el.classList.add('selected'));
       document.body.classList.remove('exporting');
