@@ -774,10 +774,13 @@
       </div>
 
       <div class="book-right grid-paper" id="bookRightPane" style="grid-column: span 2;">
-        <div class="diary-format-toolbar">
+        <div class="diary-format-toolbar no-export">
           <button class="diary-fmt-btn" id="dFmtBold"><b>B</b></button>
           <span style="font-size:11px;font-weight:bold;margin-left:4px">글자색:</span>
           <input type="color" id="dFmtColor" value="#16202B" style="width:20px;height:20px;border:none;background:none;cursor:pointer">
+          <span style="width:10px"></span>
+          <button class="btn small cal-file-btn" id="dExportImgBtn" title="현재 화면을 이미지로 저장">📸 이미지 저장</button>
+          <button class="btn small cal-file-btn" id="dExportPdfBtn" title="현재 화면을 PDF로 저장">📄 PDF 저장</button>
         </div>
 
         <div class="month-header" id="diaryHeaderRow">
@@ -821,7 +824,7 @@
                 <option value="8">8월 목표</option>
               </select>
             </div>
-            <div class="d-goal-add-box">
+            <div class="d-goal-add-box no-export">
               <input type="text" id="dNewGoalInput" placeholder="선택한 달의 새 목표 입력 후 추가...">
               <button class="btn small primary" id="dAddGoalBtn">추가</button>
             </div>
@@ -830,7 +833,7 @@
 
           <div class="home-card" style="margin-top:auto">
             <div class="home-card-header">BUCKET LIST</div>
-            <div class="d-goal-add-box">
+            <div class="d-goal-add-box no-export">
               <input type="text" id="dNewBucketInput" placeholder="새 버킷리스트 입력 후 추가...">
               <button class="btn small primary" id="dAddBucketBtn">추가</button>
             </div>
@@ -848,7 +851,7 @@
         </div>
       </div>
 
-      <div class="book-tabs">
+      <div class="book-tabs no-export">
         <button class="side-tab active" data-tab="HOME">HOME</button>
         <button class="side-tab" data-tab="WEEK">WEEK</button>
         <button class="side-tab" data-tab="MONTH">MONTH</button>
@@ -947,6 +950,8 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 (async function initApp() {
   const KEY='plan-v1', SKEY='stamps-v1', CKEY='clip-v1', MKEY='memo-v1', APPKEY='app-settings-v1', DKEY='diary-v1', FKEY='custom-font-v1', SCALEKEY='app-font-scale-v1';
@@ -1024,6 +1029,130 @@
     el.textContent = msg; el.classList.add('on');
     clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('on'), 2500);
   }
+  function currentDiaryTabLabel() {
+    const tab = diaryData && diaryData.currentTab ? diaryData.currentTab : 'HOME';
+    return { HOME: '홈', MONTH: '먼슬리', WEEK: '위클리' }[tab] || '홈';
+  }
+
+  async function waitForFontsReady() {
+    try {
+      if(document.fonts && document.fonts.ready) {
+        await Promise.race([
+          document.fonts.ready,
+          new Promise(res => setTimeout(res, 2000)) // 최대 2초 대기 후 진행
+        ]);
+      }
+    } catch(e) { /* 폰트 로딩 API 미지원 브라우저는 무시하고 진행 */ }
+  }
+
+  // html2canvas는 img의 object-fit:contain을 제대로 그리지 못해 스티커가 찌그러지므로,
+  // 캡처 직전에만 이미지 스티커를 배경이미지(contain) 방식으로 잠시 바꿔서 캡처한다.
+  function patchStickerImagesForExport(root) {
+    const imgs = Array.from(root.querySelectorAll('.placed-sticker img'));
+    const restores = [];
+    imgs.forEach(img => {
+      const src = img.getAttribute('src') || img.src;
+      const placeholder = document.createElement('div');
+      placeholder.className = 'sticker-export-fill';
+      placeholder.style.width = '100%';
+      placeholder.style.height = '100%';
+      placeholder.style.backgroundImage = `url("${src}")`;
+      placeholder.style.backgroundSize = 'contain';
+      placeholder.style.backgroundRepeat = 'no-repeat';
+      placeholder.style.backgroundPosition = 'center';
+      const parent = img.parentNode;
+      parent.replaceChild(placeholder, img);
+      restores.push(() => {
+        if(placeholder.parentNode) placeholder.parentNode.replaceChild(img, placeholder);
+      });
+    });
+    return () => restores.forEach(fn => fn());
+  }
+
+  async function captureDiaryCanvas() {
+    if(typeof html2canvas === 'undefined') {
+      toast('내보내기 기능을 불러오지 못했습니다. 인터넷 연결을 확인해주세요.');
+      return null;
+    }
+    // 실제 화면(.book-spread)을 그대로 캡처 → 적용된 폰트/스티커가 그대로 반영됨
+    const target = $('.book-spread');
+    if(!target) { toast('캡처할 화면을 찾을 수 없습니다.'); return null; }
+
+    await waitForFontsReady();
+
+    // 선택된 스티커의 편집 핸들(테두리)이 찍히지 않도록 잠시 선택 해제
+    const selected = Array.from(document.querySelectorAll('.placed-sticker.selected'));
+    selected.forEach(el => el.classList.remove('selected'));
+
+    // 이미지 스티커가 찌그러지지 않도록 캡처용으로 임시 교체
+    const restoreStickerImgs = patchStickerImagesForExport(target);
+
+    let canvas;
+    try {
+      canvas = await html2canvas(target, {
+        backgroundColor: '#ffffff',
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        ignoreElements: el => el.classList && el.classList.contains('no-export')
+      });
+    } finally {
+      restoreStickerImgs();
+      selected.forEach(el => el.classList.add('selected'));
+    }
+    return { canvas, label: currentDiaryTabLabel() };
+  }
+
+  function downloadCanvasAsPng(canvas, filename) {
+    canvas.toBlob(blob => {
+      if(!blob) { toast('이미지 생성에 실패했습니다.'); return; }
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+    }, 'image/png');
+  }
+
+  async function exportDiaryAsImage() {
+    toast('이미지를 생성하는 중...');
+    const result = await captureDiaryCanvas();
+    if(!result) return;
+    const { canvas, label } = result;
+    const dateStr = new Date().toISOString().slice(0,10);
+    downloadCanvasAsPng(canvas, `다이어리_${label}_${dateStr}.png`);
+    toast('이미지가 저장되었습니다.');
+  }
+
+  async function exportDiaryAsPdf() {
+    if(typeof window.jspdf === 'undefined') {
+      toast('PDF 내보내기 기능을 불러오지 못했습니다. 인터넷 연결을 확인해주세요.');
+      return;
+    }
+    toast('PDF를 생성하는 중...');
+    const result = await captureDiaryCanvas();
+    if(!result) return;
+    const { canvas, label } = result;
+    const { jsPDF } = window.jspdf;
+    const imgData = canvas.toDataURL('image/png');
+    const orientation = canvas.width >= canvas.height ? 'landscape' : 'portrait';
+    const pdf = new jsPDF({ orientation, unit: 'pt', format: 'a4' });
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+    const ratio = Math.min(pageW / canvas.width, pageH / canvas.height);
+    const imgW = canvas.width * ratio;
+    const imgH = canvas.height * ratio;
+    const x = (pageW - imgW) / 2;
+    const y = (pageH - imgH) / 2;
+    pdf.addImage(imgData, 'PNG', x, y, imgW, imgH);
+    const dateStr = new Date().toISOString().slice(0,10);
+    pdf.save(`다이어리_${label}_${dateStr}.pdf`);
+    toast('PDF가 저장되었습니다.');
+  }
+
+  if($('#dExportImgBtn')) $('#dExportImgBtn').onclick = exportDiaryAsImage;
+  if($('#dExportPdfBtn')) $('#dExportPdfBtn').onclick = exportDiaryAsPdf;
+
   function parse(d) { const [y,m,dd]=d.split('-').map(Number); return new Date(y, m-1, dd); }
   function esc(s) { return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
   function fmtDur(m) { m=Math.max(0,Math.round(m)); const h=Math.floor(m/60), mm=m%60; return h<=0?`${mm}분`:mm>0?`${h}시간 ${mm}분`:`${h}시간`; }
@@ -3582,7 +3711,7 @@
     const goalCol = document.createElement('div'); goalCol.className = 'd-week-col';
     goalCol.innerHTML = `
       <div class="d-week-col-head"><span class="d-week-dayname" style="color:var(--jade)">WEEKLY GOAL</span><span class="d-week-date">🎯</span></div>
-      <div class="d-goal-add-box" style="margin-top:4px">
+      <div class="d-goal-add-box no-export" style="margin-top:4px">
         <input type="text" class="wk-goal-input" placeholder="새 주간 목표..." style="border:1px solid var(--rule);border-radius:4px;padding:4px 6px;font-size:11px;width:100%">
       </div>
       <ul class="d-goals-list wk-goal-items" style="max-height:180px"></ul>
@@ -3654,7 +3783,7 @@
         <div style="font-size:10px;font-weight:800;color:var(--jade);margin-top:4px;margin-bottom:2px">
           ✅ 할 일 ${selectedWeeklyCats.size > 0 ? `<span style="font-size:9.5px;color:var(--d-theme-dark)">(${selectedWeeklyCats.size}개 과목 필터)</span>` : ''}
         </div>
-        <div class="d-week-task-addbox">
+        <div class="d-week-task-addbox no-export">
           <input type="text" class="w-add-input" placeholder="[과목] 할 일 입력..." data-date="${iso}">
           <button class="w-add-btn" data-date="${iso}">＋</button>
         </div>
