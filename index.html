@@ -426,6 +426,8 @@
   }
   .d-cal-text{margin-top:4px;font-size:10px;line-height:1.3;color:var(--ink);outline:none;word-break:break-all}
   .d-cal-text:empty:before{content:attr(placeholder);color:#C6CFC6}
+  /* 이미지/PDF 저장 시 빈 날짜 칸의 '메모...' 안내 문구는 숨김 */
+  .book-spread.export-clean .d-cal-text:empty:before{content:none !important;}
 
   #dWeeklyView{display:none;flex:1;flex-direction:column;gap:8px;overflow:hidden;min-height:0}
   .d-weekly-spread-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:8px;flex:1;min-height:0}
@@ -596,6 +598,12 @@
   .review-progress{margin-top:10px;height:6px;background:#DCE2D9;border-radius:99px;overflow:hidden}
   .review-progress-fill{height:100%;background:var(--jade);transition:width .3s ease}
   .review-empty-hint{text-align:center;color:var(--ink-soft);font-size:13px;padding:30px 10px;background:var(--card);border:1px dashed var(--rule);border-radius:12px}
+  .review-qa-box{background:#FAF9F5;border:1px dashed var(--rule);border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:12.5px}
+  .review-qa-q{margin-bottom:6px;line-height:1.5;word-break:break-word}
+  .review-qa-toggle{border:1px solid var(--jade);background:#fff;color:var(--jade);font-size:11px;font-weight:700;border-radius:6px;padding:3px 8px;cursor:pointer;margin-bottom:6px}
+  .review-qa-toggle:hover{background:var(--jade);color:#fff}
+  .review-qa-a{filter:blur(5px);transition:filter .2s;line-height:1.5;word-break:break-word}
+  .review-qa-a.revealed{filter:none}
 </style>
 </head>
 <body>
@@ -767,6 +775,7 @@
     </div>
 
     <div class="panel" id="panel"></div>
+    <datalist id="qaCatOptions"></datalist>
   </div>
 
   <!-- [2] 다이어리 섹션 -->
@@ -925,11 +934,40 @@
         <input type="text" id="reviewNewSubject" placeholder="학습한 과목/내용 입력 (예: 교육학개론 3단원)">
         <input type="date" id="reviewNewDate">
         <button class="btn primary" id="reviewCalcBtn">복습 주기 계산</button>
+        <button class="btn qa-collect-btn" id="openQaImportBtn">📚 문제에서 불러오기</button>
       </div>
 
       <div class="review-today-box" id="reviewTodayBox"></div>
 
       <div class="review-list" id="reviewListBox"></div>
+    </div>
+  </div>
+
+  <!-- [3-1] 문제&답에서 복습 항목 불러오기 모달 -->
+  <div id="qaImportModalOverlay" style="display:none;position:fixed;inset:0;background:rgba(22,32,43,.65);z-index:300;align-items:center;justify-content:center;padding:16px;">
+    <div style="width:min(720px,100%);max-height:88vh;background:var(--card);border-radius:16px;padding:20px;display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,.25);overflow:hidden">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;border-bottom:2px solid var(--rule);padding-bottom:10px">
+        <h3 style="margin:0;font-size:18px;font-weight:800;color:var(--jade)">📚 문제에서 복습 항목 불러오기</h3>
+        <button class="btn small ghost" id="closeQaImportModal" style="font-size:16px">✕</button>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;align-items:center">
+        <select id="qaImportCatFilter" style="border:1px solid var(--rule);border-radius:8px;padding:6px 8px;font-size:12.5px;outline:none">
+          <option value="">전체 과목</option>
+        </select>
+        <input type="text" id="qaImportKeyword" placeholder="문제 내용 검색..." style="flex:1;min-width:150px;border:1px solid var(--rule);border-radius:8px;padding:6px 10px;font-size:12.5px;background:#fff;outline:none">
+        <div class="toolbar-date-picker">
+          <span style="font-size:11px;color:var(--ink-soft)">복습 시작일</span>
+          <input type="date" id="qaImportStudyDate">
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:8px">
+        <button class="btn small ghost" id="qaImportSelAll">전체 선택</button>
+        <button class="btn small ghost" id="qaImportSelClear">선택 해제</button>
+      </div>
+      <div id="qaImportList" style="flex:1;overflow:auto;display:flex;flex-direction:column;gap:8px;min-height:120px"></div>
+      <div style="margin-top:12px;display:flex;justify-content:flex-end">
+        <button class="btn primary" id="qaImportConfirmBtn">선택한 문제 복습에 추가</button>
+      </div>
     </div>
   </div>
 
@@ -1142,6 +1180,9 @@
     const selected = Array.from(document.querySelectorAll('.placed-sticker.selected'));
     selected.forEach(el => el.classList.remove('selected'));
 
+    // 먼슬리의 빈 칸에 표시되는 '메모...' 안내 문구는 이미지/PDF 저장 시 숨김
+    target.classList.add('export-clean');
+
     // 이미지 스티커가 찌그러지지 않도록 캡처용으로 임시 교체
     const restoreStickerImgs = patchStickerImagesForExport(target);
 
@@ -1156,6 +1197,7 @@
       });
     } finally {
       restoreStickerImgs();
+      target.classList.remove('export-clean');
       selected.forEach(el => el.classList.add('selected'));
     }
     return { canvas, label: currentDiaryTabLabel() };
@@ -1216,6 +1258,22 @@
   function parse(d) { const [y,m,dd]=d.split('-').map(Number); return new Date(y, m-1, dd); }
   function isoLocal(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
   function esc(s) { return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+  function getAllKnownCategories() {
+    const set = new Set();
+    (state && state.days ? state.days : []).forEach(d => {
+      (d.items||[]).forEach(it => { if(it.cat) set.add(it.cat); });
+      (d.qa||[]).forEach(r => { if(r.cat) set.add(r.cat); });
+    });
+    return Array.from(set);
+  }
+
+  function refreshQaCatOptions() {
+    const dl = $('#qaCatOptions');
+    if(!dl) return;
+    dl.innerHTML = getAllKnownCategories().map(c => `<option value="${esc(c)}"></option>`).join('');
+  }
+
 
   // ── 에빙하우스 망각곡선 기반 복습 주기 ──────────────────────────────
   function calcReviewCheckpoints(studyIso) {
@@ -1289,6 +1347,13 @@
             </div>
             <button class="review-card-del" data-id="${item.id}">삭제</button>
           </div>
+          ${item.qaSnapshot ? `
+            <div class="review-qa-box">
+              <div class="review-qa-q">${item.qaSnapshot.q || '(문제 내용 없음)'}</div>
+              <button type="button" class="review-qa-toggle" data-id="${item.id}">정답 보기</button>
+              <div class="review-qa-a" id="reviewQaA-${item.id}">${item.qaSnapshot.a || '(답 없음)'}</div>
+            </div>
+          ` : ''}
           <div class="review-checkpoints">
             ${item.checkpoints.map(cp => {
               let cls = '';
@@ -1310,6 +1375,14 @@
 
     box.querySelectorAll('.review-checkpoint').forEach(el => {
       el.onclick = () => toggleReviewCheckpoint(el.dataset.id, Number(el.dataset.days));
+    });
+    box.querySelectorAll('.review-qa-toggle').forEach(btn => {
+      btn.onclick = () => {
+        const ansEl = document.getElementById('reviewQaA-' + btn.dataset.id);
+        if(!ansEl) return;
+        const revealed = ansEl.classList.toggle('revealed');
+        btn.textContent = revealed ? '정답 숨기기' : '정답 보기';
+      };
     });
     box.querySelectorAll('.review-card-del').forEach(btn => {
       btn.onclick = () => {
@@ -1353,6 +1426,97 @@
     renderReviewList();
     toast('복습 주기를 계산했어요! 1·3·7·14·30일 후 알려드릴게요 📅');
   }
+
+  // ── 문제&답 필기에서 복습 항목 불러오기 ──────────────────────────────
+  function collectAllQAItems() {
+    const list = [];
+    (state && state.days ? state.days : []).forEach(day => {
+      (day.qa||[]).forEach(qa => {
+        const plainQ = stripHTML(qa.q).trim();
+        if(!plainQ) return; // 내용이 없는 빈 문제는 목록에서 제외
+        list.push({ dayId: day.id, dayDate: day.date, qaId: qa.id, cat: qa.cat||'', q: qa.q, a: qa.a });
+      });
+    });
+    return list;
+  }
+
+  function openQaImportModal() {
+    const overlay = $('#qaImportModalOverlay');
+    if(!overlay) return;
+    const all = collectAllQAItems();
+    const catSel = $('#qaImportCatFilter');
+    const cats = Array.from(new Set(all.map(x => x.cat).filter(Boolean)));
+    catSel.innerHTML = `<option value="">전체 과목</option>` + cats.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+    if($('#qaImportStudyDate')) $('#qaImportStudyDate').value = isoLocal(new Date());
+    if($('#qaImportKeyword')) $('#qaImportKeyword').value = '';
+    overlay.style.display = 'flex';
+    renderQaImportList();
+  }
+
+  function renderQaImportList() {
+    const box = $('#qaImportList');
+    if(!box) return;
+    const keyword = ($('#qaImportKeyword').value||'').trim().toLowerCase();
+    const catFilter = $('#qaImportCatFilter').value;
+    const all = collectAllQAItems().filter(item => {
+      if(catFilter && item.cat !== catFilter) return false;
+      if(keyword && !stripHTML(item.q).toLowerCase().includes(keyword)) return false;
+      return true;
+    }).sort((a,b) => b.dayDate.localeCompare(a.dayDate));
+
+    if(all.length === 0) {
+      box.innerHTML = `<div class="review-empty-hint">불러올 문제가 없습니다.<br>학습 플래너의 '공부한 내용 필기'에서 먼저 문제&답을 작성해주세요.</div>`;
+      return;
+    }
+    box.innerHTML = all.map(item => {
+      const plainQ = stripHTML(item.q).trim() || '(내용 없음)';
+      const preview = plainQ.length > 90 ? esc(plainQ.slice(0,90)) + '…' : esc(plainQ);
+      return `
+        <label style="display:flex;gap:8px;align-items:flex-start;border:1px solid var(--rule);border-radius:8px;padding:8px 10px;cursor:pointer;background:#fff">
+          <input type="checkbox" class="qa-import-chk" data-day="${item.dayId}" data-qa="${item.qaId}" style="margin-top:3px">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:11px;color:var(--ink-soft);margin-bottom:2px">${item.dayDate}${item.cat ? ' · <b style="color:var(--jade)">'+esc(item.cat)+'</b>' : ' · <span style="color:#B7826A">과목 미지정</span>'}</div>
+            <div style="font-size:13px;line-height:1.4">${preview}</div>
+          </div>
+        </label>
+      `;
+    }).join('');
+  }
+
+  function confirmQaImport() {
+    const checked = Array.from(document.querySelectorAll('.qa-import-chk:checked'));
+    if(checked.length === 0) { toast('불러올 문제를 선택해주세요.'); return; }
+    const studyDate = ($('#qaImportStudyDate').value) || isoLocal(new Date());
+    const allQA = collectAllQAItems();
+    let added = 0;
+    checked.forEach(chk => {
+      const src = allQA.find(x => x.dayId === chk.dataset.day && x.qaId === chk.dataset.qa);
+      if(!src) return;
+      const plainQ = stripHTML(src.q).trim();
+      const shortQ = plainQ.length > 18 ? plainQ.slice(0,18) + '…' : plainQ;
+      reviewItems.push({
+        id: uid(),
+        subject: (src.cat ? src.cat : '과목 미지정') + (shortQ ? ' · ' + shortQ : ''),
+        studyDate,
+        checkpoints: calcReviewCheckpoints(studyDate),
+        qaSnapshot: { q: src.q, a: src.a, cat: src.cat, sourceDate: src.dayDate }
+      });
+      added++;
+    });
+    saveReviewItems();
+    renderReviewToday();
+    renderReviewList();
+    $('#qaImportModalOverlay').style.display = 'none';
+    toast(`${added}개의 문제를 복습 목록에 추가했어요!`);
+  }
+
+  if($('#openQaImportBtn')) $('#openQaImportBtn').onclick = openQaImportModal;
+  if($('#closeQaImportModal')) $('#closeQaImportModal').onclick = () => { $('#qaImportModalOverlay').style.display = 'none'; };
+  if($('#qaImportKeyword')) $('#qaImportKeyword').oninput = renderQaImportList;
+  if($('#qaImportCatFilter')) $('#qaImportCatFilter').onchange = renderQaImportList;
+  if($('#qaImportSelAll')) $('#qaImportSelAll').onclick = () => document.querySelectorAll('.qa-import-chk').forEach(c=>c.checked=true);
+  if($('#qaImportSelClear')) $('#qaImportSelClear').onclick = () => document.querySelectorAll('.qa-import-chk').forEach(c=>c.checked=false);
+  if($('#qaImportConfirmBtn')) $('#qaImportConfirmBtn').onclick = confirmQaImport;
 
   function fmtDur(m) { m=Math.max(0,Math.round(m)); const h=Math.floor(m/60), mm=m%60; return h<=0?`${mm}분`:mm>0?`${h}시간 ${mm}분`:`${h}시간`; }
   function fmtDurShort(m) { m=Math.max(0,Math.round(m)); const h=Math.floor(m/60), mm=m%60; return h<=0?`${mm}분`:mm>0?`${h}h${mm}m`:`${h}h`; }
@@ -2450,7 +2614,7 @@
   function mk(date, label, rest, pairs) {
     const items = (pairs||[]).map(p => ({ id:uid(), cat:p[0], text:p[1], kind:p[2]||'main', state:'none', color:'#16202B', bold:false }));
     if(!rest){ items.push({id:uid(), cat:'자가 테스트', text:'오늘 암기 항목 백지 인출', kind:'test', state:'none', color:'#16202B', bold:false}); }
-    return {id:uid(), date, label, rest:!!rest, status:'none', events:[], photos:[], qa:[{id:uid(),q:'',a:'',collapsed:false}], studyMinutes:0, timerStart:null, availableMinutes:600, trackerSlots:[], items};
+    return {id:uid(), date, label, rest:!!rest, status:'none', events:[], photos:[], qa:[{id:uid(),q:'',a:'',collapsed:false,cat:''}], studyMinutes:0, timerStart:null, availableMinutes:600, trackerSlots:[], items};
   }
 
   function seed(){
@@ -2467,8 +2631,8 @@
     if(!state.title) state.title = '학습 플랜';
     if(!Array.isArray(state.days)) state.days = seed().days;
     state.days.forEach(d => {
-      if(!Array.isArray(d.qa)) d.qa = [{id:uid(), q:'', a:'', collapsed:false}];
-      d.qa.forEach(r => { if(typeof r.collapsed !== 'boolean') r.collapsed = false; });
+      if(!Array.isArray(d.qa)) d.qa = [{id:uid(), q:'', a:'', collapsed:false, cat:''}];
+      d.qa.forEach(r => { if(typeof r.collapsed !== 'boolean') r.collapsed = false; if(typeof r.cat !== 'string') r.cat = ''; });
       if(!Array.isArray(d.events)) d.events = [];
       if(!Array.isArray(d.photos)) d.photos = [];
       if(!Array.isArray(d.items)) d.items = [];
@@ -2907,6 +3071,7 @@
               <div class="qarow-header" data-toggle="collapse">
                 <div class="q-title">
                   <span style="background:var(--jade);color:#fff;padding:1px 6px;border-radius:4px;font-size:11px">Q${qIdx+1}</span>
+                  <input type="text" class="qa-cat-input" list="qaCatOptions" placeholder="과목" value="${esc(r.cat||'')}" title="이 문제의 과목을 지정하면 복습 주기 탭에서 과목별로 불러올 수 있어요." style="width:78px;border:1px solid var(--rule);border-radius:5px;padding:2px 6px;font-size:11px;font-weight:700;color:var(--jade);background:#F3F8F5;outline:none">
                   <span class="q-preview">${previewText}</span>
                 </div>
                 <div class="q-tools">
@@ -3201,9 +3366,10 @@
         const toggleBtn = row.querySelector('.q-toggle-btn');
         const bodyEl = row.querySelector('.qarow-body');
         const delBtn = row.querySelector('.rdel-btn');
+        const catInput = row.querySelector('.qa-cat-input');
 
         header.onclick = e => {
-          if(e.target.closest('.rdel-btn')) return;
+          if(e.target.closest('.rdel-btn') || e.target.closest('.qa-cat-input')) return;
           targetQ.collapsed = !targetQ.collapsed;
           row.classList.toggle('collapsed', targetQ.collapsed);
           if(bodyEl) {
@@ -3213,10 +3379,19 @@
           saveState();
         };
 
+        if(catInput) {
+          catInput.onclick = e => e.stopPropagation();
+          catInput.onchange = () => {
+            targetQ.cat = catInput.value.trim();
+            saveState();
+            refreshQaCatOptions();
+          };
+        }
+
         delBtn.onclick = e => {
           e.stopPropagation();
           d.qa = d.qa.filter(x => x.id !== rId);
-          if(!d.qa.length) d.qa = [{id:uid(), q:'', a:'', collapsed:false}];
+          if(!d.qa.length) d.qa = [{id:uid(), q:'', a:'', collapsed:false, cat:''}];
           saveState(); openPlannerPanel();
         };
       });
@@ -3560,7 +3735,7 @@
       });
     }
     const addQA = $('#addQA');
-    if(addQA) addQA.onclick = () => { d.qa.push({id:uid(), q:'', a:'', collapsed:false}); saveState(); openPlannerPanel(); };
+    if(addQA) addQA.onclick = () => { d.qa.push({id:uid(), q:'', a:'', collapsed:false, cat: d.qa.length ? d.qa[d.qa.length-1].cat : ''}); saveState(); openPlannerPanel(); };
   }
 
   $('#mInsTable').onclick = () => {
@@ -4359,6 +4534,7 @@
     renderReviewList();
     
     ensureShape();
+    refreshQaCatOptions();
     initDiaryEvents();
     renderStickers();
     renderPlannerCalendar();
