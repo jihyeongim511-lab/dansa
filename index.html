@@ -4618,6 +4618,10 @@
     if(!diaryData.dailyNoteMap) diaryData.dailyNoteMap = {};
     if(focusEl && document.activeElement !== focusEl) focusEl.value = diaryData.dailyFocusMap[date] || '';
     if(noteEl && document.activeElement !== noteEl) noteEl.value = diaryData.dailyNoteMap[date] || '';
+    // 이미 저장된 내용이 있으면 버튼이 '수정'으로 바뀌어 고칠 수 있다는 걸 알려줌
+    const fBtn = $('#homeFocusSaveBtn'), nBtn = $('#homeNoteSaveBtn');
+    if(fBtn) fBtn.textContent = diaryData.dailyFocusMap[date] ? '수정' : '저장';
+    if(nBtn) nBtn.textContent = diaryData.dailyNoteMap[date] ? '수정' : '기록';
 
     const d = getDayForHome(date);
     const study = d ? liveMinutes(d) : 0;
@@ -5139,24 +5143,31 @@
       homeTodayDate.value = homeTodayDate.value || moodLocalDate();
       homeTodayDate.onchange = () => { renderHomeTodayDashboard(); renderHomeMoodDashboard(); };
     }
-    const homeFocusSaveBtn = $('#homeFocusSaveBtn');
-    if(homeFocusSaveBtn) homeFocusSaveBtn.onclick = () => {
+    // 한 줄 목표 / 한 줄 기록: 저장 후에도 언제든 고쳐 쓸 수 있고, 저장 버튼을 안 눌러도 칸을 벗어나면 자동 저장
+    const saveHomeField = (mapKey, inputSel, msg, silent) => {
       const date = getHomeDate();
-      if(!diaryData.dailyFocusMap) diaryData.dailyFocusMap = {};
-      diaryData.dailyFocusMap[date] = ($('#homeFocusInput')?.value || '').trim();
-      saveDiaryState(); renderHomeTodayDashboard(); toast('오늘의 한 줄 목표를 저장했어요.');
+      if(!diaryData[mapKey]) diaryData[mapKey] = {};
+      const val = ($(inputSel)?.value || '').trim();
+      const prev = diaryData[mapKey][date] || '';
+      if(silent && prev === val) return;
+      if(val) diaryData[mapKey][date] = val; else delete diaryData[mapKey][date];
+      saveDiaryState(); renderHomeTodayDashboard();
+      if(!silent) toast(val ? msg : '내용을 비웠어요.');
     };
-    const homeFocusInput = $('#homeFocusInput');
-    if(homeFocusInput) homeFocusInput.onkeydown = e => { if(e.key === 'Enter'){ e.preventDefault(); homeFocusSaveBtn?.click(); } };
-    const homeNoteSaveBtn = $('#homeNoteSaveBtn');
-    if(homeNoteSaveBtn) homeNoteSaveBtn.onclick = () => {
-      const date = getHomeDate();
-      if(!diaryData.dailyNoteMap) diaryData.dailyNoteMap = {};
-      diaryData.dailyNoteMap[date] = ($('#homeNoteInput')?.value || '').trim();
-      saveDiaryState(); renderHomeTodayDashboard(); toast('오늘의 한 줄 기록을 저장했어요.');
+    const bindHomeField = (btnSel, inputSel, mapKey, msg) => {
+      const btn = $(btnSel), input = $(inputSel);
+      if(btn) btn.onclick = () => saveHomeField(mapKey, inputSel, msg, false);
+      if(input) {
+        // 한글 조합 중 Enter는 글자 확정용이므로 저장하지 않음 (마지막 글자 누락 방지)
+        input.onkeydown = e => {
+          if(e.key === 'Enter' && !e.isComposing && e.keyCode !== 229) { e.preventDefault(); saveHomeField(mapKey, inputSel, msg, false); }
+        };
+        // 저장 버튼을 누르지 않고 칸을 벗어나도 수정 내용 보존
+        input.onchange = () => saveHomeField(mapKey, inputSel, msg, true);
+      }
     };
-    const homeNoteInput = $('#homeNoteInput');
-    if(homeNoteInput) homeNoteInput.onkeydown = e => { if(e.key === 'Enter'){ e.preventDefault(); homeNoteSaveBtn?.click(); } };
+    bindHomeField('#homeFocusSaveBtn', '#homeFocusInput', 'dailyFocusMap', '오늘의 한 줄 목표를 저장했어요.');
+    bindHomeField('#homeNoteSaveBtn', '#homeNoteInput', 'dailyNoteMap', '오늘의 한 줄 기록을 저장했어요.');
 
     const goalMonthSelect = $('#goalMonthSelect');
     if(goalMonthSelect) {
