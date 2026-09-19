@@ -2871,6 +2871,22 @@
     };
   }
 
+  // 메모장 형광펜: 텍스트를 드래그로 선택한 뒤 색을 누르면 칠해지고, ✕는 칠한 걸 지운다.
+  document.querySelectorAll('.hl-color-btn[data-target="memo"]').forEach(btn => {
+    btn.onmousedown = e => e.preventDefault();
+    btn.onclick = () => {
+      applyHighlightColor(btn.dataset.color);
+      storage.set(MKEY, JSON.stringify({ html: $('#memoArea').innerHTML }));
+    };
+  });
+  document.querySelectorAll('.hl-clear-btn[data-target="memo"]').forEach(btn => {
+    btn.onmousedown = e => e.preventDefault();
+    btn.onclick = () => {
+      applyHighlightColor('transparent');
+      storage.set(MKEY, JSON.stringify({ html: $('#memoArea').innerHTML }));
+    };
+  });
+
   function setAppFont(fontFamily) {
     document.documentElement.style.setProperty('--app-font', fontFamily);
     const selector = $('#fontSelector');
