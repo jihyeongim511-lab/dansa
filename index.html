@@ -1711,11 +1711,13 @@
       span.className = el.className;
       span.textContent = text;
       span.style.cssText = `
-        display:inline-flex;align-items:center;box-sizing:border-box;
+        display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;
+        text-align:center;white-space:nowrap;
         width:${rect.width}px;height:${rect.height}px;
         font-family:${cs.fontFamily};font-size:${cs.fontSize};font-weight:${cs.fontWeight};
         letter-spacing:normal;color:${cs.color};background:${cs.backgroundColor};
-        border:${cs.border};border-radius:${cs.borderRadius};padding:${cs.padding};
+        border:${cs.border};border-radius:${cs.borderRadius};
+        padding:${cs.paddingTop} ${Math.max(parseFloat(cs.paddingLeft), parseFloat(cs.paddingRight))}px;
       `;
       const parent = el.parentNode;
       const next = el.nextSibling;
