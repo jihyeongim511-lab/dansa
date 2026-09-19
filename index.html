@@ -347,6 +347,37 @@
   .home-note-row input{flex:1;min-width:0;border:1px solid var(--rule);border-radius:7px;padding:6px 8px;font-size:11px;outline:none}
   .home-note-row button{flex:none}
   .home-streak{margin-top:7px;font-size:9.5px;color:var(--ink-soft);text-align:right}
+  /* ===== 휴식 → 복귀 로그 ===== */
+  .home-rest-card{background:#fff;border:1.5px solid var(--d-theme);border-radius:12px;padding:12px;box-shadow:0 3px 8px rgba(0,0,0,0.03)}
+  .home-right-tools .home-rest-card{flex:none;width:100%;box-sizing:border-box}
+  .rest-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+  .rest-title{font-size:11px;font-weight:800;color:var(--d-theme-dark);letter-spacing:1px}
+  .rest-select{border:1px solid var(--rule);background:#FAFBF8;border-radius:6px;padding:3px 6px;font-size:11px;color:var(--ink);outline:none}
+  .rest-idle-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:7px;font-size:10.5px;color:var(--ink-soft);font-weight:700}
+  .rest-type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .rest-type-btn{border:1.5px solid var(--d-theme);background:var(--d-theme-soft);border-radius:9px;padding:8px 4px;font-size:11px;font-weight:800;color:var(--ink);line-height:1.35;transition:background .12s,transform .12s}
+  .rest-type-btn:hover{background:#fff;transform:translateY(-1px)}
+  .rest-type-btn .ico{display:block;font-size:18px;margin-bottom:2px}
+  .rest-live{border-radius:10px;padding:10px;background:var(--d-theme-soft);border:1.5px dashed var(--d-theme-dark);text-align:center}
+  .rest-live.over{background:#FFF4E5;border-color:#E0A040}
+  .rest-live .lbl{font-size:10.5px;font-weight:800;color:var(--ink-soft)}
+  .rest-live .clock{font-size:26px;font-weight:900;font-variant-numeric:tabular-nums;color:var(--ink);letter-spacing:1px;margin:2px 0}
+  .rest-live.over .clock{color:#B5651D}
+  .rest-live-actions{display:flex;gap:6px;justify-content:center;margin-top:6px}
+  .rest-insight{margin-top:10px;background:#FAFBF8;border:1px dashed var(--rule);border-radius:8px;padding:8px 9px;font-size:11px;line-height:1.55;color:var(--ink)}
+  .rest-insight .badge{display:inline-block;background:var(--d-theme-dark);color:#fff;border-radius:99px;padding:1px 8px;font-size:9.5px;font-weight:800;margin-right:5px;vertical-align:1px}
+  .rest-insight .note{display:block;margin-top:3px;font-size:9.5px;color:#89958B}
+  .rest-bars{margin-top:8px;display:flex;flex-direction:column;gap:5px}
+  .rest-bar-row{display:grid;grid-template-columns:104px 1fr 84px;gap:6px;align-items:center;font-size:10px;color:var(--ink-soft);font-weight:700}
+  .rest-bar-row .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rest-bar-track{height:7px;background:#ECEEE9;border-radius:99px;overflow:hidden}
+  .rest-bar-fill{height:100%;border-radius:99px;transition:width .3s ease}
+  .rest-bar-row .v{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink);white-space:nowrap}
+  .rest-log{margin-top:8px}
+  .rest-log summary{font-size:10.5px;font-weight:700;color:var(--ink-soft);cursor:pointer}
+  .rest-entry{display:grid;grid-template-columns:1fr auto;gap:6px;align-items:center;padding:5px 2px;border-bottom:1px solid #EEF1EC;font-size:10.5px}
+  .rest-entry .t{color:var(--ink-soft);font-variant-numeric:tabular-nums}
+
   .home-mood-card{background:#fff;border:1.5px solid var(--d-theme);border-radius:12px;padding:12px;box-shadow:0 3px 8px rgba(0,0,0,0.03)}
   .home-mood-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
   .home-mood-title{font-size:11px;font-weight:800;color:var(--d-theme-dark);letter-spacing:1px}
@@ -977,6 +1008,21 @@
               <div id="moodDashTimelineWrap"></div>
               <div class="home-mood-legend" id="moodDashLegend"></div>
             </div>
+
+            <div class="home-rest-card" id="homeRestCard">
+              <div class="rest-head">
+                <span class="rest-title">☕ REST → RETURN LOG</span>
+                <select class="rest-select no-export" id="restRangeSelect" title="인사이트 집계 기간">
+                  <option value="7">최근 7일</option>
+                  <option value="30" selected>최근 30일</option>
+                  <option value="0">전체</option>
+                </select>
+              </div>
+              <div id="restControls"></div>
+              <div class="rest-insight" id="restInsight"></div>
+              <div class="rest-bars" id="restBars"></div>
+              <details class="rest-log no-export"><summary>최근 휴식 기록</summary><div id="restLogList"></div></details>
+            </div>
           </div>
         </div>
 
@@ -1177,6 +1223,9 @@
   let stamps = { success: null, fail: null };
   let clip = [];
   let moodRecords = [];
+  let restData = { records: [], active: null, lastPlannedMin: 5 };
+  let restTick = null;
+  let restBaseTitle = document.title;
   let selected = null;
   let studyTick = null;
   let lastActiveTable = null;
@@ -1337,6 +1386,277 @@
     }
 
     renderMoodTracker();
+  }
+
+  // ===== 휴식 → 복귀 로그 =====
+  // 휴식 타입을 누르면 타이머가 시작되고, 권장 휴식 시간이 끝난 시점부터
+  // [공부 재개]를 누를 때까지의 지연(delay)을 초 단위로 기록합니다.
+  // 시간은 setInterval 카운터가 아니라 타임스탬프 차이로 계산하므로
+  // 새로고침·탭 전환·기기 변경에도 값이 어긋나지 않습니다.
+  const REST_KEY = 'rest-return-v1';
+  const REST_OUTLIER_MIN = 90;   // 권장 종료 후 이 시간(분)을 넘겨 복귀하면 저장 여부를 물어봄
+  const REST_MIN_SAMPLE = 3;     // 이보다 적으면 인사이트에 '표본 적음' 안내
+  const REST_TYPES = {
+    music: { icon:'🎵', label:'음악 감상 / 스트레칭', short:'음악·스트레칭', color:'#5FAE93' },
+    sns:   { icon:'📱', label:'스마트폰 / SNS',       short:'스마트폰·SNS',  color:'#E07A6E' },
+    etc:   { icon:'☕', label:'기타',                 short:'기타',          color:'#9AA7B4' }
+  };
+  const REST_PLAN_OPTIONS = [[3,'3분'],[4,'4분 (노래 1곡)'],[5,'5분'],[10,'10분'],[15,'15분'],[20,'20분']];
+
+  function fmtRestDur(sec) {
+    sec = Math.max(0, Math.round(sec));
+    if(sec < 60) return `${sec}초`;
+    if(sec < 3600) { const m = Math.floor(sec/60), r = sec % 60; return r ? `${m}분 ${r}초` : `${m}분`; }
+    const h = Math.floor(sec/3600), m = Math.floor((sec % 3600)/60);
+    return m ? `${h}시간 ${m}분` : `${h}시간`;
+  }
+  function fmtRestClock(sec) {
+    sec = Math.max(0, Math.floor(sec));
+    const h = Math.floor(sec/3600), m = Math.floor((sec % 3600)/60), r = sec % 60;
+    const mm = String(m).padStart(2,'0'), ss = String(r).padStart(2,'0');
+    return h ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
+  }
+
+  function loadRestData(parsed) {
+    const p = parsed && typeof parsed === 'object' ? parsed : {};
+    restData = {
+      records: Array.isArray(p.records) ? p.records.filter(r => r && typeof r.delaySec === 'number') : [],
+      active: p.active && p.active.startTs ? p.active : null,
+      lastPlannedMin: Number(p.lastPlannedMin) > 0 ? Number(p.lastPlannedMin) : 5
+    };
+  }
+
+  async function saveRestData() {
+    try {
+      await storage.set(REST_KEY, JSON.stringify(restData));
+    } catch(e) {
+      console.error('휴식 로그 저장 실패:', e);
+      toast('휴식 기록 저장 중 문제가 발생했습니다.');
+    }
+  }
+
+  function restEndTs(a) { return a.startTs + a.plannedMin * 60000; }
+
+  function renderRestControls() {
+    const box = $('#restControls');
+    if(!box) return;
+    const a = restData.active;
+
+    if(!a) {
+      restApplyTitle(false);
+      box.innerHTML = `
+        <div class="rest-idle-row">
+          <span>권장 휴식</span>
+          <select class="rest-select" id="restPlanSel">
+            ${REST_PLAN_OPTIONS.map(([m, t]) => `<option value="${m}" ${m === restData.lastPlannedMin ? 'selected' : ''}>${t}</option>`).join('')}
+          </select>
+          <span>· 쉬는 방식을 누르면 휴식이 시작돼요</span>
+        </div>
+        <div class="rest-type-grid">
+          ${Object.entries(REST_TYPES).map(([k, t]) => `<button type="button" class="rest-type-btn" data-rest-type="${k}"><span class="ico">${t.icon}</span>${t.label.replace(' / ', '<br>/ ')}</button>`).join('')}
+        </div>`;
+      return;
+    }
+
+    const t = REST_TYPES[a.type] || REST_TYPES.etc;
+    const isOver = Date.now() >= restEndTs(a);
+    restApplyTitle(isOver);
+    box.innerHTML = `
+      <div class="rest-live ${isOver ? 'over' : ''}" id="restLive">
+        <div class="lbl" id="restLiveLbl"></div>
+        <div class="clock" id="restClock"></div>
+        <div class="lbl">${t.icon} ${t.label} · 권장 ${a.plannedMin}분</div>
+        <div class="rest-live-actions">
+          <button type="button" class="btn small primary" id="restResumeBtn">▶ 공부 재개</button>
+          <button type="button" class="btn small ghost" id="restCancelBtn">취소</button>
+        </div>
+      </div>`;
+    updateRestClock();
+  }
+
+  function updateRestClock() {
+    const a = restData.active;
+    const clock = $('#restClock'), lbl = $('#restLiveLbl'), live = $('#restLive');
+    if(!a || !clock || !lbl || !live) return;
+    const now = Date.now(), end = restEndTs(a);
+    if(now < end) {
+      clock.textContent = fmtRestClock(Math.ceil((end - now) / 1000));
+      lbl.textContent = '휴식 중 · 남은 시간';
+      live.classList.remove('over');
+    } else {
+      clock.textContent = '+' + fmtRestClock((now - end) / 1000);
+      lbl.textContent = '⏰ 휴식 끝! 공부 복귀까지 지연 중';
+      live.classList.add('over');
+    }
+  }
+
+  function restApplyTitle(isOver) {
+    if(!restBaseTitle || restBaseTitle.startsWith('⏰')) restBaseTitle = '학습 플랜 & 다이어리';
+    document.title = isOver ? `⏰ 휴식 끝! · ${restBaseTitle}` : restBaseTitle;
+  }
+
+  function tickRest() {
+    const a = restData.active;
+    if(!a) return;
+    const wasOver = !!document.title.startsWith('⏰');
+    const isOver = Date.now() >= restEndTs(a);
+    if(isOver && !wasOver) {
+      renderRestControls();
+      toast('⏰ 권장 휴식이 끝났어요. 준비되면 [공부 재개]를 눌러주세요');
+    } else {
+      updateRestClock();
+    }
+  }
+
+  async function startRest(type) {
+    if(restData.active) return;
+    const sel = $('#restPlanSel');
+    const plannedMin = parseInt(sel ? sel.value : restData.lastPlannedMin, 10) || 5;
+    const now = Date.now();
+    restData.lastPlannedMin = plannedMin;
+    restData.active = { id: `rest_${now}_${uid()}`, type: REST_TYPES[type] ? type : 'etc', plannedMin, startTs: now };
+    renderRestControls();
+    toast(`${REST_TYPES[restData.active.type].icon} 휴식 시작 · ${plannedMin}분 뒤부터 복귀 시간을 재요`);
+    await saveRestData();
+  }
+
+  async function resumeRest() {
+    const a = restData.active;
+    if(!a) return;
+    const now = Date.now();
+    const delaySec = Math.max(0, Math.round((now - restEndTs(a)) / 1000));
+
+    if(delaySec > REST_OUTLIER_MIN * 60) {
+      const keep = confirm(`권장 휴식이 끝난 지 ${fmtRestDur(delaySec)}이 지났어요.\n자리를 비웠던 시간이라면 평균이 왜곡될 수 있어요.\n\n이 기록을 저장할까요? (취소하면 저장하지 않아요)`);
+      if(!keep) {
+        restData.active = null;
+        renderRestControls(); renderRestInsight();
+        await saveRestData();
+        return;
+      }
+    }
+
+    restData.records.push({
+      id: a.id, date: isoLocal(new Date(a.startTs)), type: a.type, plannedMin: a.plannedMin,
+      startTs: a.startTs, endTs: restEndTs(a), resumeTs: now,
+      restSec: Math.round((now - a.startTs) / 1000), delaySec
+    });
+    restData.active = null;
+    renderRestControls();
+    renderRestInsight();
+    toast(delaySec === 0 ? '🚀 휴식 시간 안에 복귀했어요 (지연 0초)' : `🚀 복귀까지 ${fmtRestDur(delaySec)} 걸렸어요`);
+    await saveRestData();
+  }
+
+  async function cancelRest() {
+    if(!restData.active) return;
+    if(!confirm('이번 휴식을 기록하지 않고 취소할까요?')) return;
+    restData.active = null;
+    renderRestControls();
+    await saveRestData();
+  }
+
+  function restRecordsInRange() {
+    const days = parseInt(($('#restRangeSelect') || {}).value || '30', 10);
+    if(!days) return restData.records;
+    const since = Date.now() - days * 86400000;
+    return restData.records.filter(r => (r.startTs || 0) >= since);
+  }
+
+  function restStats(records) {
+    const out = {};
+    Object.keys(REST_TYPES).forEach(k => { out[k] = { n: 0, sum: 0, avg: 0 }; });
+    records.forEach(r => { const o = out[r.type] || out.etc; o.n++; o.sum += r.delaySec; });
+    Object.values(out).forEach(o => { o.avg = o.n ? Math.round(o.sum / o.n) : 0; });
+    return out;
+  }
+
+  function renderRestInsight() {
+    const insightEl = $('#restInsight'), barsEl = $('#restBars'), listEl = $('#restLogList');
+    if(!insightEl || !barsEl || !listEl) return;
+
+    const stats = restStats(restRecordsInRange());
+    const keys = Object.keys(REST_TYPES).filter(k => stats[k].n > 0);
+    const q = k => `「${REST_TYPES[k].label}」`;
+
+    // --- 인사이트 뱃지 ---
+    if(!keys.length) {
+      insightEl.innerHTML = `<span class="badge">INSIGHT</span>휴식 후 [공부 재개]를 누르면 타입별 복귀 시간이 여기에 쌓여요.`;
+    } else if(keys.length === 1) {
+      const k = keys[0];
+      insightEl.innerHTML = `<span class="badge">INSIGHT</span>${q(k)} 휴식 후 복귀까지 평균 <b>${fmtRestDur(stats[k].avg)}</b> (${stats[k].n}회). 다른 방식으로 쉬어본 기록이 생기면 비교해드려요.`;
+    } else {
+      const sorted = keys.slice().sort((x, y) => stats[x].avg - stats[y].avg);
+      const best = sorted[0], worst = sorted[sorted.length - 1];
+      const diff = stats[worst].avg - stats[best].avg;
+      let msg;
+      if(diff < 30) {
+        msg = `휴식 타입에 따른 복귀 시간 차이가 크지 않아요. 가장 빠른 ${q(best)}과 가장 느린 ${q(worst)}의 평균 차이가 ${fmtRestDur(diff)}예요.`;
+      } else {
+        const bestTxt = stats[best].avg === 0 ? '지연 없이 바로 복귀했지만' : `평균 <b>${fmtRestDur(stats[best].avg)}</b> 만에 복귀했지만`;
+        msg = `${q(best)} 휴식 후에는 ${bestTxt}, ${q(worst)} 휴식 후에는 복귀까지 평균 <b>${fmtRestDur(stats[worst].avg)}</b>이 걸렸어요 (${fmtRestDur(diff)} 더).`;
+        if(worst === 'sns' && diff >= 60) msg += ' 📵 다음 휴식엔 폰을 멀리 두고 쉬어볼까요?';
+      }
+      const small = Math.min(stats[best].n, stats[worst].n) < REST_MIN_SAMPLE;
+      insightEl.innerHTML = `<span class="badge">INSIGHT</span>${msg}` +
+        (small ? `<span class="note">기록이 ${REST_MIN_SAMPLE}회 미만인 타입이 있어 아직 참고용이에요. 쌓일수록 정확해져요.</span>` : '');
+    }
+
+    // --- 타입별 평균 막대 ---
+    const maxAvg = Math.max(1, ...Object.keys(REST_TYPES).map(k => stats[k].avg));
+    barsEl.innerHTML = Object.entries(REST_TYPES).map(([k, t]) => {
+      const st = stats[k];
+      const w = st.n ? Math.max(4, Math.round(st.avg / maxAvg * 100)) : 0;
+      return `<div class="rest-bar-row">
+        <span class="nm">${t.icon} ${t.short}</span>
+        <div class="rest-bar-track"><div class="rest-bar-fill" style="width:${w}%;background:${t.color}"></div></div>
+        <span class="v">${st.n ? `${fmtRestDur(st.avg)} · ${st.n}회` : '기록 없음'}</span>
+      </div>`;
+    }).join('');
+
+    // --- 최근 기록 목록 (삭제 가능) ---
+    const recent = restData.records.slice().sort((a, b) => (b.startTs || 0) - (a.startTs || 0)).slice(0, 10);
+    listEl.innerHTML = recent.length ? recent.map(r => {
+      const t = REST_TYPES[r.type] || REST_TYPES.etc;
+      const d = new Date(r.startTs || Date.now());
+      const when = `${d.getMonth() + 1}/${d.getDate()} ${d.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'})}`;
+      return `<div class="rest-entry" data-rest-id="${esc(r.id)}">
+        <span><span class="t">${when}</span> ${t.icon} ${t.short} · 권장 ${r.plannedMin}분 · 지연 <b>${fmtRestDur(r.delaySec)}</b></span>
+        <button type="button" class="btn small ghost rest-del" title="이 기록 삭제">✕</button>
+      </div>`;
+    }).join('') : '<div style="padding:8px 2px;font-size:10.5px;color:#9AA79A">아직 기록이 없어요.</div>';
+  }
+
+  function initRestTracker() {
+    const controls = $('#restControls');
+    if(!controls) return;
+
+    controls.onclick = e => {
+      const typeBtn = e.target.closest('[data-rest-type]');
+      if(typeBtn) return startRest(typeBtn.dataset.restType);
+      if(e.target.closest('#restResumeBtn')) return resumeRest();
+      if(e.target.closest('#restCancelBtn')) return cancelRest();
+    };
+    controls.onchange = e => {
+      if(e.target.id === 'restPlanSel') { restData.lastPlannedMin = parseInt(e.target.value, 10) || 5; saveRestData(); }
+    };
+    const range = $('#restRangeSelect');
+    if(range) range.onchange = renderRestInsight;
+    const list = $('#restLogList');
+    if(list) list.onclick = async e => {
+      const del = e.target.closest('.rest-del');
+      if(!del) return;
+      const id = del.closest('.rest-entry')?.dataset.restId;
+      restData.records = restData.records.filter(r => r.id !== id);
+      renderRestInsight();
+      await saveRestData();
+    };
+
+    restBaseTitle = document.title;
+    renderRestControls();
+    renderRestInsight();
+    if(!restTick) restTick = setInterval(tickRest, 1000);
+    document.addEventListener('visibilitychange', () => { if(!document.hidden) tickRest(); });
   }
 
   function currentDiaryTabLabel() {
@@ -5038,6 +5358,10 @@
     initMoodTracker();
     if(moodDashDate) moodDashDate.onchange = renderHomeMoodDashboard;
     renderHomeMoodDashboard();
+
+    const restRes = await storage.get(REST_KEY);
+    if(restRes && restRes.value) { try { loadRestData(JSON.parse(restRes.value)); } catch(e) { loadRestData(null); } }
+    initRestTracker();
 
     const rvRes = await storage.get(REVIEWKEY);
     if(rvRes && rvRes.value) { try { reviewItems = JSON.parse(rvRes.value) || []; } catch(e) { reviewItems = []; } }
