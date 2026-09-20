@@ -1704,7 +1704,9 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
     sns:   { icon:'📱', label:'유튜브 및 SNS',        short:'유튜브·SNS',    color:'#E07A6E' },
     snack: { icon:'🍪', label:'간식',                 short:'간식',          color:'#E3A857' },
     // 예전 '기타' 기록을 잃지 않기 위해 남겨둔 항목 (버튼으로는 나오지 않고, 기존 기록이 있을 때만 통계에 표시)
-    etc:   { icon:'☕', label:'기타',                 short:'기타',          color:'#9AA7B4', legacy:true }
+    etc:   { icon:'☕', label:'기타',                 short:'기타',          color:'#9AA7B4', legacy:true },
+    // 타임 트래커에서 손으로 직접 칠한 휴식 칸 (버튼 목록에는 노출되지 않음)
+    manual:{ icon:'✋', label:'직접 칠한 휴식',        short:'수동 휴식',     color:'#6B7B8C', legacy:true }
   };
   const restVisibleKeys = stats => Object.keys(REST_TYPES).filter(k => !REST_TYPES[k].legacy || (stats && stats[k] && stats[k].n > 0));
   const REST_PLAN_MINS = [5, 10, 15];   // 휴식 시간 선택지(분)
@@ -1935,9 +1937,10 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
     const d = state.days.find(x => x.id === selected);
     if(!d) return;
     const sum = restDaySummary(d.date);
+    const manualMin = (d.manualRestSlots || []).length * 10;
     const v = document.getElementById('ttRestVal'), sub = document.getElementById('ttRestSub');
-    if(v) v.textContent = fmtRestTotal(sum.sec);
-    if(sub) sub.textContent = `${sum.n}회`;
+    if(v) v.textContent = fmtRestTotal(sum.sec + manualMin * 60);
+    if(sub) sub.textContent = `${sum.n}회${manualMin ? ` + 직접 ${fmtDur(manualMin)}` : ''}`;
     const sig = restSigFor(d);
     if(cont.dataset.restSig !== sig) {
       cont.innerHTML = renderTimeTracker(d);
@@ -2911,6 +2914,20 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
   function fmtDur(m) { m=Math.max(0,Math.round(m)); const h=Math.floor(m/60), mm=m%60; return h<=0?`${mm}분`:mm>0?`${h}시간 ${mm}분`:`${h}시간`; }
   function fmtDurShort(m) { m=Math.max(0,Math.round(m)); const h=Math.floor(m/60), mm=m%60; return h<=0?`${mm}분`:mm>0?`${h}h${mm}m`:`${h}h`; }
   function liveMinutes(d) { return (d.trackerSlots ? d.trackerSlots.length * 10 : d.studyMinutes) + (d.timerStart ? (Date.now()-d.timerStart)/60000 : 0); }
+  // 공부 스톱워치로 흐른 시간을 타임 트래커의 10분 칸에 자동으로 채워 넣습니다.
+  function markStudySlotsFromTimer(d, startTs, endTs) {
+    if(!startTs || !endTs || endTs <= startTs) return;
+    const set = new Set(d.trackerSlots || []);
+    const first = new Date(startTs);
+    first.setSeconds(0, 0);
+    first.setMinutes(Math.floor(first.getMinutes() / 10) * 10);
+    for(let t = first.getTime(); t < endTs; t += 600000) {
+      const dt = new Date(t);
+      set.add(`${dt.getHours()}_${Math.floor(dt.getMinutes() / 10)}`);
+    }
+    d.trackerSlots = Array.from(set);
+    d.studyMinutes = d.trackerSlots.length * 10;
+  }
   function scheduledMinutes(d) { return (d.events||[]).reduce((sum,ev)=>sum+(Number(ev.duration)||0),0); }
   function stripHTML(html) { const div = document.createElement('div'); div.innerHTML = String(html||''); return div.textContent || ''; }
   function cur() { return state.days.find(x => x.id === selected) || state.days[0]; }
@@ -4189,7 +4206,7 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
   function mk(date, label, rest, pairs) {
     const items = (pairs||[]).map(p => ({ id:uid(), cat:p[0], text:p[1], kind:p[2]||'main', state:'none', color:'#16202B', bold:false }));
     if(!rest){ items.push({id:uid(), cat:'자가 테스트', text:'오늘 암기 항목 백지 인출', kind:'test', state:'none', color:'#16202B', bold:false}); }
-    return {id:uid(), date, label, rest:!!rest, status:'none', events:[], photos:[], qa:[{id:uid(),q:'',a:'',collapsed:false,cat:''}], studyMinutes:0, timerStart:null, availableMinutes:600, trackerSlots:[], items};
+    return {id:uid(), date, label, rest:!!rest, status:'none', events:[], photos:[], qa:[{id:uid(),q:'',a:'',collapsed:false,cat:''}], studyMinutes:0, timerStart:null, availableMinutes:600, trackerSlots:[], manualRestSlots:[], items};
   }
 
   function seed(){
@@ -4212,6 +4229,7 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
       if(!Array.isArray(d.photos)) d.photos = [];
       if(!Array.isArray(d.items)) d.items = [];
       if(!Array.isArray(d.trackerSlots)) d.trackerSlots = [];
+      if(!Array.isArray(d.manualRestSlots)) d.manualRestSlots = [];
       if(d.nextTaskId === undefined) d.nextTaskId = null;
       d.items.forEach(it => {
         if(!it.state){ it.state = it.done ? 'done' : 'none'; delete it.done; }
@@ -4422,6 +4440,7 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
     });
 
     const studiedSet = new Set(d.trackerSlots || []);
+    const manualRestSet = new Set(d.manualRestSlots || []);
     const restMap = restSlotsForDate(d.date);   // 휴식 타이머로 쉰 시간
     let html = `<div class="tt-grid">`;
     for(let r = 0; r < 24; r++) {
@@ -4432,7 +4451,7 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
         const slotKey = `${h24}_${sub}`;
         const isSched = scheduledSlots.has(slotKey);
         const isStudied = studiedSet.has(slotKey);
-        const rs = restMap.get(slotKey);
+        const rs = restMap.get(slotKey) || (manualRestSet.has(slotKey) ? { type:'manual', over:false, tip:'직접 칠한 휴식' } : null);
         const cls = ['tt-slot', isSched ? 'scheduled' : '', isStudied ? 'studied' : '', rs ? 'rested' : '', rs && rs.over ? 'rest-over' : ''].filter(Boolean).join(' ');
         const rc = rs ? ((REST_TYPES[rs.type] || REST_TYPES.etc).color) : '';
         const tip = `${dispHour}시 ${sub*10}분 ~ ${sub*10+10}분${rs ? ' · ' + rs.tip + (rs.over ? ' (권장 시간 초과)' : '') : ''}`;
@@ -4506,9 +4525,10 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
         <div class="tracker-head">
           <div>
             <h3 style="margin:0;font-size:14px;font-weight:800">⏱ 10분 공부 타임 트래커 & 통계</h3>
-            <span style="font-size:11.5px;color:var(--ink-soft)">1칸=10분. 클릭하거나 드래그하면 보라색으로 색칠되며 공부 시간이 집계됩니다. 휴식 타이머로 쉰 시간은 자동으로 칠해져요.</span>
+            <span style="font-size:11.5px;color:var(--ink-soft)" id="trackModeHint">1칸=10분. 클릭하거나 드래그하면 보라색으로 색칠되며 공부 시간이 집계됩니다. 휴식 타이머로 쉰 시간은 자동으로 칠해져요.</span>
           </div>
           <div style="display:flex;gap:6px">
+            <button class="btn small ghost" id="trackModeBtn">🟣 공부 칠하기 모드</button>
             <button class="btn small ghost" id="resetTrackerBtn">트래커 비우기</button>
           </div>
         </div>
@@ -4533,8 +4553,8 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
           </div>
           <div class="stat-card rest-stat">
             <div class="lbl">☕ 휴식 시간</div>
-            <div class="val" id="ttRestVal">${fmtRestTotal(restDaySummary(d.date).sec)}</div>
-            <div class="pct" id="ttRestSub">${restDaySummary(d.date).n}회</div>
+            <div class="val" id="ttRestVal">${fmtRestTotal(restDaySummary(d.date).sec + (d.manualRestSlots||[]).length*600)}</div>
+            <div class="pct" id="ttRestSub">${restDaySummary(d.date).n}회${(d.manualRestSlots||[]).length ? ` + 직접 ${fmtDur((d.manualRestSlots||[]).length*10)}` : ''}</div>
           </div>
         </div>
 
@@ -4543,6 +4563,7 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
             <div class="tt-legend-item"><span class="tt-legend-swatch" style="background:#EBF2FB;border:1px solid #C6D8EB"></span><span>내 캘린더 일정</span></div>
             <div class="tt-legend-item"><span class="tt-legend-swatch" style="background:#AA52B6"></span><span>공부한 시간 (10분/칸)</span></div>
             <div class="tt-legend-item"><span class="tt-legend-swatch" style="background:linear-gradient(90deg,#5FAE93 33%,#E07A6E 33% 66%,#E3A857 66%)"></span><span>휴식 (색 = 휴식 종류 · 줄무늬 = 권장 시간 초과)</span></div>
+            <div class="tt-legend-item"><span class="tt-legend-swatch" style="background:#6B7B8C"></span><span>직접 칠한 휴식 (휴식 모드에서 클릭)</span></div>
             <span style="margin-left:auto;font-size:11px;color:var(--ink-soft);font-weight:normal">💡 연속 클릭·드래그 지원</span>
           </div>
           <div id="trackerGridContainer">${renderTimeTracker(d)}</div>
@@ -4752,24 +4773,71 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
     trackerContainer.dataset.restSig = restSigFor(d);
     let isTrackingMouseDown = false;
     let trackAction = null;
+    let trackMode = 'study';   // 'study' | 'rest' — 모드 버튼으로 전환
+
+    const trackModeBtn = $('#trackModeBtn');
+    const trackModeHint = $('#trackModeHint');
+    function applyTrackModeUI() {
+      if(trackMode === 'rest') {
+        trackModeBtn.textContent = '☕ 휴식 칠하기 모드';
+        trackModeBtn.style.background = '#EAF0F5';
+        trackModeBtn.style.borderColor = 'var(--rest)';
+        trackModeBtn.style.color = 'var(--rest)';
+        trackModeHint.textContent = '1칸=10분. 지금은 휴식 모드예요 — 클릭·드래그하면 회색(휴식)으로 칠해집니다. 다시 누르면 공부 모드로 돌아가요.';
+      } else {
+        trackModeBtn.textContent = '🟣 공부 칠하기 모드';
+        trackModeBtn.style.background = '';
+        trackModeBtn.style.borderColor = '';
+        trackModeBtn.style.color = '';
+        trackModeHint.textContent = '1칸=10분. 클릭하거나 드래그하면 보라색으로 색칠되며 공부 시간이 집계됩니다. 휴식 타이머로 쉰 시간은 자동으로 칠해져요.';
+      }
+    }
+    trackModeBtn.onclick = () => { trackMode = trackMode === 'study' ? 'rest' : 'study'; applyTrackModeUI(); };
+    applyTrackModeUI();
+
+    function toggleStudySlot(slot, key, forceAction) {
+      const set = new Set(d.trackerSlots || []);
+      const isOn = set.has(key);
+      const willAdd = forceAction ? forceAction === 'add' : !isOn;
+      if(willAdd === isOn) return null;
+      if(willAdd) { set.add(key); slot.classList.add('studied'); }
+      else { set.delete(key); slot.classList.remove('studied'); }
+      d.trackerSlots = Array.from(set);
+      d.studyMinutes = d.trackerSlots.length * 10;
+      return willAdd ? 'add' : 'remove';
+    }
+
+    function toggleRestSlot(slot, key, forceAction) {
+      const set = new Set(d.manualRestSlots || []);
+      const isOn = set.has(key);
+      const willAdd = forceAction ? forceAction === 'add' : !isOn;
+      if(willAdd === isOn) return null;
+      if(willAdd) {
+        set.add(key);
+        slot.classList.add('rested');
+        slot.style.setProperty('--rc', REST_TYPES.manual.color);
+      } else {
+        set.delete(key);
+        // 자동(타이머) 휴식 기록이 이 칸에 남아있으면 그 색으로 되돌리고, 없으면 완전히 지웁니다.
+        const autoRs = restSlotsForDate(d.date).get(key);
+        if(autoRs) {
+          slot.style.setProperty('--rc', (REST_TYPES[autoRs.type] || REST_TYPES.etc).color);
+          slot.classList.toggle('rest-over', !!autoRs.over);
+        } else {
+          slot.classList.remove('rested', 'rest-over');
+          slot.style.removeProperty('--rc');
+        }
+      }
+      d.manualRestSlots = Array.from(set);
+      return willAdd ? 'add' : 'remove';
+    }
 
     trackerContainer.onmousedown = e => {
       const slot = e.target.closest('.tt-slot');
       if(!slot) return;
       isTrackingMouseDown = true;
       const key = slot.dataset.key;
-      const set = new Set(d.trackerSlots || []);
-      if(set.has(key)) {
-        set.delete(key);
-        trackAction = 'remove';
-        slot.classList.remove('studied');
-      } else {
-        set.add(key);
-        trackAction = 'add';
-        slot.classList.add('studied');
-      }
-      d.trackerSlots = Array.from(set);
-      d.studyMinutes = d.trackerSlots.length * 10;
+      trackAction = trackMode === 'rest' ? toggleRestSlot(slot, key) : toggleStudySlot(slot, key);
       saveState();
       updateTrackerHeaderStats();
     };
@@ -4781,16 +4849,8 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
       const slot = e.target.closest('.tt-slot');
       if(!slot) return;
       const key = slot.dataset.key;
-      const set = new Set(d.trackerSlots || []);
-      if(trackAction === 'add' && !set.has(key)) {
-        set.add(key);
-        slot.classList.add('studied');
-      } else if(trackAction === 'remove' && set.has(key)) {
-        set.delete(key);
-        slot.classList.remove('studied');
-      }
-      d.trackerSlots = Array.from(set);
-      d.studyMinutes = d.trackerSlots.length * 10;
+      if(trackMode === 'rest') toggleRestSlot(slot, key, trackAction);
+      else toggleStudySlot(slot, key, trackAction);
       saveState();
       updateTrackerHeaderStats();
     };
@@ -4804,13 +4864,19 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
       if(valEl) valEl.innerText = fmtDur(curM);
       if(pctEl) pctEl.innerText = `${pct}% 달성`;
       if(stime) stime.innerHTML = `${fmtDur(curM)} <span style="font-size:14px;color:#AA52B6">(${pct}% 달성)</span>`;
+      const manualMin = (d.manualRestSlots || []).length * 10;
+      const restVal = $('#ttRestVal'), restSub = $('#ttRestSub');
+      const autoSum = restDaySummary(d.date);
+      if(restVal) restVal.innerText = fmtRestTotal(autoSum.sec + manualMin * 60);
+      if(restSub) restSub.innerText = `${autoSum.n}회${manualMin ? ` + 직접 ${fmtDur(manualMin)}` : ''}`;
       renderPlannerCalendar();
     }
 
     $('#resetTrackerBtn').onclick = () => {
-      if(confirm('오늘의 타임트래커 기록을 모두 지우시겠습니까?')) {
+      if(confirm('오늘의 타임트래커 기록을 모두 지우시겠습니까? (직접 칠한 휴식 칸도 함께 지워집니다)')) {
         d.trackerSlots = [];
         d.studyMinutes = 0;
+        d.manualRestSlots = [];
         saveState(); openPlannerPanel(); toast('타임트래커가 초기화되었습니다.');
       }
     };
@@ -4840,7 +4906,7 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
       };
     });
     $('#timerBtn').onclick = () => {
-      if(d.timerStart){ d.studyMinutes += (Date.now()-d.timerStart)/60000; d.timerStart=null; } else { d.timerStart=Date.now(); }
+      if(d.timerStart){ markStudySlotsFromTimer(d, d.timerStart, Date.now()); d.timerStart=null; } else { d.timerStart=Date.now(); }
       saveState(); renderPlannerCalendar(); openPlannerPanel();
     };
     $('#saveAvail').onclick = () => {
