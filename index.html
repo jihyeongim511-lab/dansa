@@ -779,6 +779,51 @@
   .fc-done-title{font-size:19px;font-weight:900}
   .fc-primary-btn{border:none;background:var(--d-theme-dark);color:#fff;padding:13px 22px;border-radius:14px;font-size:15px;font-weight:900;cursor:pointer;margin-top:8px}
   .fc-secondary-btn{border:1.5px solid rgba(255,255,255,.3);background:transparent;color:#fff;padding:11px 22px;border-radius:12px;font-size:13.5px;font-weight:800;cursor:pointer;margin-top:8px}
+
+  /* 자동 성취감 팝업 */
+  .ach-popup{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);z-index:9800;background:#fff;border-radius:18px;padding:16px 22px;box-shadow:0 14px 40px rgba(0,0,0,.22);border:2px solid var(--jade);text-align:center;opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease;max-width:90vw}
+  .ach-popup.on{opacity:1;transform:translate(-50%,0)}
+  .ach-emoji{font-size:30px;line-height:1.1}
+  .ach-title{font-size:15px;font-weight:900;color:var(--jade);margin-top:2px}
+  .ach-cat{font-size:12px;font-weight:800;color:var(--ink-soft);margin-top:6px}
+  .ach-text{font-size:15px;font-weight:800;color:var(--ink);margin-top:2px;word-break:keep-all}
+  .ach-count{display:inline-block;margin-top:8px;background:var(--jade);color:#fff;font-size:12px;font-weight:900;padding:3px 12px;border-radius:99px}
+
+  /* 공부 흐름(Flow) 표시 */
+  .home-flow-wrap{margin-top:10px;padding-top:10px;border-top:1px dashed var(--rule)}
+  .home-flow-head{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;font-weight:800;color:var(--ink-soft);margin-bottom:6px}
+  .flow-blocks{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:8px}
+  .flow-block{width:16px;height:16px;border-radius:4px;background:#E2E7DE;flex:none}
+  .flow-block.filled{background:var(--jade)}
+  .flow-block.partial{background:linear-gradient(90deg,var(--jade) 50%,#E2E7DE 50%)}
+  .flow-periods{display:flex;flex-direction:column;gap:4px}
+  .flow-period{display:flex;align-items:center;gap:6px;font-size:12px;padding:4px 8px;border-radius:8px;background:#F7F9F6}
+  .flow-period .fp-num{font-weight:800;color:var(--ink-soft);width:20px;flex:none}
+  .flow-period .fp-label{flex:1;color:var(--ink);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .flow-period .fp-mark{flex:none;font-weight:900}
+  .flow-period.done{background:#EAF4EF}
+  .flow-period.done .fp-mark{color:var(--jade)}
+  .flow-period.current{background:#FFF6E0;box-shadow:inset 0 0 0 1.5px #EFD48A}
+  .flow-period.current .fp-mark{color:var(--gold)}
+  .flow-period.upcoming .fp-label{color:var(--ink-soft)}
+  .flow-empty{font-size:12px;color:var(--ink-soft);padding:4px 2px}
+
+  /* AI 휴식 추천 오버레이 */
+  body.bs-lock{overflow:hidden}
+  .bs-overlay{position:fixed;inset:0;z-index:9600;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(15,25,20,.7);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+  .bs-overlay.on{display:flex}
+  .bs-card{width:100%;max-width:340px;background:#fff;border-radius:22px;padding:24px 20px 18px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4);animation:fcPop .22s ease-out}
+  .bs-emoji{font-size:38px}
+  .bs-title{font-size:19px;font-weight:900;color:var(--ink);margin-top:2px}
+  .bs-sub{font-size:12.5px;color:var(--ink-soft);font-weight:700;margin-top:2px}
+  .bs-rec-box{background:#F3F8F5;border:1.5px solid var(--jade);border-radius:14px;padding:12px;margin:14px 0}
+  .bs-rec-k{font-size:11px;font-weight:800;color:var(--jade)}
+  .bs-rec-v{font-size:30px;font-weight:900;color:var(--ink);margin:2px 0 8px}
+  .bs-tips{display:flex;flex-direction:column;gap:3px;text-align:left}
+  .bs-tip{font-size:12.5px;font-weight:700;color:var(--ink-soft)}
+  .bs-primary{display:block;width:100%;border:none;border-radius:14px;padding:14px;font-size:15.5px;font-weight:900;background:var(--jade);color:#fff;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.18)}
+  .bs-primary:active{transform:scale(.98)}
+  .bs-secondary{display:block;width:100%;border:none;background:none;color:#9AA79A;font-size:12px;font-weight:700;cursor:pointer;margin-top:10px;text-decoration:underline}
 </style>
 
 </head>
@@ -1092,6 +1137,11 @@
               </div>
               <div class="home-return-box" id="homeReturnBox"></div>
               <div class="home-progress-wrap"><div class="home-progress-label"><span>오늘 할 일 진행률</span><span id="homeTaskPct">0%</span></div><div class="home-progress"><div class="home-progress-fill" id="homeTaskFill"></div></div></div>
+              <div class="home-flow-wrap" id="homeFlowWrap">
+                <div class="home-flow-head"><span>📊 오늘 공부 흐름</span></div>
+                <div class="flow-blocks" id="homeFlowBlocks"></div>
+                <div class="flow-periods" id="homeFlowPeriods"></div>
+              </div>
               <div class="home-summary" id="homeDailySummary">오늘의 기록을 모아 한 줄로 정리해드려요.</div>
               <div class="home-note-row no-export"><input id="homeNoteInput" type="text" placeholder="오늘의 한 줄 기록…"><button class="btn small" id="homeNoteSaveBtn">기록</button></div>
               <div class="home-streak" id="homeStreak">🔥 공부/기록 연속 0일</div>
@@ -1351,6 +1401,28 @@
     if(!el) return;
     el.textContent = msg; el.classList.add('on');
     clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('on'), 2500);
+  }
+
+  // ===== 자동 성취감 팝업: 할 일을 완료 체크할 때마다 등장 =====
+  let achEl = null;
+  function showAchievementPopup(cat, text, count) {
+    if(!achEl) {
+      achEl = document.createElement('div');
+      achEl.id = 'achPopup';
+      achEl.className = 'ach-popup';
+      document.body.appendChild(achEl);
+    }
+    achEl.innerHTML = `
+      <div class="ach-emoji">🎉</div>
+      <div class="ach-title">완료!</div>
+      <div class="ach-cat">${esc(cat || '')}</div>
+      <div class="ach-text">${esc(text || '')}</div>
+      <div class="ach-count">+1 완료 · 오늘 ${count}개째</div>`;
+    achEl.classList.remove('on');
+    void achEl.offsetWidth; // 애니메이션 재시작을 위한 리플로우
+    achEl.classList.add('on');
+    clearTimeout(achEl._t);
+    achEl._t = setTimeout(() => achEl.classList.remove('on'), 2200);
   }
   // ===== 무드 트래커 =====
   // 날짜는 UTC(toISOString)가 아니라 한국 현지 날짜를 사용하고,
@@ -1631,6 +1703,7 @@
       }
     }
     syncReturnOverlay();
+    checkStudyBreakSuggestion();
   }
 
   // 휴식 종료 시각에 정확히 깨어나도록 예약 (다른 탭에서 유튜브를 보는 중에도 최대한 제때 동작)
@@ -1909,6 +1982,105 @@
   async function restAgain() {
     restData.focus = null;
     await startRest(restData.lastType || 'music');
+  }
+
+  // ===== 쉬는 시간 추천 (누적 공부 시간 기준 규칙 기반 추천 · 실제 AI 호출 아님) =====
+  const BREAK_BASE_INTERVAL_MIN = 90;  // 이만큼 공부가 쌓이면 휴식을 추천
+  const BREAK_SNOOZE_MIN = 30;         // '나중에'를 누르면 이만큼 뒤로 미룸
+  const BREAK_TIP_POOL = ['스트레칭 하기', '물 한 잔 마시기', '창밖 먼 곳 바라보기(눈 휴식)', '가볍게 걷기', '심호흡 크게 3번 하기', '목·어깨 풀어주기'];
+  let breakSuggest = { shown: false, nextTriggerMin: BREAK_BASE_INTERVAL_MIN, dateKey: '' };
+  let bsEl = null;
+
+  function recommendBreakMinutes(studiedMin) {
+    if(studiedMin >= 150) return 15;
+    if(studiedMin >= 90) return 10;
+    return 5;
+  }
+
+  function shuffleArr(arr) {
+    const a = arr.slice();
+    for(let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+    return a;
+  }
+
+  function ensureBreakSuggestOverlay() {
+    if(bsEl) return bsEl;
+    bsEl = document.createElement('div');
+    bsEl.id = 'bsOverlay';
+    bsEl.className = 'bs-overlay';
+    document.body.appendChild(bsEl);
+    bsEl.onclick = e => {
+      const b = e.target.closest('[data-bs]');
+      if(!b) return;
+      const act = b.dataset.bs;
+      if(act === 'start') startRecommendedBreak(Number(b.dataset.min));
+      else if(act === 'snooze') snoozeBreakSuggest();
+    };
+    return bsEl;
+  }
+
+  function openBreakSuggestOverlay(studiedMin) {
+    breakSuggest.shown = true;
+    const recMin = recommendBreakMinutes(studiedMin);
+    const tips = shuffleArr(BREAK_TIP_POOL).slice(0, 2);
+    ensureBreakSuggestOverlay();
+    bsEl.innerHTML = `
+      <div class="bs-card">
+        <div class="bs-emoji">⏰</div>
+        <div class="bs-title">${Math.round(studiedMin)}분 공부 완료</div>
+        <div class="bs-sub">잠깐 쉬어가면 집중력이 오래가요</div>
+        <div class="bs-rec-box">
+          <div class="bs-rec-k">추천 휴식</div>
+          <div class="bs-rec-v">${recMin}분</div>
+          <div class="bs-tips">${tips.map(t => `<div class="bs-tip">✓ ${esc(t)}</div>`).join('')}</div>
+        </div>
+        <button type="button" class="bs-primary" data-bs="start" data-min="${recMin}">▶ 휴식 시작</button>
+        <button type="button" class="bs-secondary" data-bs="snooze">나중에 (${BREAK_SNOOZE_MIN}분 뒤 다시 알림)</button>
+      </div>`;
+    bsEl.classList.add('on');
+    document.body.classList.add('bs-lock');
+  }
+
+  function closeBreakSuggestOverlay() {
+    if(!bsEl) return;
+    bsEl.classList.remove('on');
+    bsEl.innerHTML = '';
+    document.body.classList.remove('bs-lock');
+  }
+
+  function todayStudiedMin() {
+    const d = (state && Array.isArray(state.days) ? state.days : []).find(x => x.date === moodLocalDate());
+    return d ? liveMinutes(d) : 0;
+  }
+
+  async function startRecommendedBreak(min) {
+    breakSuggest.shown = false;
+    breakSuggest.nextTriggerMin = todayStudiedMin() + BREAK_BASE_INTERVAL_MIN;
+    closeBreakSuggestOverlay();
+    restData.lastPlannedMin = REST_PLAN_MINS.includes(min) ? min : 5;
+    await startRest(restData.lastType || 'music');
+    const rc = document.getElementById('restControls');
+    if(rc) rc.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function snoozeBreakSuggest() {
+    breakSuggest.shown = false;
+    breakSuggest.nextTriggerMin = todayStudiedMin() + BREAK_SNOOZE_MIN;
+    closeBreakSuggestOverlay();
+    toast(`⏰ ${BREAK_SNOOZE_MIN}분 뒤에 다시 알려드릴게요`);
+  }
+
+  function checkStudyBreakSuggestion() {
+    if(!state || !Array.isArray(state.days)) return;
+    const todayKey = moodLocalDate();
+    if(breakSuggest.dateKey !== todayKey) {
+      breakSuggest.dateKey = todayKey;
+      breakSuggest.nextTriggerMin = BREAK_BASE_INTERVAL_MIN;
+      breakSuggest.shown = false;
+    }
+    if(restData.active || restData.focus || breakSuggest.shown) return;
+    const studiedMin = todayStudiedMin();
+    if(studiedMin >= breakSuggest.nextTriggerMin) openBreakSuggestOverlay(studiedMin);
   }
 
   // HOME '오늘' 카드: 휴식 횟수 + 복귀 성공(별점, 성공/전체)
@@ -3092,15 +3264,6 @@
   let fcEl = null;
   let fcData = { list: [], order: [], idx: 0, flipped: false };
 
-  function fcShuffle(arr) {
-    const a = arr.slice();
-    for(let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-  }
-
   function ensureFlashcardOverlay() {
     if(fcEl) return fcEl;
     fcEl = document.createElement('div');
@@ -3133,7 +3296,7 @@
   function openFlashcardMode(list) {
     if(!list || !list.length) { toast('플래시카드로 넘길 문제가 없어요. 먼저 문제를 불러와주세요.'); return; }
     fcData.list = list;
-    fcData.order = fcShuffle(list.map((_, i) => i));
+    fcData.order = shuffleArr(list.map((_, i) => i));
     fcData.idx = 0;
     fcData.flipped = false;
     ensureFlashcardOverlay();
@@ -3166,7 +3329,7 @@
   }
 
   function fcShuffleRestart() {
-    fcData.order = fcShuffle(fcData.list.map((_, i) => i));
+    fcData.order = shuffleArr(fcData.list.map((_, i) => i));
     fcData.idx = 0;
     fcData.flipped = false;
     renderFlashcard();
@@ -4419,7 +4582,12 @@
         const it = d.items[idx], a = b.dataset.act;
 
         if(a==='toggle') {
-          it.state = it.state==='done' ? 'none' : 'done';
+          const wasDone = it.state === 'done';
+          it.state = wasDone ? 'none' : 'done';
+          if(!wasDone && it.state === 'done') {
+            const doneCountToday = d.items.filter(x => x.state === 'done').length;
+            showAchievementPopup(it.cat, it.text, doneCountToday);
+          }
         } else if(a==='pick-next') {
           d.nextTaskId = (d.nextTaskId === it.id) ? null : it.id;
         } else if(a==='del') {
@@ -5128,6 +5296,41 @@
     return (state && Array.isArray(state.days) ? state.days : []).find(d => d.date === date) || null;
   }
 
+  // ===== 공부 흐름(Flow) 표시: 오늘 계획을 '교시' 블록으로 시각화 =====
+  function renderHomeFlow(items, isRealToday) {
+    const blocksEl = $('#homeFlowBlocks');
+    const periodsEl = $('#homeFlowPeriods');
+    if(!blocksEl || !periodsEl) return;
+
+    if(!items || !items.length) {
+      blocksEl.innerHTML = '';
+      periodsEl.innerHTML = '<div class="flow-empty">아직 이 날의 할 일이 없어요.</div>';
+      return;
+    }
+
+    // 아직 시작 전인 항목 중 첫 번째를 '진행중'으로 표시 (오늘 날짜일 때만)
+    let currentIdx = -1;
+    if(isRealToday) currentIdx = items.findIndex(it => it && it.state !== 'done' && it.state !== 'partial');
+
+    blocksEl.innerHTML = items.map(it => {
+      const cls = it.state === 'done' ? 'filled' : it.state === 'partial' ? 'partial' : '';
+      return `<span class="flow-block ${cls}"></span>`;
+    }).join('');
+
+    periodsEl.innerHTML = items.map((it, idx) => {
+      const label = it.cat ? `${it.cat} · ${it.text}` : (it.text || '');
+      let cls = 'upcoming', mark = '';
+      if(it.state === 'done') { cls = 'done'; mark = '✓'; }
+      else if(it.state === 'partial') { cls = 'done'; mark = '◐'; }
+      else if(idx === currentIdx) { cls = 'current'; mark = '진행중'; }
+      return `<div class="flow-period ${cls}">
+        <span class="fp-num">${idx + 1}교시</span>
+        <span class="fp-label">${esc(label)}</span>
+        <span class="fp-mark">${mark}</span>
+      </div>`;
+    }).join('');
+  }
+
   function renderHomeTodayDashboard() {
     const dateEl = $('#homeTodayDate');
     const focusEl = $('#homeFocusInput');
@@ -5163,6 +5366,7 @@
     renderHomeReturnBox(date);
     if($('#homeTaskPct')) $('#homeTaskPct').textContent = `${taskPct}%`;
     if($('#homeTaskFill')) $('#homeTaskFill').style.width = `${taskPct}%`;
+    renderHomeFlow(items, date === moodLocalDate());
 
     const summary = $('#homeDailySummary');
     if(summary) {
