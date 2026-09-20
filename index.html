@@ -2006,6 +2006,12 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
     restData.focus = null;   // 새 휴식을 시작하면 이전 집중 세션은 정리
     restData.active = { id: `rest_${now}_${uid()}`, type: key, plannedMin, startTs: now };
     roDismissedId = null;
+    // 휴식 추천 알림 기준 시각 갱신: 추천 팝업이 아니라 다른 버튼으로 휴식을 시작해도
+    // '지금까지 공부한 시간 + 기본 간격'을 다음 알림 기준으로 다시 잡아서,
+    // 복귀 후 짧게 공부해도 이전 누적 시간과 합쳐져 바로 다시 뜨는 일이 없게 함
+    breakSuggest.shown = false;
+    breakSuggest.nextTriggerMin = todayStudiedMin() + BREAK_BASE_INTERVAL_MIN;
+    closeBreakSuggestOverlay();
     renderRestControls();
     scheduleRestEndTimer();
     syncReturnOverlay();
