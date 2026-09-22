@@ -1399,6 +1399,10 @@
         <button class="btn small ghost" id="nItalicBtn" title="기울임"><i>I</i></button>
         <button class="btn small ghost" id="nUnderlineBtn" title="밑줄"><u>U</u></button>
         <span class="divider"></span>
+        <button class="btn small ghost" id="nAlignLeftBtn" title="왼쪽 정렬">⯇ 왼쪽</button>
+        <button class="btn small ghost" id="nAlignCenterBtn" title="가운데 정렬">☰ 가운데</button>
+        <button class="btn small ghost" id="nAlignRightBtn" title="오른쪽 정렬">⯈ 오른쪽</button>
+        <span class="divider"></span>
         <span style="font-size:11px;font-weight:700;color:var(--ink-soft)">글자색</span>
         <input type="color" id="nForeColor" value="#16202B" title="글자 색">
         <span class="divider"></span>
@@ -1558,14 +1562,21 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
   const storage = {
     async set(k, v) {
       try { localStorage.setItem(k, String(v)); } catch(e){}
-      const { error } = await supabaseClient.from('my_planner').upsert({ key: k, value: String(v) });
-      if (error) console.error('Supabase 저장 에러:', error);
+      try {
+        const { error } = await supabaseClient.from('my_planner').upsert({ key: k, value: String(v) });
+        if (error) {
+          console.error('Supabase 저장 에러:', error.message || error.details || error.hint || JSON.stringify(error));
+        }
+      } catch(err) {
+        console.error('Supabase 저장 실패(네트워크/설정 문제):', err && err.message ? err.message : err);
+      }
     },
     async get(k) {
       try {
         const { data, error } = await supabaseClient.from('my_planner').select('value').eq('key', k).maybeSingle();
+        if(error) console.error('Supabase 조회 에러:', error.message || error.details || error.hint || JSON.stringify(error));
         if(data && data.value) return { value: data.value };
-      } catch(err){}
+      } catch(err){ console.error('Supabase 조회 실패(네트워크/설정 문제):', err && err.message ? err.message : err); }
       const localVal = localStorage.getItem(k);
       return localVal ? { value: localVal } : null;
     },
@@ -5632,7 +5643,9 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
   }
 
   // 표 안에서 마지막으로 클릭한 셀/표를 추적 (필기 영역 전용)
-  document.addEventListener('focusin', e => {
+  // td/th는 자체적으로 focus 가능한 요소가 아니라서 focusin만으로는 클릭을 못 잡을 때가 있어,
+  // mousedown(클릭 시작 시점)에서도 동일하게 잡아준다. (셀 병합이 안 되던 원인)
+  function trackNotesActiveCell(e){
     const cell = e.target.closest && e.target.closest('#notesPage td, #notesPage th');
     if(cell) {
       document.querySelectorAll('#notesPage td, #notesPage th').forEach(c => c.classList.remove('active-cell'));
@@ -5640,7 +5653,9 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
       notesLastActiveCell = cell;
       notesLastActiveTable = cell.closest('table');
     }
-  });
+  }
+  document.addEventListener('mousedown', trackNotesActiveCell);
+  document.addEventListener('focusin', trackNotesActiveCell);
 
   function notesGetTable(){
     const page = $('#notesPage');
@@ -5654,6 +5669,9 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
   $('#nBoldBtn').onclick = () => { $('#notesPage').focus(); document.execCommand('bold'); notesAfterEdit(); };
   $('#nItalicBtn').onclick = () => { $('#notesPage').focus(); document.execCommand('italic'); notesAfterEdit(); };
   $('#nUnderlineBtn').onclick = () => { $('#notesPage').focus(); document.execCommand('underline'); notesAfterEdit(); };
+  $('#nAlignLeftBtn').onclick = () => { $('#notesPage').focus(); document.execCommand('justifyLeft'); notesAfterEdit(); };
+  $('#nAlignCenterBtn').onclick = () => { $('#notesPage').focus(); document.execCommand('justifyCenter'); notesAfterEdit(); };
+  $('#nAlignRightBtn').onclick = () => { $('#notesPage').focus(); document.execCommand('justifyRight'); notesAfterEdit(); };
   $('#nForeColor').oninput = e => {
     $('#notesPage').focus();
     if(savedSelectionRange) {
@@ -5681,7 +5699,7 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
   $('#nInsTable').onclick = () => {
     const page = $('#notesPage');
     page.focus();
-    document.execCommand('insertHTML', false, '<table><tr><td>제목1</td><td>제목2</td></tr><tr><td>내용1</td><td>내용2</td></tr></table><p><br></p>');
+    document.execCommand('insertHTML', false, '<table><tr><td contenteditable="true">제목1</td><td contenteditable="true">제목2</td></tr><tr><td contenteditable="true">내용1</td><td contenteditable="true">내용2</td></tr></table><p><br></p>');
     notesAfterEdit();
   };
   $('#nAddRowBtn').onclick = () => {
@@ -5689,13 +5707,13 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
     if(!tbl) return toast('필기장에서 표를 먼저 선택하세요.');
     const cols = tbl.rows[0] ? tbl.rows[0].cells.length : 2;
     const r = tbl.insertRow();
-    for(let i=0;i<cols;i++){ const c = r.insertCell(); c.innerText = '셀'; }
+    for(let i=0;i<cols;i++){ const c = r.insertCell(); c.contentEditable = 'true'; c.innerText = '셀'; }
     notesAfterEdit();
   };
   $('#nAddColBtn').onclick = () => {
     const tbl = notesGetTable();
     if(!tbl) return toast('필기장에서 표를 먼저 선택하세요.');
-    for(let i=0;i<tbl.rows.length;i++){ const c = tbl.rows[i].insertCell(); c.innerText = '내용'; }
+    for(let i=0;i<tbl.rows.length;i++){ const c = tbl.rows[i].insertCell(); c.contentEditable = 'true'; c.innerText = '내용'; }
     notesAfterEdit();
   };
   $('#nDelRowBtn').onclick = () => {
@@ -5750,12 +5768,108 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
     const tbl = notesGetTable();
     if(tbl){ tbl.remove(); notesLastActiveTable = null; notesLastActiveCell = null; notesAfterEdit(); toast('표가 삭제되었습니다.'); }
   };
-  $('#nInsToggleBtn').onclick = () => {
+  // 노션처럼: 커서가 있는 바로 그 자리에 토글을 넣는다 (다른 토글 안이면 그 안에 중첩됨).
+  // 삽입 직후 커서를 새 토글 '바깥'(뒤따라오는 빈 문단)으로 명확히 옮겨서,
+  // 다시 실행해도 방금 만든 토글 안으로 또 들어가 버리지 않게 한다.
+  function insertNoteToggleAtCursor() {
     const page = $('#notesPage');
     page.focus();
-    document.execCommand('insertHTML', false, '<details class="note-toggle" open><summary>토글 제목 (클릭하여 수정)</summary><div class="note-toggle-body" contenteditable="true">여기에 내용을 적으세요.</div></details><p><br></p>');
+
+    const sel = window.getSelection();
+    let range;
+    if (sel && sel.rangeCount) {
+      range = sel.getRangeAt(0);
+      if (!page.contains(range.commonAncestorContainer)) range = null;
+    }
+    if (!range) {
+      range = document.createRange();
+      range.selectNodeContents(page);
+      range.collapse(false);
+    }
+    range.deleteContents();
+
+    const details = document.createElement('details');
+    details.className = 'note-toggle';
+    details.open = true;
+    const summary = document.createElement('summary');
+    summary.textContent = '토글 제목 (클릭하여 수정)';
+    const body = document.createElement('div');
+    body.className = 'note-toggle-body';
+    body.contentEditable = 'true';
+    body.textContent = '여기에 내용을 적으세요.';
+    details.appendChild(summary);
+    details.appendChild(body);
+
+    const trailingP = document.createElement('p');
+    trailingP.appendChild(document.createElement('br'));
+
+    const frag = document.createDocumentFragment();
+    frag.appendChild(details);
+    frag.appendChild(trailingP);
+    range.insertNode(frag);
+
+    // 커서를 새 토글 뒤의 빈 문단으로 이동
+    const newRange = document.createRange();
+    newRange.setStart(trailingP, 0);
+    newRange.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(newRange);
+  }
+
+  $('#nInsToggleBtn').onclick = () => {
+    insertNoteToggleAtCursor();
     notesAfterEdit();
   };
+
+  // ===== 노션 스타일 단축어: "> " → 토글, "- " 또는 "* " → 글머리 목록 =====
+  // 줄 맨 앞에서 해당 문자 하나만 입력된 상태로 스페이스를 누르면 변환된다.
+  function notesFindBlock(node) {
+    const page = $('#notesPage');
+    let el = node.nodeType === 3 ? node.parentElement : node;
+    while (el && el !== page) {
+      if (/^(P|DIV|LI|TD|TH|H1|H2|H3|H4|H5|H6|BLOCKQUOTE|SUMMARY)$/.test(el.tagName)) return el;
+      el = el.parentElement;
+    }
+    return page;
+  }
+
+  $('#notesPage').addEventListener('keydown', e => {
+    if (e.key !== ' ') return;
+    const page = $('#notesPage');
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount || !sel.isCollapsed) return;
+    let range = sel.getRangeAt(0);
+    if (!page.contains(range.startContainer)) return;
+    if (range.startContainer.nodeType !== 3) return; // 순수 텍스트 노드일 때만 처리
+
+    const block = notesFindBlock(range.startContainer);
+    if (!block) return;
+
+    const preRange = document.createRange();
+    preRange.selectNodeContents(block);
+    preRange.setEnd(range.startContainer, range.startOffset);
+    const textBefore = preRange.toString();
+
+    if (textBefore === '>') {
+      e.preventDefault();
+      range.setStart(range.startContainer, range.startOffset - 1);
+      range.deleteContents();
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
+      insertNoteToggleAtCursor();
+      notesAfterEdit();
+    } else if (textBefore === '-' || textBefore === '*') {
+      e.preventDefault();
+      range.setStart(range.startContainer, range.startOffset - 1);
+      range.deleteContents();
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
+      document.execCommand('insertUnorderedList');
+      notesAfterEdit();
+    }
+  });
   $('#nInsImage').onclick = () => {
     pickFile(async f => {
       const b64 = await shrinkImage(f, 700, 0.85);
