@@ -4092,36 +4092,48 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
   async function fetchWithFallback(targetUrl) {
     const proxies = [
       url => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
-      url => 'https://corsproxy.io/?' + encodeURIComponent(url),
-      url => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(url)
+      url => 'https://corsproxy.io/?url=' + encodeURIComponent(url),
+      url => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(url),
+      url => 'https://thingproxy.freeboard.io/fetch/' + url,
+      url => 'https://api.allorigins.win/get?url=' + encodeURIComponent(url)
     ];
 
+    const errors = [];
     for (const makeProxy of proxies) {
       try {
         const proxyUrl = makeProxy(targetUrl);
         const res = await fetch(proxyUrl, { cache: 'no-store' });
-        if (res.ok) {
-          const text = await res.text();
-          if (text.includes('BEGIN:VCALENDAR')) {
-            return text;
-          }
+        if (!res.ok) { errors.push(`${proxyUrl} → HTTP ${res.status}`); continue; }
+        let text = await res.text();
+        // allorigins /get 엔드포인트는 JSON으로 감싸서 반환함
+        if (proxyUrl.includes('allorigins.win/get')) {
+          try { text = JSON.parse(text).contents || ''; } catch(e) {}
         }
-      } catch (e) {}
+        if (text.includes('BEGIN:VCALENDAR')) {
+          return text;
+        }
+        errors.push(`${proxyUrl} → 캘린더 형식 아님 (응답 ${text.length}자)`);
+      } catch (e) {
+        errors.push(`${makeProxy(targetUrl)} → ${e.message}`);
+      }
     }
-    throw new Error('프록시 연결 실패');
+    console.warn('[구글 캘린더 동기화 실패]', errors);
+    throw new Error('프록시 연결 실패: ' + errors.join(' | '));
   }
 
   async function syncGoogleCalendar() {
     toast('구글 캘린더 일정을 가져오는 중입니다...');
     const targets = [GOOGLE_PUBLIC_ICAL_URL, GOOGLE_PRIVATE_ICAL_URL];
+    const allErrors = [];
     for(const tUrl of targets) {
       try {
         const text = await fetchWithFallback(tUrl);
         await parseAndLoadIcsText(text);
         return;
-      } catch(e) {}
+      } catch(e) { allErrors.push(e.message); }
     }
-    toast('외부 접속 차단으로 캘린더 화면을 바로 엽니다. 일정을 확인하고 추가해보세요!');
+    console.warn('[구글 캘린더 동기화 전체 실패]', allErrors);
+    toast('외부 접속 차단으로 캘린더 화면을 바로 엽니다. 개발자 콘솔(F12)에서 자세한 원인을 확인할 수 있어요.');
     openGoogleCalendarModal();
   }
 
