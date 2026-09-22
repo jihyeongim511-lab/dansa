@@ -4022,6 +4022,84 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
     return null;
   }
 
+  // [반복 일정(RRULE) 처리] 구글 캘린더는 매일/매주 반복 일정을 미래 날짜 나열 없이
+  // RRULE 한 줄로만 표현하므로, 여기서 직접 발생 날짜들을 계산해서 펼쳐준다.
+  const RRULE_DAY_MAP = {SU:0,MO:1,TU:2,WE:3,TH:4,FR:5,SA:6};
+
+  function parseRRule(str) {
+    const parts = {};
+    str.split(';').forEach(kv => {
+      const [k,v] = kv.split('=');
+      if(k && v) parts[k.toUpperCase()] = v;
+    });
+    return {
+      freq: parts.FREQ,
+      interval: parts.INTERVAL ? parseInt(parts.INTERVAL,10) : 1,
+      count: parts.COUNT ? parseInt(parts.COUNT,10) : null,
+      until: parts.UNTIL || null,
+      byday: parts.BYDAY ? parts.BYDAY.split(',') : null
+    };
+  }
+
+  // startInfo: parseIcsDate() 결과, rrule: parseRRule() 결과
+  // maxOccurrences: 무한 반복(종료일 없음) 폭주 방지용 상한
+  // horizonDate: 이 날짜 이후는 계산하지 않음 (미래 너무 먼 일정 방지)
+  function expandRecurrence(startInfo, rrule, maxOccurrences, horizonDate) {
+    const occurrences = [];
+    if(!rrule.freq || !['DAILY','WEEKLY','MONTHLY','YEARLY'].includes(rrule.freq)) return occurrences;
+    const untilInfo = rrule.until ? parseIcsDate(rrule.until) : null;
+    const untilDate = untilInfo ? (untilInfo.fullDate || new Date(untilInfo.date+'T23:59:59')) : null;
+    const baseDate = startInfo.fullDate ? new Date(startInfo.fullDate) : new Date(startInfo.date+'T00:00:00');
+    let count = 0;
+
+    function pushOcc(dt) {
+      const y=dt.getFullYear(), m=dt.getMonth(), d=dt.getDate();
+      occurrences.push(`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`);
+      count++;
+    }
+
+    if(rrule.freq === 'WEEKLY' && rrule.byday && rrule.byday.length) {
+      let weekStart = new Date(baseDate);
+      weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+      let weeks = 0;
+      outer:
+      while(true) {
+        for(const bd of rrule.byday) {
+          const dow = RRULE_DAY_MAP[bd.slice(-2)];
+          if(dow === undefined) continue;
+          const occ = new Date(weekStart);
+          occ.setDate(occ.getDate() + dow);
+          occ.setHours(baseDate.getHours(), baseDate.getMinutes(), 0, 0);
+          if(occ < baseDate) continue;
+          if(untilDate && occ > untilDate) break outer;
+          if(occ > horizonDate) break outer;
+          pushOcc(occ);
+          if(rrule.count && count >= rrule.count) break outer;
+          if(count >= maxOccurrences) break outer;
+        }
+        weeks++;
+        weekStart.setDate(weekStart.getDate() + 7*rrule.interval);
+        if(weeks > maxOccurrences) break;
+      }
+    } else {
+      let cursor = new Date(baseDate);
+      while(true) {
+        if(untilDate && cursor > untilDate) break;
+        if(cursor > horizonDate) break;
+        pushOcc(cursor);
+        if(rrule.count && count >= rrule.count) break;
+        if(count >= maxOccurrences) break;
+        const next = new Date(cursor);
+        if(rrule.freq === 'DAILY') next.setDate(next.getDate() + rrule.interval);
+        else if(rrule.freq === 'WEEKLY') next.setDate(next.getDate() + 7*rrule.interval);
+        else if(rrule.freq === 'MONTHLY') next.setMonth(next.getMonth() + rrule.interval);
+        else if(rrule.freq === 'YEARLY') next.setFullYear(next.getFullYear() + rrule.interval);
+        cursor = next;
+      }
+    }
+    return occurrences;
+  }
+
   // [캘린더 일정 파싱 및 중복 필터링]
   async function parseAndLoadIcsText(icsText) {
     const rawEvents = icsText.split('BEGIN:VEVENT');
@@ -4032,9 +4110,27 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
     let addedCount = 0;
     let skippedCount = 0;
 
+    // 반복 일정이 너무 멀리까지 안 펼쳐지도록 오늘부터 1년 뒤까지만 계산
+    const horizonDate = new Date();
+    horizonDate.setFullYear(horizonDate.getFullYear() + 1);
+
+    function addEvent(dateStr, timeStr, title, duration) {
+      let targetDay = state.days.find(d => d.date === dateStr);
+      if(!targetDay) {
+        targetDay = mk(dateStr, `${dateStr.slice(5)} 일정`, false, []);
+        state.days.push(targetDay);
+      }
+      const isDuplicate = targetDay.events.some(ev =>
+        ev.time === timeStr && ev.title.trim() === title.trim()
+      );
+      if(isDuplicate) { skippedCount++; return; }
+      targetDay.events.push({ id: uid(), time: timeStr, duration, title, done: false });
+      addedCount++;
+    }
+
     for(let i = 1; i < rawEvents.length; i++) {
       const block = rawEvents[i].split('END:VEVENT')[0];
-      
+
       const summaryMatch = block.match(/SUMMARY:(.*?)(\r?\n)/);
       const title = summaryMatch ? summaryMatch[1].trim() : '구글 캘린더 일정';
 
@@ -4053,29 +4149,17 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
         }
       }
 
-      let targetDay = state.days.find(d => d.date === startInfo.date);
-      if(!targetDay) {
-        targetDay = mk(startInfo.date, `${startInfo.date.slice(5)} 일정`, false, []);
-        state.days.push(targetDay);
+      const rruleMatch = block.match(/RRULE:(.+)/);
+      if(rruleMatch) {
+        // 반복 일정: RRULE을 펼쳐서 발생하는 모든 날짜에 등록 (최대 400회)
+        const rrule = parseRRule(rruleMatch[1].trim());
+        const dates = expandRecurrence(startInfo, rrule, 400, horizonDate);
+        for(const dateStr of dates) {
+          addEvent(dateStr, startInfo.time, title, duration);
+        }
+      } else {
+        addEvent(startInfo.date, startInfo.time, title, duration);
       }
-
-      const isDuplicate = targetDay.events.some(ev => 
-        ev.time === startInfo.time && ev.title.trim() === title.trim()
-      );
-
-      if(isDuplicate) {
-        skippedCount++;
-        continue;
-      }
-
-      targetDay.events.push({
-        id: uid(),
-        time: startInfo.time,
-        duration: duration,
-        title: title,
-        done: false
-      });
-      addedCount++;
     }
 
     await saveState();
