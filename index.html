@@ -157,14 +157,14 @@
   .notes-page table td, .notes-page table th{border:1px solid var(--rule);padding:6px 8px;min-width:40px}
   .notes-page table td.active-cell, .notes-page table th.active-cell{outline:2px solid var(--jade);outline-offset:-2px}
   .notes-page img{max-width:100%;border-radius:6px;margin:4px 0}
-  .notes-page details.note-toggle{border:1px solid var(--rule);border-radius:8px;padding:6px 10px;margin:8px 0;background:#FAFBF8}
-  .notes-page details.note-toggle > summary{cursor:default;font-weight:700;color:var(--jade);list-style:none;padding:2px 0;display:flex;align-items:flex-start;gap:6px}
+  .notes-page details.note-toggle{border:none;border-radius:0;padding:0;margin:1px 0;background:transparent}
+  .notes-page details.note-toggle > summary{cursor:default;font-weight:400;color:var(--ink);list-style:none;padding:2px 0;display:flex;align-items:flex-start;gap:5px}
   .notes-page details.note-toggle > summary::-webkit-details-marker{display:none}
-  .notes-page details.note-toggle > summary .note-toggle-arrow{cursor:pointer;user-select:none;flex:none;display:inline-block;transition:transform .15s ease;line-height:1.5}
+  .notes-page details.note-toggle > summary .note-toggle-arrow{cursor:pointer;user-select:none;flex:none;display:inline-block;transition:transform .15s ease;line-height:1.6;color:var(--ink-soft);font-size:10px;width:14px;text-align:center;margin-top:4px}
   .notes-page details.note-toggle[open] > summary .note-toggle-arrow{transform:rotate(90deg)}
   .notes-page details.note-toggle > summary .note-toggle-title{flex:1;min-width:0;cursor:text;outline:none;border-radius:3px}
   .notes-page details.note-toggle > summary .note-toggle-title:focus{outline:1px dashed var(--jade);outline-offset:2px}
-  .notes-page details.note-toggle .note-toggle-body{padding:6px 4px 2px;min-height:20px}
+  .notes-page details.note-toggle .note-toggle-body{padding:1px 0 1px 19px;min-height:18px}
   .notes-empty-hint{font-size:12px;color:var(--ink-soft);margin:0 0 8px}
 
   .cal{max-width:980px;margin:0 auto;background:var(--card);border:1px solid var(--rule);border-radius:12px;overflow:hidden}
