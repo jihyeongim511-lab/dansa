@@ -4257,6 +4257,25 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
     }
   });
 
+  // 노션에서 복사한 '들여쓰기 텍스트'(서식 없는 순수 텍스트로만 붙여넣기 되는 경우)를
+  // 필기 모드에 붙여넣을 때는 들여쓰기 깊이를 읽어 원래 트리 모양(중첩 목록/표)으로 되살린다.
+  // 이미지 붙여넣기(위 리스너)와는 별개의 리스너라 서로 방해하지 않는다.
+  window.addEventListener('paste', (e) => {
+    if (!(document.activeElement && document.activeElement.id === 'notesPage')) return;
+    const cd = e.clipboardData || e.originalEvent?.clipboardData;
+    if (!cd) return;
+    // 이미지가 함께 있으면 위쪽 이미지 붙여넣기 리스너가 이미 처리했으므로 건드리지 않는다.
+    for (let i = 0; i < cd.items.length; i++) { if (cd.items[i].type.indexOf('image') !== -1) return; }
+    const text = cd.getData('text/plain');
+    if (!text) return;
+    const treeHtml = notesTextToTreeHtml(text);
+    if (!treeHtml) return; // 목록/표 구조가 아니면 브라우저 기본 붙여넣기(서식 있는 HTML 등)를 그대로 둔다
+    e.preventDefault();
+    document.execCommand('insertHTML', false, treeHtml);
+    notesAfterEdit();
+    toast('노션 목록 구조를 그대로 살려서 붙여넣었습니다!');
+  });
+
   document.addEventListener('selectionchange', () => {
     const sel = window.getSelection();
     if (sel && sel.rangeCount > 0) {
@@ -5712,6 +5731,103 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
   function notesAfterEdit(){
     saveCurrentNoteHtml();
     persistNotes();
+  }
+
+  // ===== 노션에서 복붙한 '들여쓰기 텍스트'를 원래 트리 모양(중첩 목록/표)으로 되살리기 =====
+  // 노션 웹앱에서 토글/글머리 목록을 복사하면 브라우저에 따라 서식 있는 HTML 대신
+  // 들여쓰기+"- " 기호로만 이루어진 순수 텍스트만 전달되는 경우가 있다.
+  // 그걸 그냥 붙여넣으면 들여쓰기가 다 사라지고 한 줄로 뭉개지므로,
+  // 여기서 줄마다의 들여쓰기 깊이를 읽어 중첩된 <ul><li>로, 마크다운 표는 실제 <table>로 재구성한다.
+  function notesEscapeHtml(s){
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  function notesBuildNestedListHtml(items){
+    // items: [{indent:Number, text:String}] — indent 칸 수가 크면 클수록 더 깊은 하위 항목
+    const levels = [...new Set(items.map(it => it.indent))].sort((a,b) => a - b);
+    const levelOf = ind => levels.indexOf(ind);
+    const root = document.createElement('ul');
+    const stack = [{ level: -1, ul: root, li: null }];
+    items.forEach(item => {
+      const level = levelOf(item.indent);
+      while (stack.length > 1 && level <= stack[stack.length - 1].level) stack.pop();
+      const parent = stack[stack.length - 1];
+      let ul;
+      if (parent.li) {
+        ul = parent.li.querySelector(':scope > ul');
+        if (!ul) { ul = document.createElement('ul'); parent.li.appendChild(ul); }
+      } else {
+        ul = parent.ul;
+      }
+      const li = document.createElement('li');
+      li.textContent = item.text;
+      ul.appendChild(li);
+      stack.push({ level, ul, li });
+    });
+    return root.outerHTML;
+  }
+  function notesBuildTableHtml(tableLines){
+    // tableLines: "| a | b |" 형태의 마크다운 표 줄들 (노션이 표를 복사하면 이 모양으로 옴)
+    const parseRow = (line) => {
+      let cells = line.split('|');
+      if (cells.length && cells[0].trim() === '') cells.shift();
+      if (cells.length && cells[cells.length - 1].trim() === '') cells.pop();
+      return cells.map(c => c.trim());
+    };
+    let rows = tableLines.map(parseRow);
+    let headerRow = null;
+    if (rows.length > 1 && rows[1].every(c => /^:?-{1,}:?$/.test(c))) {
+      headerRow = rows[0];
+      rows = rows.slice(2);
+    }
+    const table = document.createElement('table');
+    if (headerRow) {
+      const tr = document.createElement('tr');
+      headerRow.forEach(c => { const th = document.createElement('th'); th.textContent = c; tr.appendChild(th); });
+      table.appendChild(tr);
+    }
+    rows.forEach(r => {
+      const tr = document.createElement('tr');
+      r.forEach(c => { const td = document.createElement('td'); td.textContent = c; tr.appendChild(td); });
+      table.appendChild(tr);
+    });
+    return table.outerHTML;
+  }
+  function notesTextToTreeHtml(text){
+    const bulletRe = /^(\s*)[-*•]\s+(.*)$/;
+    const lines = text.replace(/\r\n?/g, '\n').split('\n');
+    if (!lines.some(l => bulletRe.test(l))) return null; // 목록 형태가 아니면 변환하지 않음(일반 텍스트는 그대로 붙여넣기)
+
+    const out = [];
+    let i = 0;
+    while (i < lines.length) {
+      const line = lines[i];
+      if (line.trim() === '') { i++; continue; }
+
+      if (/^\s*\|.*\|\s*$/.test(line)) {
+        const tableLines = [];
+        while (i < lines.length && /^\s*\|.*\|\s*$/.test(lines[i])) { tableLines.push(lines[i].trim()); i++; }
+        out.push(notesBuildTableHtml(tableLines));
+        continue;
+      }
+
+      const m = bulletRe.exec(line);
+      if (m) {
+        const items = [];
+        while (i < lines.length) {
+          if (lines[i].trim() === '') { i++; continue; }
+          const mm = bulletRe.exec(lines[i]);
+          if (!mm) break;
+          items.push({ indent: mm[1].replace(/\t/g, '    ').length, text: mm[2] });
+          i++;
+        }
+        out.push(notesBuildNestedListHtml(items));
+        continue;
+      }
+
+      out.push(`<p>${notesEscapeHtml(line)}</p>`);
+      i++;
+    }
+    return out.join('');
   }
 
   $('#nBoldBtn').onclick = () => { $('#notesPage').focus(); document.execCommand('bold'); notesAfterEdit(); };
