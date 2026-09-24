@@ -374,6 +374,11 @@
   .hl-palette-wrap{display:inline-flex;align-items:center;gap:3px;background:#fff;padding:2px 5px;border-radius:5px;border:1px solid var(--rule)}
   .hl-color-btn{width:16px;height:16px;border-radius:3px;border:1px solid rgba(0,0,0,0.15);cursor:pointer;display:inline-block}
   .hl-color-btn:hover{transform:scale(1.15)}
+  .w-sel-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 8px;font-size:11px;color:var(--ink-soft)}
+  .w-sel-bar .btn.on{background:var(--jade);color:#fff;border-color:var(--jade)}
+  .d-week-task-item.w-sel{background:rgba(60,140,100,.2);outline:1.5px solid var(--jade);border-radius:6px}
+  #dWeeklyGrid.w-select-mode .d-week-task-item{cursor:pointer}
+  #dWeeklyGrid.w-select-mode .w-txt{pointer-events:none;user-select:none}
 
   .photos{margin-top:16px;padding-top:14px;border-top:1px dashed var(--rule)}
   .photos h3{margin:0;font-size:13px;font-weight:700;margin-bottom:8px}
@@ -7690,7 +7695,10 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
   }
 
   // ===== 위클리 할 일: 꾹 눌러 옮기기 · 우클릭(터치는 길게 누르기) 복사/붙여넣기 =====
-  let weeklyClip = null;          // 복사해 둔 할 일 1개 (복사한 시점의 스냅샷)
+  let weeklyClips = [];           // 복사해 둔 할 일들 [{item, dow}] (복사한 시점의 스냅샷, dow=원래 요일 0~6)
+  const weeklySel = new Set();    // 위클리에서 선택 중인 할 일 id
+  let weeklySelectMode = false;
+  const dowOf = iso => new Date(iso + 'T00:00:00').getDay();
   let weeklyCtxMenuEl = null;
   let weeklyInteractionsReady = false;
 
@@ -7722,12 +7730,67 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
   }
 
   function pasteWeeklyTask(dstIso, refId, after){
-    if(!weeklyClip) return false;
-    const copy = JSON.parse(JSON.stringify(weeklyClip));
-    copy.id = uid();
-    copy.state = 'none';   // 복사본은 아직 안 한 상태로 붙여넣기
-    insertTaskAt(dstIso, copy, refId, after);
+    if(!weeklyClips.length) return false;
+    let ref = refId, aft = after;
+    weeklyClips.forEach(c => {
+      const copy = JSON.parse(JSON.stringify(c.item));
+      copy.id = uid();
+      copy.state = 'none';   // 복사본은 아직 안 한 상태로 붙여넣기
+      insertTaskAt(dstIso, copy, ref, aft);
+      ref = copy.id; aft = true;   // 여러 개는 복사한 순서대로 이어 붙인다
+    });
     return true;
+  }
+
+  // 지금 보고 있는 주에, 복사해 둔 할 일을 원래 요일 그대로 붙여넣기
+  function pasteWeeklyByWeekday(){
+    const map = {};
+    $('#dWeeklyGrid').querySelectorAll('.d-week-tasks').forEach(ul => { map[dowOf(ul.dataset.date)] = ul.dataset.date; });
+    let n = 0;
+    weeklyClips.forEach(c => {
+      const iso = map[c.dow]; if(!iso) return;
+      const copy = JSON.parse(JSON.stringify(c.item));
+      copy.id = uid(); copy.state = 'none';
+      insertTaskAt(iso, copy, null, false); n++;
+    });
+    if(n) afterWeeklyChange(`📅 ${n}개를 이 주에 같은 요일로 붙여넣었어요`);
+  }
+
+  function copySelectedWeekly(){
+    const clips = [];
+    $('#dWeeklyGrid').querySelectorAll('.d-week-task-item.w-sel').forEach(li => {
+      const day = findPlanDay(li.dataset.date);
+      const it = day && day.items.find(v => v.id === li.dataset.id);
+      if(it) clips.push({ item: JSON.parse(JSON.stringify(it)), dow: dowOf(li.dataset.date) });
+    });
+    if(!clips.length) return;
+    weeklyClips = clips; weeklySel.clear(); refreshWeeklySelUi();
+    toast(`📋 ${clips.length}개를 복사했어요 — 다른 주로 넘어가서 붙여넣으세요`);
+  }
+
+  function refreshWeeklySelUi(){
+    const grid = $('#dWeeklyGrid'), bar = $('#wSelBar');
+    if(!grid || !bar) return;
+    const present = new Set([...grid.querySelectorAll('.d-week-task-item')].map(li => li.dataset.id));
+    [...weeklySel].forEach(id => { if(!present.has(id)) weeklySel.delete(id); });
+    grid.classList.toggle('w-select-mode', weeklySelectMode);
+    grid.querySelectorAll('.d-week-task-item').forEach(li => li.classList.toggle('w-sel', weeklySel.has(li.dataset.id)));
+    bar.innerHTML = '';
+    const add = (label, fn, on) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'btn small ghost' + (on ? ' on' : ''); b.textContent = label; b.onclick = fn; bar.appendChild(b); };
+    const say = t => { const sp = document.createElement('span'); sp.textContent = t; bar.appendChild(sp); };
+    add('☑ 여러 개 선택', () => { weeklySelectMode = !weeklySelectMode; refreshWeeklySelUi(); }, weeklySelectMode);
+    if(!weeklySelectMode && !weeklySel.size && !weeklyClips.length) say('Ctrl/⌘+클릭으로도 고를 수 있어요');
+    if(weeklySel.size){
+      say(`${weeklySel.size}개 선택`);
+      add('📋 복사', copySelectedWeekly);
+      add('선택 해제', () => { weeklySel.clear(); refreshWeeklySelUi(); });
+    }
+    if(weeklyClips.length){
+      say(`복사됨 ${weeklyClips.length}개`);
+      add('📅 이 주에 같은 요일로 붙여넣기', pasteWeeklyByWeekday);
+      add('비우기', () => { weeklyClips = []; refreshWeeklySelUi(); });
+      say('(특정 날짜에만: 그 날짜 칸 우클릭 · 터치는 길게 누르기)');
+    }
   }
 
   function afterWeeklyChange(msg){
@@ -7751,19 +7814,26 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
       menu.appendChild(b);
     };
     if(itemId){
-      addBtn('📋 복사', () => {
-        const day = findPlanDay(iso);
-        const it = day && day.items.find(v => v.id === itemId);
-        if(!it) return;
-        weeklyClip = JSON.parse(JSON.stringify(it));
-        toast(`📋 복사했어요 — 붙여넣을 날짜를 ${fromTouch ? '길게 눌러' : '우클릭해'} 주세요`);
-      });
+      if(weeklySel.size > 1 && weeklySel.has(itemId)){
+        addBtn(`📋 선택한 ${weeklySel.size}개 복사`, copySelectedWeekly);
+      } else {
+        addBtn('📋 복사', () => {
+          const day = findPlanDay(iso);
+          const it = day && day.items.find(v => v.id === itemId);
+          if(!it) return;
+          weeklyClips = [{ item: JSON.parse(JSON.stringify(it)), dow: dowOf(iso) }];
+          refreshWeeklySelUi();
+          toast(`📋 복사했어요 — 붙여넣을 날짜를 ${fromTouch ? '길게 눌러' : '우클릭해'} 주세요`);
+        });
+      }
     }
-    const clipName = weeklyClip ? `[${weeklyClip.cat}] ${weeklyClip.text}` : '';
+    const c0 = weeklyClips[0];
+    const clipName = c0 ? `[${c0.item.cat}] ${c0.item.text}` : '';
     addBtn(
-      weeklyClip ? `📥 붙여넣기 · ${clipName.length > 18 ? clipName.slice(0, 18) + '…' : clipName}` : '📥 붙여넣기 (복사한 할 일 없음)',
-      () => { if(pasteWeeklyTask(iso, itemId, true)) afterWeeklyChange(`📥 ${shortMD(iso)}에 붙여넣었어요`); },
-      !weeklyClip
+      weeklyClips.length > 1 ? `📥 붙여넣기 · ${weeklyClips.length}개`
+        : c0 ? `📥 붙여넣기 · ${clipName.length > 18 ? clipName.slice(0, 18) + '…' : clipName}` : '📥 붙여넣기 (복사한 할 일 없음)',
+      () => { if(pasteWeeklyTask(iso, itemId, true)) afterWeeklyChange(`📥 ${shortMD(iso)}에 ${weeklyClips.length}개 붙여넣었어요`); },
+      !weeklyClips.length
     );
     document.body.appendChild(menu);
     const r = menu.getBoundingClientRect();
@@ -7786,6 +7856,29 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
     const grid = $('#dWeeklyGrid');
     if(!grid) return;
     weeklyInteractionsReady = true;
+
+    const bar = document.createElement('div');
+    bar.id = 'wSelBar'; bar.className = 'w-sel-bar no-export';
+    grid.parentElement.insertBefore(bar, grid);
+    new MutationObserver(refreshWeeklySelUi).observe(grid, { childList: true });
+    grid.addEventListener('click', e => {
+      const li = e.target.closest('.d-week-task-item');
+      if(!li || e.target.closest('input, .w-del')) return;
+      if(!(weeklySelectMode || e.ctrlKey || e.metaKey || e.shiftKey)) return;
+      e.preventDefault(); e.stopPropagation();
+      if(document.activeElement && document.activeElement.blur) document.activeElement.blur();
+      const id = li.dataset.id;
+      if(weeklySel.has(id)) weeklySel.delete(id); else weeklySel.add(id);
+      refreshWeeklySelUi();
+    }, true);
+    document.addEventListener('keydown', e => {
+      if(!(e.ctrlKey || e.metaKey) || e.key.toLowerCase() !== 'c' || !weeklySel.size) return;
+      const a = document.activeElement;
+      if(a && (a.isContentEditable || /^(INPUT|TEXTAREA)$/.test(a.tagName))) return;
+      const sl = window.getSelection(); if(sl && !sl.isCollapsed) return;
+      e.preventDefault(); copySelectedWeekly();
+    });
+    refreshWeeklySelUi();
 
     const HOLD_MOUSE = 350, HOLD_TOUCH = 450, MOVE_TOL = 8;
     let press = null;          // 누르고 있는 중(아직 길게 누르기 전)
