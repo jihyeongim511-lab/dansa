@@ -1457,7 +1457,7 @@
         <button class="btn small ghost" id="nAlignRightBtn" title="오른쪽 정렬">⯈ 오른쪽</button>
         <span class="divider"></span>
         <span style="font-size:11px;font-weight:700;color:var(--ink-soft)">글자색</span>
-        <input type="color" id="nForeColor" value="#16202B" title="글자 색">
+        <input type="color" id="nForeColor" value="#16202B" title="글자 색 (단축키: Alt+Shift+1~5 빨강·파랑·초록·주황·보라, Alt+Shift+0 기본색)">
         <span class="divider"></span>
         <button class="btn small ghost" id="nBulletBtn" title="글머리 기호(•)">• 목록</button>
         <button class="btn small ghost" id="nNumBtn" title="번호 매기기(1. 2.)">1. 목록</button>
@@ -1466,11 +1466,11 @@
         <span class="divider"></span>
         <div class="hl-palette-wrap">
           <span style="font-size:11px">🖍</span>
-          <span class="hl-color-btn" data-target="notes" data-color="#FFF59D" style="background:#FFF59D" title="노랑 형광펜"></span>
-          <span class="hl-color-btn" data-target="notes" data-color="#C8E6C9" style="background:#C8E6C9" title="연두 형광펜"></span>
-          <span class="hl-color-btn" data-target="notes" data-color="#FFCDD2" style="background:#FFCDD2" title="분홍 형광펜"></span>
-          <span class="hl-color-btn" data-target="notes" data-color="#B3E5FC" style="background:#B3E5FC" title="하늘 형광펜"></span>
-          <button class="btn small ghost hl-clear-btn" data-target="notes" style="font-size:9.5px;padding:1px 3px" title="형광펜 지우기">✕</button>
+          <span class="hl-color-btn" data-target="notes" data-color="#FFF59D" style="background:#FFF59D" title="노랑 형광펜 (Alt+1)"></span>
+          <span class="hl-color-btn" data-target="notes" data-color="#C8E6C9" style="background:#C8E6C9" title="연두 형광펜 (Alt+2)"></span>
+          <span class="hl-color-btn" data-target="notes" data-color="#FFCDD2" style="background:#FFCDD2" title="분홍 형광펜 (Alt+3)"></span>
+          <span class="hl-color-btn" data-target="notes" data-color="#B3E5FC" style="background:#B3E5FC" title="하늘 형광펜 (Alt+4)"></span>
+          <button class="btn small ghost hl-clear-btn" data-target="notes" style="font-size:9.5px;padding:1px 3px" title="형광펜 지우기 (Alt+0)">✕</button>
         </div>
         <span class="divider"></span>
         <button class="btn small ghost" id="nInsTable">표 삽입</button>
@@ -1483,6 +1483,7 @@
         <button class="btn small danger ghost" id="nDelTableBtn">표 삭제</button>
         <span class="divider"></span>
         <button class="btn small ghost" id="nInsToggleBtn" title="접고 펼칠 수 있는 토글 블록 삽입">▶ 토글 삽입</button>
+        <label style="display:inline-flex;align-items:center;gap:3px;font-size:10.5px;color:var(--ink-soft);cursor:pointer" title="노션에서 복사한 들여쓰기 목록(하위 항목이 있는 항목)을 토글로 바꿔 붙여넣어요"><input type="checkbox" id="nPasteToggleChk" checked>붙여넣기 시 토글로 변환</label>
         <button class="btn small ghost" id="nInsChecklistBtn" title="체크리스트 삽입 ( [] + 스페이스 )">☑ 체크리스트</button>
         <button class="btn small ghost" id="nInsCodeBtn" title="코드블럭 삽입 ( ``` + 스페이스 )">&lt;/&gt; 코드블럭</button>
         <button class="btn small ghost" id="nInsQuoteBtn" title="인용문 삽입">❝ 인용문</button>
@@ -4417,6 +4418,13 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
     if (!cd) return;
     // 이미지가 함께 있으면 위쪽 이미지 붙여넣기 리스너가 이미 처리했으므로 건드리지 않는다.
     for (let i = 0; i < cd.items.length; i++) { if (cd.items[i].type.indexOf('image') !== -1) return; }
+    const togFrag = notesFragmentFromClipboard(cd);
+    if (togFrag && notesInsertFragment(togFrag)) {
+      e.preventDefault();
+      notesAfterEdit();
+      toast('노션 토글을 그대로 살려서 붙여넣었습니다!');
+      return;
+    }
     const text = cd.getData('text/plain');
     if (!text) return;
     const treeHtml = notesTextToTreeHtml(text);
@@ -5981,6 +5989,131 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
     return out.join('');
   }
 
+  // ===== 노션 토글 붙여넣기 → 필기모드 토글(details.note-toggle)로 변환 =====
+  function notesMakeToggleEl(titleHtml, open){
+    const d = document.createElement('details'); d.className = 'note-toggle'; d.open = !!open;
+    const sm = document.createElement('summary'); sm.contentEditable = 'false';
+    const ar = document.createElement('span'); ar.className = 'note-toggle-arrow'; ar.contentEditable = 'false'; ar.textContent = '▶';
+    const t = document.createElement('span'); t.className = 'note-toggle-title'; t.contentEditable = 'true'; t.innerHTML = titleHtml || '토글';
+    sm.appendChild(ar); sm.appendChild(t);
+    const body = document.createElement('div'); body.className = 'note-toggle-body'; body.contentEditable = 'true';
+    d.appendChild(sm); d.appendChild(body);
+    return d;
+  }
+  function notesCleanNode(root){
+    root.querySelectorAll('script,style,meta,link,iframe,object,embed,title').forEach(n => n.remove());
+    root.querySelectorAll('*').forEach(el => {
+      [...el.attributes].forEach(at => {
+        const n = at.name.toLowerCase();
+        if (n.startsWith('on') || n === 'style' || n === 'class' || n === 'id' || n === 'contenteditable' || (n === 'open' && el.tagName !== 'DETAILS')) el.removeAttribute(at.name);
+        else if ((n === 'href' || n === 'src') && /^\s*javascript:/i.test(at.value)) el.removeAttribute(at.name);
+      });
+    });
+  }
+  function notesFragmentFromDetailsHtml(html){
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    // 노션 HTML은 토글을 <ul class="toggle"><li><details>… 로 감싸기도 한다 → 껍데기 제거
+    doc.querySelectorAll('ul.toggle, ul.notion-toggle').forEach(ul => {
+      const parent = ul.parentNode;
+      ul.querySelectorAll(':scope > li').forEach(li => { while (li.firstChild) parent.insertBefore(li.firstChild, ul); });
+      ul.remove();
+    });
+    notesCleanNode(doc.body);
+    [...doc.body.querySelectorAll('details')].reverse().forEach(d => { // 안쪽 토글부터 변환
+      const sum = d.querySelector(':scope > summary');
+      const t = notesMakeToggleEl(sum ? sum.innerHTML.trim() : '', d.hasAttribute('open'));
+      const body = t.querySelector('.note-toggle-body');
+      [...d.childNodes].forEach(n => { if (n !== sum) body.appendChild(n); });
+      d.replaceWith(t);
+    });
+    const f = document.createDocumentFragment();
+    while (doc.body.firstChild) f.appendChild(doc.body.firstChild);
+    return f;
+  }
+  // 텍스트로만 복사되는 <details><summary>…</summary> … </details> 형태
+  function notesFragmentFromDetailsText(text){
+    const root = document.createElement('div'), stack = [root]; let buf = [];
+    const flush = () => {
+      if (!buf.length) return;
+      const h = notesTextToTreeHtml(buf.join('\n')) || buf.filter(l => l.trim()).map(l => `<p>${notesEscapeHtml(l.trim())}</p>`).join('');
+      stack[stack.length - 1].insertAdjacentHTML('beforeend', h); buf = [];
+    };
+    text.replace(/\r\n?/g, '\n').split('\n').forEach(line => {
+      let rest = line.trim(), m;
+      while (rest) {
+        if ((m = /^<details[^>]*>/i.exec(rest))) {
+          flush();
+          const t = notesMakeToggleEl('', true);
+          stack[stack.length - 1].appendChild(t); stack.push(t.querySelector('.note-toggle-body'));
+          rest = rest.slice(m[0].length).trim();
+        } else if ((m = /^<summary[^>]*>([\s\S]*?)<\/summary>/i.exec(rest)) && stack.length > 1) {
+          stack[stack.length - 1].previousElementSibling.querySelector('.note-toggle-title').innerHTML = notesEscapeHtml(m[1].trim()) || '토글';
+          rest = rest.slice(m[0].length).trim();
+        } else if ((m = /^<\/details>/i.exec(rest))) {
+          flush(); if (stack.length > 1) stack.pop();
+          rest = rest.slice(m[0].length).trim();
+        } else { buf.push(line); break; }
+      }
+    });
+    flush();
+    const f = document.createDocumentFragment();
+    while (root.firstChild) f.appendChild(root.firstChild);
+    return f;
+  }
+  // 들여쓰기 "- " 목록만 왔을 때: 하위 항목이 있는 항목 → 토글, 하위 항목이 없는 항목 → 토글 안의 일반 줄
+  function notesFragmentFromBulletsAsToggles(text){
+    const re = /^(\s*)[-*•]\s+(.*)$/;
+    const lines = text.replace(/\r\n?/g, '\n').split('\n').filter(l => l.trim() !== '');
+    if (!lines.length || !lines.every(l => re.test(l))) return null;
+    const items = lines.map(l => { const m = re.exec(l); return { indent: m[1].replace(/\t/g, '    ').length, text: m[2] }; });
+    const levels = [...new Set(items.map(i => i.indent))].sort((a, b) => a - b);
+    const roots = [], stack = [];
+    items.forEach(it => {
+      const node = { text: it.text, level: levels.indexOf(it.indent), kids: [] };
+      while (stack.length && stack[stack.length - 1].level >= node.level) stack.pop();
+      (stack.length ? stack[stack.length - 1].kids : roots).push(node);
+      stack.push(node);
+    });
+    if (!roots.some(n => n.kids.length)) return null; // 하위 항목이 전혀 없는 평평한 목록은 그냥 목록으로 둔다
+    const f = document.createDocumentFragment();
+    const render = (nodes, parent) => nodes.forEach(n => {
+      if (n.kids.length) { const t = notesMakeToggleEl(notesEscapeHtml(n.text), true); parent.appendChild(t); render(n.kids, t.querySelector('.note-toggle-body')); }
+      else { const p = document.createElement('p'); p.textContent = n.text; parent.appendChild(p); }
+    });
+    render(roots, f);
+    return f;
+  }
+  function notesFragmentFromClipboard(cd){
+    const html = cd.getData('text/html'), text = cd.getData('text/plain');
+    if (html && /<details[\s>]/i.test(html)) return notesFragmentFromDetailsHtml(html);
+    if (text && /<details[\s>]/i.test(text)) return notesFragmentFromDetailsText(text);
+    const chk = $('#nPasteToggleChk');
+    if (text && chk && chk.checked) return notesFragmentFromBulletsAsToggles(text);
+    return null;
+  }
+  function notesInsertFragment(frag){
+    const page = $('#notesPage'), sel = window.getSelection();
+    let range = sel.rangeCount ? sel.getRangeAt(0) : null;
+    if (!range || !page.contains(range.commonAncestorContainer)) { range = document.createRange(); range.selectNodeContents(page); range.collapse(false); }
+    const el = range.startContainer.nodeType === 3 ? range.startContainer.parentElement : range.startContainer;
+    if (el.closest('.note-toggle-title')) return false; // 토글 제목 안에는 토글을 넣지 않는다(기본 붙여넣기로)
+    if (frag.lastChild && frag.lastChild.nodeName === 'DETAILS') { const p = document.createElement('p'); p.appendChild(document.createElement('br')); frag.appendChild(p); }
+    const tail = frag.lastChild;
+    if (!tail) return false;
+    const blk = el.closest('p,div');
+    const emptyBlk = blk && blk !== page && !blk.classList.contains('note-toggle-body') && range.collapsed && !blk.querySelector('img,table,details') && blk.textContent.trim() === '';
+    if (emptyBlk) blk.replaceWith(frag); else { range.deleteContents(); range.insertNode(frag); }
+    const r = document.createRange();
+    if (tail.nodeName === 'P' || tail.nodeName === 'DIV') r.setStart(tail, 0); else r.setStartAfter(tail);
+    r.collapse(true); sel.removeAllRanges(); sel.addRange(r);
+    return true;
+  }
+  (function(){
+    const chk = $('#nPasteToggleChk'); if (!chk) return;
+    try { chk.checked = localStorage.getItem('notes-paste-as-toggle') !== '0'; } catch(e) {}
+    chk.onchange = () => { try { localStorage.setItem('notes-paste-as-toggle', chk.checked ? '1' : '0'); } catch(e) {} };
+  })();
+
   $('#nBoldBtn').onclick = () => { $('#notesPage').focus(); document.execCommand('bold'); notesAfterEdit(); };
   $('#nItalicBtn').onclick = () => { $('#notesPage').focus(); document.execCommand('italic'); notesAfterEdit(); };
   $('#nUnderlineBtn').onclick = () => { $('#notesPage').focus(); document.execCommand('underline'); notesAfterEdit(); };
@@ -6009,6 +6142,30 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
   document.querySelectorAll('.hl-clear-btn[data-target="notes"]').forEach(btn => {
     btn.onmousedown = e => e.preventDefault();
     btn.onclick = () => { applyHighlightColor('transparent'); notesAfterEdit(); };
+  });
+
+  // ===== 필기 모드 색 단축키 =====
+  // 형광펜: Alt+1 노랑 / 2 연두 / 3 분홍 / 4 하늘 / 0 지우기
+  // 글자색: Alt+Shift+1 빨강 / 2 파랑 / 3 초록 / 4 주황 / 5 보라 / 0 기본색
+  const NOTES_HL_KEYS = { 1:'#FFF59D', 2:'#C8E6C9', 3:'#FFCDD2', 4:'#B3E5FC', 0:'transparent' };
+  const NOTES_FC_KEYS = { 1:'#D32F2F', 2:'#1565C0', 3:'#2E7D32', 4:'#E65100', 5:'#6A1B9A', 0:'#16202B' };
+  $('#notesPage').addEventListener('keydown', e => {
+    if (!e.altKey || e.ctrlKey || e.metaKey) return;
+    const m = /^Digit(\d)$/.exec(e.code); // Mac의 Option 조합 문자와 무관하게 물리 키로 인식
+    if (!m) return;
+    const n = Number(m[1]);
+    const table = e.shiftKey ? NOTES_FC_KEYS : NOTES_HL_KEYS;
+    if (!(n in table)) return;
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount || sel.isCollapsed) { e.preventDefault(); toast('색을 바꿀 글자를 먼저 드래그해서 선택하세요.'); return; }
+    e.preventDefault();
+    if (e.shiftKey) {
+      document.execCommand('foreColor', false, table[n]);
+      $('#nForeColor').value = table[n];
+    } else if (!document.execCommand('backColor', false, table[n])) {
+      document.execCommand('hiliteColor', false, table[n]);
+    }
+    notesAfterEdit();
   });
 
   $('#nInsTable').onclick = () => {
