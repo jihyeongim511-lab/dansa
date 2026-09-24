@@ -616,6 +616,15 @@
   .d-week-task-item .w-del{border:none;background:none;color:#B9C2B5;font-size:11px;padding:0 3px;cursor:pointer;flex:none}
   .d-week-task-item .w-del:hover{color:var(--seal)}
 
+  /* 위클리 할 일: 꾹 눌러 옮기기 · 우클릭 복사/붙여넣기 */
+  .d-week-task-item{-webkit-touch-callout:none}
+  .d-week-col.w-drop-hover{outline:2px dashed var(--d-theme-dark);outline-offset:-3px;background:var(--d-theme-soft)}
+  .d-week-task-item.w-drop-before{box-shadow:inset 0 2px 0 var(--d-theme-dark)}
+  .d-week-task-item.w-drop-after{box-shadow:inset 0 -2px 0 var(--d-theme-dark)}
+  .w-drag-ghost{position:fixed;left:0;top:0;z-index:9600;pointer-events:none;max-width:230px;padding:5px 10px;border-radius:8px;background:#fff;border:1.5px solid var(--d-theme-dark);box-shadow:0 8px 22px rgba(0,0,0,.22);font-size:12px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  body.w-dragging, body.w-dragging *{cursor:grabbing !important;user-select:none !important;-webkit-user-select:none !important}
+  .w-ctx-menu button{white-space:nowrap}
+
   .d-week-task-addbox{display:flex;gap:3px;margin-bottom:6px}
   .d-week-task-addbox input{flex:1;min-width:0;border:1px solid var(--rule);border-radius:5px;padding:3px 6px;font-size:11px;outline:none}
   .d-week-task-addbox input:focus{border-color:var(--jade)}
@@ -7523,7 +7532,269 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
     });
   }
 
+  // ===== 위클리 할 일: 꾹 눌러 옮기기 · 우클릭(터치는 길게 누르기) 복사/붙여넣기 =====
+  let weeklyClip = null;          // 복사해 둔 할 일 1개 (복사한 시점의 스냅샷)
+  let weeklyCtxMenuEl = null;
+  let weeklyInteractionsReady = false;
+
+  const findPlanDay = iso => state.days.find(d => d.date === iso);
+  const weeklyColDate = col => { const ul = col && col.querySelector('.d-week-tasks'); return ul ? ul.dataset.date : null; };
+  const shortMD = iso => `${+iso.slice(5, 7)}/${+iso.slice(8, 10)}`;
+
+  // dstIso 날짜의 refId 할 일 앞(after=false)/뒤(after=true)에 끼워 넣는다. refId가 없으면 맨 끝
+  function insertTaskAt(dstIso, item, refId, after){
+    let dst = findPlanDay(dstIso);
+    if(!dst){ dst = mk(dstIso, `${dstIso.slice(5)} 일정`, false, []); state.days.push(dst); }
+    let at = dst.items.length;
+    if(refId){
+      const ri = dst.items.findIndex(x => x.id === refId);
+      if(ri >= 0) at = after ? ri + 1 : ri;
+    }
+    dst.items.splice(at, 0, item);
+  }
+
+  function moveWeeklyTask(srcIso, id, dstIso, refId, after){
+    if(refId === id) return false;
+    const src = findPlanDay(srcIso);
+    const idx = src ? src.items.findIndex(x => x.id === id) : -1;
+    if(idx < 0) return false;
+    const [item] = src.items.splice(idx, 1);
+    if(srcIso !== dstIso && src.nextTaskId === id) src.nextTaskId = null;
+    insertTaskAt(dstIso, item, refId, after);
+    return true;
+  }
+
+  function pasteWeeklyTask(dstIso, refId, after){
+    if(!weeklyClip) return false;
+    const copy = JSON.parse(JSON.stringify(weeklyClip));
+    copy.id = uid();
+    copy.state = 'none';   // 복사본은 아직 안 한 상태로 붙여넣기
+    insertTaskAt(dstIso, copy, refId, after);
+    return true;
+  }
+
+  function afterWeeklyChange(msg){
+    saveState();
+    renderDiaryWeekly();
+    renderPlannerCalendar();
+    toast(msg);
+  }
+
+  function closeWeeklyCtxMenu(){ if(weeklyCtxMenuEl){ weeklyCtxMenuEl.remove(); weeklyCtxMenuEl = null; } }
+
+  function openWeeklyCtxMenu(x, y, iso, itemId, fromTouch){
+    closeWeeklyCtxMenu();
+    const menu = document.createElement('div');
+    menu.className = 'notes-ctx-menu w-ctx-menu';
+    const addBtn = (label, fn, disabled) => {
+      const b = document.createElement('button');
+      b.textContent = label;
+      b.disabled = !!disabled;
+      b.onclick = () => { closeWeeklyCtxMenu(); fn(); };
+      menu.appendChild(b);
+    };
+    if(itemId){
+      addBtn('📋 복사', () => {
+        const day = findPlanDay(iso);
+        const it = day && day.items.find(v => v.id === itemId);
+        if(!it) return;
+        weeklyClip = JSON.parse(JSON.stringify(it));
+        toast(`📋 복사했어요 — 붙여넣을 날짜를 ${fromTouch ? '길게 눌러' : '우클릭해'} 주세요`);
+      });
+    }
+    const clipName = weeklyClip ? `[${weeklyClip.cat}] ${weeklyClip.text}` : '';
+    addBtn(
+      weeklyClip ? `📥 붙여넣기 · ${clipName.length > 18 ? clipName.slice(0, 18) + '…' : clipName}` : '📥 붙여넣기 (복사한 할 일 없음)',
+      () => { if(pasteWeeklyTask(iso, itemId, true)) afterWeeklyChange(`📥 ${shortMD(iso)}에 붙여넣었어요`); },
+      !weeklyClip
+    );
+    document.body.appendChild(menu);
+    const r = menu.getBoundingClientRect();
+    let top = y;
+    if(fromTouch) top = (y - r.height - 16 >= 8) ? y - r.height - 16 : y + 16;   // 손가락에 가리지 않게
+    menu.style.left = Math.max(8, Math.min(x, window.innerWidth - r.width - 8)) + 'px';
+    menu.style.top = Math.max(8, Math.min(top, window.innerHeight - r.height - 8)) + 'px';
+    if(fromTouch){ menu.style.pointerEvents = 'none'; setTimeout(() => { menu.style.pointerEvents = ''; }, 300); }
+    weeklyCtxMenuEl = menu;
+  }
+
+  function swallowNextClick(){
+    const h = ev => { ev.stopPropagation(); ev.preventDefault(); };
+    window.addEventListener('click', h, { capture: true, once: true });
+    setTimeout(() => window.removeEventListener('click', h, true), 60);
+  }
+
+  function initWeeklyTaskInteractions(){
+    if(weeklyInteractionsReady) return;
+    const grid = $('#dWeeklyGrid');
+    if(!grid) return;
+    weeklyInteractionsReady = true;
+
+    const HOLD_MOUSE = 350, HOLD_TOUCH = 450, MOVE_TOL = 8;
+    let press = null;          // 누르고 있는 중(아직 길게 누르기 전)
+    let drag = null;           // 길게 눌러서 들고 있는 중
+    let dragStyleEl = null;
+    let lastPointerType = 'mouse';
+
+    const cancelPress = () => { if(press){ clearTimeout(press.timer); press = null; } };
+    const clearDropMarks = () => grid.querySelectorAll('.w-drop-hover, .w-drop-before, .w-drop-after')
+      .forEach(n => n.classList.remove('w-drop-hover', 'w-drop-before', 'w-drop-after'));
+    const placeGhost = d => { if(d.ghost) d.ghost.style.transform = `translate(${d.x + 14}px, ${d.y + 14}px)`; };
+
+    // 손가락/커서 아래에 있는 날짜 칸과 (있다면) 그 안의 할 일 위치를 찾아 표시
+    function updateTarget(d){
+      clearDropMarks();
+      d.target = null;
+      const el = document.elementFromPoint(d.x, d.y);
+      const col = el && el.closest('.d-week-col');
+      const iso = weeklyColDate(col);
+      if(!iso) return;
+      col.classList.add('w-drop-hover');
+      let refId = null, after = false;
+      const tli = el.closest('.d-week-task-item');
+      if(tli && col.contains(tli)){
+        refId = tli.dataset.id;
+        const r = tli.getBoundingClientRect();
+        after = d.y > r.top + r.height / 2;
+        tli.classList.add(after ? 'w-drop-after' : 'w-drop-before');
+      }
+      d.target = { iso, refId, after };
+    }
+
+    // 화면 위/아래 가장자리로 가져가면 자동 스크롤 (모바일 세로 배치 대비)
+    function autoScroll(d){
+      const view = $('#dWeeklyView');
+      const inView = !!view && view.scrollHeight > view.clientHeight + 2;
+      const rect = inView ? view.getBoundingClientRect() : { top: 0, bottom: window.innerHeight };
+      const ZONE = 50, STEP = 12;
+      let dy = 0;
+      if(d.y < rect.top + ZONE) dy = -STEP; else if(d.y > rect.bottom - ZONE) dy = STEP;
+      if(!dy) return false;
+      if(inView){ const b = view.scrollTop; view.scrollTop += dy; return view.scrollTop !== b; }
+      const b = window.scrollY; window.scrollBy(0, dy); return window.scrollY !== b;
+    }
+
+    function tick(){
+      if(!drag || drag.menuOnly) return;
+      if(autoScroll(drag) || drag.dirty){ drag.dirty = false; updateTarget(drag); }
+      drag.raf = requestAnimationFrame(tick);
+    }
+
+    function startDrag(){
+      const p = press;
+      if(!p) return;
+      press = null;
+      const d = drag = { iso: p.iso, id: p.id, type: p.type, pid: p.pid, x: p.x, y: p.y, sx: p.x, sy: p.y,
+                         moved: false, dirty: true, menuOnly: !p.id, ghost: null, target: null, raf: 0 };
+      const sel = window.getSelection(); if(sel) sel.removeAllRanges();
+      if(navigator.vibrate) navigator.vibrate(12);
+      if(d.menuOnly) return;   // 빈 곳을 길게 누른 터치: 손을 떼면 메뉴만 띄움
+      const g = document.createElement('div');
+      g.className = 'w-drag-ghost';
+      g.textContent = `${p.li.querySelector('.w-cat')?.textContent || ''} ${p.li.querySelector('.w-txt')?.textContent || ''}`.trim();
+      document.body.appendChild(g);
+      d.ghost = g;
+      // 다시 그려져도 남도록 원본 흐리게 처리는 스타일 태그로
+      dragStyleEl = document.createElement('style');
+      dragStyleEl.textContent = `.d-week-task-item[data-id="${CSS.escape(d.id)}"]{opacity:.35}`;
+      document.head.appendChild(dragStyleEl);
+      document.body.classList.add('w-dragging');
+      placeGhost(d);
+      tick();
+    }
+
+    function endDrag(commit){
+      const d = drag;
+      if(!d) return;
+      drag = null;
+      cancelAnimationFrame(d.raf);
+      if(!d.menuOnly) updateTarget(d);   // 손을 뗀 자리 기준으로 최종 확정
+      const t = d.target;
+      clearDropMarks();
+      if(d.ghost) d.ghost.remove();
+      if(dragStyleEl){ dragStyleEl.remove(); dragStyleEl = null; }
+      document.body.classList.remove('w-dragging');
+      swallowNextClick();
+      if(!commit) return;
+      if(d.menuOnly){ if(!d.moved) openWeeklyCtxMenu(d.x, d.y, d.iso, null, true); return; }
+      // 터치에서 길게 눌렀다가 움직이지 않고 뗐다면 → 복사/붙여넣기 메뉴
+      if(d.type === 'touch' && !d.moved){ openWeeklyCtxMenu(d.x, d.y, d.iso, d.id, true); return; }
+      if(!t) return;
+      if(moveWeeklyTask(d.iso, d.id, t.iso, t.refId, t.after)){
+        afterWeeklyChange(t.iso === d.iso ? '↕️ 순서를 바꿨어요' : `📅 ${shortMD(t.iso)}로 옮겼어요`);
+      }
+    }
+
+    grid.addEventListener('pointerdown', e => {
+      lastPointerType = e.pointerType;
+      if(!e.isPrimary || drag) return;
+      if(e.pointerType !== 'touch' && e.button !== 0) return;   // 우클릭은 contextmenu 쪽에서 처리
+      cancelPress();
+      const li = e.target.closest('.d-week-task-item');
+      let iso, id = null;
+      if(li){
+        if(e.target.closest('input, .w-del')) return;   // 체크박스·삭제 버튼은 그대로
+        iso = li.dataset.date; id = li.dataset.id;
+      } else {
+        // 터치는 우클릭이 없어서, 빈 곳 길게 누르기로 붙여넣기 메뉴를 연다
+        if(e.pointerType !== 'touch') return;
+        const col = e.target.closest('.d-week-col');
+        iso = weeklyColDate(col);
+        if(!iso || e.target.closest('input, button, .d-week-memo, [contenteditable="true"]')) return;
+      }
+      press = { li, iso, id, x: e.clientX, y: e.clientY, pid: e.pointerId, type: e.pointerType };
+      press.timer = setTimeout(startDrag, e.pointerType === 'touch' ? HOLD_TOUCH : HOLD_MOUSE);
+    });
+
+    document.addEventListener('pointermove', e => {
+      if(drag){
+        if(e.pointerId !== drag.pid) return;
+        drag.x = e.clientX; drag.y = e.clientY;
+        if(!drag.moved && Math.hypot(drag.x - drag.sx, drag.y - drag.sy) > MOVE_TOL) drag.moved = true;
+        if(!drag.menuOnly){ placeGhost(drag); drag.dirty = true; }
+      } else if(press && e.pointerId === press.pid){
+        if(Math.hypot(e.clientX - press.x, e.clientY - press.y) > MOVE_TOL) cancelPress();   // 스크롤·글자 선택이면 취소
+      }
+    });
+
+    const finish = (e, canceled) => {
+      if(drag && e.pointerId === drag.pid){
+        drag.x = e.clientX; drag.y = e.clientY;
+        endDrag(!canceled);
+      } else if(press && e.pointerId === press.pid){
+        cancelPress();
+      }
+    };
+    document.addEventListener('pointerup', e => finish(e, false));
+    document.addEventListener('pointercancel', e => finish(e, true));
+
+    // 들고 있는 동안에는 터치 스크롤이 일어나지 않게
+    document.addEventListener('touchmove', e => { if(drag) e.preventDefault(); }, { passive: false });
+
+    // 우클릭
+    grid.addEventListener('contextmenu', e => {
+      if(e.target.closest('.d-week-memo, input, textarea, .g-text')) return;   // 메모·입력칸은 기본 메뉴 유지
+      const li = e.target.closest('.d-week-task-item');
+      const iso = li ? li.dataset.date : weeklyColDate(e.target.closest('.d-week-col'));
+      if(!iso) return;                                                        // 주간 목표 칸 등
+      if(lastPointerType === 'touch'){ e.preventDefault(); return; }          // 터치 길게 누르기는 위 pointer 흐름이 처리
+      const sel = window.getSelection();
+      if(li && sel && !sel.isCollapsed && li.contains(sel.anchorNode)) return; // 글자를 선택해 둔 경우엔 기본 복사 메뉴
+      e.preventDefault();
+      openWeeklyCtxMenu(e.clientX, e.clientY, iso, li ? li.dataset.id : null, false);
+    });
+
+    document.addEventListener('pointerdown', e => { if(weeklyCtxMenuEl && !weeklyCtxMenuEl.contains(e.target)) closeWeeklyCtxMenu(); }, true);
+    document.addEventListener('scroll', closeWeeklyCtxMenu, true);
+    document.addEventListener('keydown', e => {
+      if(e.key !== 'Escape') return;
+      closeWeeklyCtxMenu();
+      if(drag) endDrag(false);
+    });
+  }
+
   function initDiaryEvents(){
+    initWeeklyTaskInteractions();
     const prevBtn = $('#dPrevBtn'), nextBtn = $('#dNextBtn');
     if(prevBtn) prevBtn.onclick = () => { 
       if(diaryData.currentTab === 'WEEK') diaryData.currentWeekOffset--; 
