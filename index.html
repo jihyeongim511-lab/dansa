@@ -1030,6 +1030,69 @@
   }
 </style>
 
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap">
+<style>
+/* 사회과 암기장 (scoped) */
+#socialContainer{--bg:#f5f6fa;--surface:#fff;--fg:#1c2340;--muted:#5d6482;--line:#d9dce8;--accent:#3447b8;--accent-soft:#e4e8fb;--hl:#ffe36e;--hl-fg:#1c2340;--good:#1d7a4d;--bad:#b3372f;--display:"Gowun Batang","Noto Serif KR",serif;font-size:calc(15px*var(--app-font-scale,1));line-height:1.7;color:var(--fg);max-width:980px;margin:0 auto;background:var(--card,#FAFBF8);border:1px solid var(--rule);border-radius:12px;padding:8px 20px 40px}
+#socialContainer .sg-bar{position:static;margin-inline:0;padding-inline:0;border-bottom:1px solid var(--line);background:transparent}
+@media (max-width:560px){#socialContainer{padding-inline:12px}#socialContainer .sg-pm{grid-template-columns:1fr}}
+#socialContainer *{box-sizing:border-box}
+#socialContainer{background:var(--bg);color:var(--fg);font-family:inherit;font-size:15px;line-height:1.7;padding-inline:16px;padding-block:0 64px}
+#socialContainer .sg-wrap{max-width:none}
+#socialContainer header.sg-top{padding-block:28px 12px}
+#socialContainer header.sg-top h1{font-family:var(--display);font-size:clamp(1.7em,5vw,2.4em);line-height:1.25;margin:0 0 6px;text-wrap:balance}
+#socialContainer header.sg-top p{margin:0;color:var(--muted);font-size:.9em}
+
+#socialContainer .sg-bar-in{display:flex;flex-direction:column;gap:8px}
+#socialContainer .sg-toggles{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#socialContainer button{font:inherit;cursor:pointer}
+#socialContainer .sg-btn{border:1px solid var(--accent);background:var(--surface);color:var(--accent);border-radius:6px;padding:5px 12px;font-size:.85em;font-weight:500}
+#socialContainer .sg-btn[aria-pressed="true"]{background:var(--accent);color:var(--surface)}
+#socialContainer .sg-btn:focus-visible,#socialContainer .sg-nav a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#socialContainer .sg-hint{font-size:.78em;color:var(--muted)}
+#socialContainer .sg-nav{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:thin}
+#socialContainer .sg-nav a{flex:none;text-decoration:none;color:var(--fg);font-size:.8em;padding:3px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+#socialContainer .sg-nav a:hover{border-color:var(--accent);color:var(--accent)}
+#socialContainer section{padding-block-start:36px}
+#socialContainer h2{font-family:var(--display);font-size:1.5em;margin:0 0 14px;padding-bottom:6px;border-bottom:2px solid var(--fg);display:flex;gap:10px;align-items:baseline;text-wrap:balance}
+#socialContainer h2 .sg-n{font-family:inherit;font-size:.8em;font-weight:700;color:var(--accent);letter-spacing:.06em}
+#socialContainer h3{font-size:1.05em;margin:26px 0 8px;color:var(--accent)}
+#socialContainer h4{font-size:.92em;margin:16px 0 4px}
+#socialContainer p{margin:6px 0}
+#socialContainer ul{margin:6px 0;padding-left:1.2em}
+#socialContainer li{margin:2px 0}
+#socialContainer .sg-k{background:var(--hl);color:var(--hl-fg);padding:0 3px;border-radius:3px;font-weight:500;font-style:normal;transition:color .15s,background .15s}
+#socialContainer.sg-quiz .sg-k:not(.sg-on){color:transparent;background:var(--accent-soft);cursor:pointer;user-select:none;box-shadow:inset 0 0 0 1px var(--line)}
+#socialContainer.sg-quiz .sg-k.sg-on{cursor:pointer}
+#socialContainer .sg-card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin-block:10px}
+#socialContainer .sg-tbl{overflow-x:auto;margin-block:10px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+#socialContainer table{border-collapse:collapse;width:100%;min-width:520px;font-size:.9em}
+#socialContainer th,#socialContainer td{padding:8px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+#socialContainer tr:last-child td{border-bottom:0}
+#socialContainer th{background:var(--accent-soft);font-weight:700;white-space:nowrap}
+#socialContainer td:first-child{white-space:nowrap;font-weight:700}
+#socialContainer td.sg-wrapc{white-space:normal}
+#socialContainer .sg-pm{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-block:10px}
+#socialContainer .sg-pm>div{min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 14px}
+#socialContainer .sg-pm b.sg-p{color:var(--good)}
+#socialContainer .sg-pm b.sg-m{color:var(--bad)}
+#socialContainer .sg-flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-block:10px}
+#socialContainer .sg-flow span{background:var(--surface);border:1px solid var(--accent);color:var(--fg);border-radius:6px;padding:4px 10px;font-size:.88em;font-weight:500}
+#socialContainer .sg-flow i{font-style:normal;color:var(--muted)}
+#socialContainer .sg-tip{border-left:3px solid var(--accent);background:var(--accent-soft);padding:8px 14px;border-radius:0 8px 8px 0;margin-block:12px;font-size:.88em}
+#socialContainer .sg-tip b{color:var(--accent)}
+#socialContainer .sg-note{color:var(--muted);font-size:.82em}
+#socialContainer .sg-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-block:10px}
+#socialContainer .sg-cols>div{min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 14px}
+#socialContainer .sg-cols h4{margin-top:0}
+#socialContainer footer{margin-top:48px;color:var(--muted);font-size:.8em;border-top:1px solid var(--line);padding-top:14px}
+#socialContainer .sg-h1{font-family:var(--display);font-size:clamp(1.5em,5vw,2.1em);line-height:1.25;margin:0 0 6px;text-wrap:balance}
+#socialContainer header.sg-top{padding-block:20px 12px}
+#socialContainer header.sg-top p{margin:0;color:var(--muted);font-size:.9em}
+#socialContainer .sg-btn[hidden]{display:none}
+#socialContainer section{scroll-margin-top:12px}
+
+</style>
 </head>
 <body>
 <div id="root">
@@ -1040,6 +1103,7 @@
       <button class="nav-tab" id="btnModeDiary">📖 다이어리 모드</button>
       <button class="nav-tab" id="btnModeReview">🧠 복습 주기</button>
       <button class="nav-tab" id="btnModeNotes">🗒️ 필기 모드</button>
+      <button class="nav-tab" id="btnModeSocial">📚 사회과 암기장</button>
       <button class="btn save-btn" id="manualGlobalSaveBtn" title="모든 변경 사항을 저장소에 즉시 동기화합니다.">💾 전체 저장</button>
       
       <button class="btn qa-collect-btn" id="openQACollectorBtn" title="원하는 날짜들의 문제와 정답만 모아서 봅니다.">📚 문제 모아보기</button>
@@ -1502,6 +1566,385 @@
       </div>
       <div class="notes-page" id="notesPage" contenteditable="true" data-ph="여기에 자유롭게 필기하세요. 표, 사진, 토글, 하이라이트를 모두 쓸 수 있어요."></div>
     </div>
+  </div>
+
+  <!-- [5] 사회과 교육론 암기장 -->
+  <div id="socialContainer" style="display:none">
+<div class="sg-wrap">
+<header class="sg-top">
+  <h1 class="sg-h1">초등 사회과 교육론 암기장</h1>
+  <p>사회 기본 이론 단권화 자료를 암기 순서에 맞춰 다시 정리했습니다. 노란 표시가 핵심어입니다.</p>
+</header>
+</div>
+
+<div class="sg-bar"><div class="sg-bar-in">
+  <div class="sg-toggles">
+    <button class="sg-btn" id="sgQuizBtn" aria-pressed="false">핵심어 가리기</button>
+    <button class="sg-btn" id="sgRevealBtn" hidden>모두 보기</button>
+    <span class="sg-hint" id="sgHint">핵심어를 가리고 떠올려 보세요. 칸을 누르면 하나씩 열립니다.</span>
+  </div>
+  <nav class="sg-nav" aria-label="목차">
+    <a href="#sg-s1" data-sg>1 교수·학습 모형</a><a href="#sg-s2" data-sg>2 수업 기법</a><a href="#sg-s3" data-sg>3 시민성</a><a href="#sg-s4" data-sg>4 고급 사고력</a><a href="#sg-s5" data-sg>5 교육 유형</a><a href="#sg-s6" data-sg>6~7 평가·융합</a><a href="#sg-s8" data-sg>8 내용 구성</a><a href="#sg-s9" data-sg>9 역사·지리</a><a href="#sg-s10" data-sg>10 영역·체계</a>
+  </nav>
+</div></div>
+
+<main class="sg-wrap">
+
+<section id="sg-s1">
+<h2><span class="sg-n">01</span>사회과 교수·학습 모형</h2>
+<div class="sg-tbl"><table>
+<tr><th>모형</th><th>한 줄 핵심</th></tr>
+<tr><td>개념 학습</td><td class="sg-wrapc">경험한 대상을 <b class="sg-k">속성</b>으로 분류·범주화한 추상적 용어를 학습 (속성·원형·상황 모형)</td></tr>
+<tr><td>탐구 학습</td><td class="sg-wrapc"><b class="sg-k">일반화된 지식</b>을 얻는 과정을 학습 (가설 설정 → 검증)</td></tr>
+<tr><td>문제해결 학습</td><td class="sg-wrapc"><b class="sg-k">일상생활</b> 문제의 원인 파악, 해결 방안 제시</td></tr>
+<tr><td>의사 결정 학습</td><td class="sg-wrapc"><b class="sg-k">사실 + 가치</b>가 섞인 문제를 합리적으로 해결</td></tr>
+<tr><td>논쟁 문제 학습</td><td class="sg-wrapc">찬반이 팽팽한 <b class="sg-k">사회적 문제</b>를 다룸 (법리 모형)</td></tr>
+<tr><td>협동 학습</td><td class="sg-wrapc"><b class="sg-k">소집단</b> 협력으로 인지·정의 능력 신장</td></tr>
+<tr><td>가치 학습</td><td class="sg-wrapc">가치 명료화 모형, 가치 분석 모형</td></tr>
+</table></div>
+
+<h3>1-1. 개념 학습 모형</h3>
+<h4>개념의 종류</h4>
+<ul>
+<li>상위·하위·동위 개념</li>
+<li><b class="sg-k">접합(결합) 개념</b>: 밀접하게 관련된 여러 속성이 모여 하나의 개념 구성</li>
+<li><b class="sg-k">이접 개념</b>: 서로 독립적인 속성 중 하나만으로 형성, 여러 대안</li>
+<li><b class="sg-k">관계 개념</b>: 하나가 다른 것을 전제, 두 요소가 밀접한 상관·비교 관계</li>
+</ul>
+
+<h4>① 속성(고정) 모형 : <b class="sg-k">결정적 속성</b> 중심 → 사례</h4>
+<div class="sg-flow"><span>문제 제기</span><i>→</i><span>속성 제시와 정의</span><i>→</i><span>속성 검토</span><i>→</i><span>사례 검토(예/비례)</span><i>→</i><span>가설 검증</span><i>→</i><span>개념 분석·관련 문제 검토·평가</span></div>
+<div class="sg-pm">
+<div><b class="sg-p">장점</b><br>교수·학습 단계가 논리적·인지적 활동 과정에 부합</div>
+<div><b class="sg-m">단점</b><br>명확한 속성을 제시하기 어려운 <b class="sg-k">추상적 개념</b>에 약함</div>
+</div>
+<ul>
+<li>사례 검토: 예에서 속성 분석, 비례에서 "속성이 아닌 점" 분석</li>
+<li>가설 검증: 새로운 대상을 제시하고 어떤 속성 때문에 예/비례인지 분석</li>
+</ul>
+
+<h4>② 원형 모형 : 개념의 <b class="sg-k">원형(전형적 예)</b>에서 결정적 속성 탐색</h4>
+<div class="sg-flow"><span>문제 제기</span><i>→</i><span>원형과 정의 제시</span><i>→</i><span>비례 제시</span><i>→</i><span>속성 검토</span><i>→</i><span>개념 분석·평가</span></div>
+<div class="sg-pm">
+<div><b class="sg-p">장점</b><br>속성이 모호해도 적절한 예로 이해도 상승</div>
+<div><b class="sg-m">단점</b><br>여러 사례가 같은 개념으로 분류되는 <b class="sg-k">기준</b>을 분명히 제시하기 어려움</div>
+</div>
+
+<h4>③ 상황 모형 : <b class="sg-k">사회·문화적 환경</b>의 상황·경험·기대·행동 중심</h4>
+<div class="sg-flow"><span>문제 제기</span><i>→</i><span>상황·경험 제시</span><i>→</i><span>사례 검토(예/비례)</span><i>→</i><span>속성 검토</span><i>→</i><span>개념 분석·평가</span></div>
+<div class="sg-pm">
+<div><b class="sg-p">장점</b><br>역사적 맥락, 사회·문화적 상황에서 <b class="sg-k">구체적</b>으로 이해</div>
+<div><b class="sg-m">단점</b><br>추상화·일반화에 제한, 배경지식 부족 시 활용 어려움, 다른 상황에 보편 적용 어려움</div>
+</div>
+
+<h3>1-2. 탐구 학습 모형</h3>
+<p>지식·이론을 발견한 <b class="sg-k">사고 과정과 방법</b>을 재현합니다. 법칙성이 강해 일반화를 도출할 수 있는 주제에 적합합니다.</p>
+<p class="sg-note">일반화된 지식 = 사회과학적 지식 = 가치중립적 지식 = 객관적 지식. 인지 발달 수준에 따라 교사·학생의 역할 비중을 조절.</p>
+<div class="sg-flow"><span>문제 제기</span><i>→</i><span>가설 설정</span><i>→</i><span>자료 수집·분석</span><i>→</i><span>가설 검증·일반화</span></div>
+
+<div class="sg-cols">
+<div><h4>마시알라스·콕스 (권오정, 김영석)</h4>
+<div class="sg-flow" style="flex-direction:column;align-items:flex-start">
+<span>탐구 문제 파악</span><span>가설 설정</span><span>탐색</span><span>증거 제시</span><span>일반화</span></div>
+<ul>
+<li>탐구 문제 파악: 탐구 상황 제시 → 학습 문제 설정</li>
+<li>가설: <b class="sg-k">원인-결과</b> 관계 진술 (인과관계, 경향성)</li>
+<li>탐색: 가설 타당성 검토, 탐구 계획 수립 (자료 종류는 개념의 <b class="sg-k">대표성·수집 가능성</b> 기준)</li>
+<li>증거 제시: 자료 수집, 평가, 분석</li>
+<li>일반화: 결과 요약, 증거로 결론</li></ul></div>
+<div><h4>뱅크스, 울레버·스콧 (차경수, 모경환)</h4>
+<div class="sg-flow" style="flex-direction:column;align-items:flex-start">
+<span>문제 제기</span><span>가설 설정</span><span>용어 정의 및 개념화</span><span>자료 수집</span><span>자료 분석</span><span>가설 검증 및 일반화</span></div>
+<ul>
+<li>문제 제기: 문제 상황을 <b class="sg-k">예화</b>로 제시</li>
+<li>가설: 제기된 문제에 대한 <b class="sg-k">잠정적 결론</b></li>
+<li>용어 정의: 자료의 종류·수집 방법 고안에 유용</li>
+<li>일반화: <b class="sg-k">임시적</b> 성격</li></ul></div>
+</div>
+
+<h3>1-3. 문제해결 학습 모형</h3>
+<div class="sg-flow"><span>문제 확인</span><i>→</i><span>문제 발생 원인 파악</span><i>→</i><span>해결 방안 탐색</span><i>→</i><span>해결 방안 결정</span><i>→</i><span>해결 방안 실천</span></div>
+<ul>
+<li>문제 확인: 시청각 자료, 개인에 미치는 <b class="sg-k">심각성</b> → 해결 필요성 공감</li>
+<li>원인 파악: 정보의 <b class="sg-k">신뢰성·타당성</b> 점검, 정보 유목화, 원인-결과 연관성 사고, 사실과 가치 구분</li>
+<li>방안 결정: 장단점·<b class="sg-k">비용편익</b> 비교 분석, 순위 → 최적안 결정</li>
+<li>방안 실천: 실천 계획 세우기, 성과·부작용 논의</li>
+</ul>
+<div class="sg-pm">
+<div><b class="sg-p">장점</b><br>일상 문제 해결에 유용한 지식, 문제해결 능력 신장</div>
+<div><b class="sg-m">단점</b><br>문제와 관련된 <b class="sg-k">일반적 원리·구조</b> 파악 지도가 약함</div>
+</div>
+<div class="sg-tbl"><table>
+<tr><th>구분</th><th>문제해결 학습</th><th>탐구 학습</th></tr>
+<tr><td>문제</td><td class="sg-wrapc">일상적 문제</td><td class="sg-wrapc">과학적 문제 (객관적으로 조사·증명)</td></tr>
+<tr><td>자료</td><td class="sg-wrapc">일상적 자료와 정보</td><td class="sg-wrapc">과학적·객관적 자료</td></tr>
+</table></div>
+
+<h3>1-4. 의사 결정 학습 모형</h3>
+<p>사실과 가치가 혼재된 개인적·사회적 문제를 합리적으로 해결합니다.</p>
+<div class="sg-pm">
+<div><b class="sg-p">장점</b><br>의사 결정력 발달, 행위의 실천</div>
+<div><b class="sg-m">단점</b><br>합리적 결정이 항상 옳거나 공동체 전체의 이익은 아님</div>
+</div>
+<h4>뱅크스 모형</h4>
+<div class="sg-flow"><span>문제 제기</span><i>→</i><span>사회 탐구</span><i>→</i><span>가치 탐구</span><i>→</i><span>의사 결정</span><i>→</i><span>행동</span></div>
+<ul>
+<li>문제 제기: 사실적·가치적 측면이 <b class="sg-k">혼재</b>함을 인식</li>
+<li>사회 탐구: 가설 설정 → 자료 수집 → 자료 분석 → 가설 검증 (의사 결정에 필요한 지식을 S가 스스로 획득)</li>
+<li>가치 탐구: 가치 문제·가치 갈등 확인 → 대안 검토와 결과 예측 → <b class="sg-k">가치 선택</b></li>
+<li>의사 결정: 사실 + 가치를 종합해 결과 예측</li>
+<li>행동: 가장 적절한 대안 선택, 선택에 따라 행동</li>
+</ul>
+<h4>의사 결정 매트릭스 모형 (왜 선택되었는가?)</h4>
+<div class="sg-flow"><span>문제 정의</span><i>→</i><span>대안 나열</span><i>→</i><span>선택 기준 작성</span><i>→</i><span>대안 평가(도표에 점수)</span><i>→</i><span>의사 결정(최고점 선택)</span></div>
+
+<h3>1-5. 논쟁 문제 학습 모형 (윤리-법률, 법리 모형)</h3>
+<p><b class="sg-k">논쟁 문제 = 사회적 문제</b>: 찬반이 팽팽, 사회 다수에 영향, 정답이 없음.</p>
+<div class="sg-pm">
+<div><b class="sg-p">장점</b><br><b class="sg-k">의사 결정력</b> (합리적으로 선택하고 그 선택을 옹호할 수 있는 능력)</div>
+<div><b class="sg-m">단점</b><br>기본 가치만으로 명확히 해결하기 어렵고 보편적 기준·원리가 약함</div>
+</div>
+<div class="sg-tbl"><table>
+<tr><th>비판 입장</th><th>내용</th></tr>
+<tr><td>진보</td><td class="sg-wrapc">사회에 대한 <b class="sg-k">보수적 가치·규범 주입</b>(기본 가치, 일반적 가치)</td></tr>
+<tr><td>보수</td><td class="sg-wrapc">사회적 쟁점을 제시해 <b class="sg-k">사회 질서에 의문·혼란</b></td></tr>
+</table></div>
+
+<h4>논쟁 문제의 유형 3가지</h4>
+<div class="sg-tbl"><table>
+<tr><th>유형</th><th>의견 대립의 이유</th><th>해결</th></tr>
+<tr><td>용어 정의 문제</td><td class="sg-wrapc">개념의 불명확</td><td class="sg-wrapc"><b class="sg-k">개념의 명료화</b></td></tr>
+<tr><td>사실 문제</td><td class="sg-wrapc">사실 여부</td><td class="sg-wrapc"><b class="sg-k">경험적 증거</b>로 사실 증명</td></tr>
+<tr><td>가치 문제</td><td class="sg-wrapc">우선시하는 가치</td><td class="sg-wrapc"><b class="sg-k">가치 갈등의 해결</b></td></tr>
+</table></div>
+
+<h4>가치의 위계</h4>
+<div class="sg-flow"><span>기본 가치</span><i>&gt;</i><span>일반적(사회적) 가치</span><i>&gt;</i><span>특수한(개인적) 가치</span></div>
+<ul>
+<li>기본 가치: 최상의 궁극적 가치 (예: 인간의 존엄성)</li>
+<li>일반적(사회적) 가치: 법에 의해 보장 (예: 재산권, 공정성)</li>
+<li>특수한(개인적) 가치: 특정 상황·집단에 적용</li>
+</ul>
+
+<h4>올리버·셰이버 (하버드 모형) 단계</h4>
+<div class="sg-tbl"><table>
+<tr><th>단계</th><th>내용</th></tr>
+<tr><td>문제 제기</td><td class="sg-wrapc">시청각 자료, 개인에 미치는 심각성 → 해결 필요성 공감</td></tr>
+<tr><td>개념의 명확화</td><td class="sg-wrapc">개념 정의가 불명확하면 토론이 어렵거나 의견이 대립될 수 있음을 인식</td></tr>
+<tr><td>사실의 경험적 확인</td><td class="sg-wrapc">경험적(객관적) 자료로 검증</td></tr>
+<tr><td>가치 갈등의 해결</td><td class="sg-wrapc">대립 가치를 비교해 우선순위 결정. 해결 기준은 <b class="sg-k">법률적(윤리·법률적) = 기본적 = 궁극적 가치</b></td></tr>
+<tr><td>대안 모색 및 결론</td><td class="sg-wrapc">사실 확인, 가치 분석 결과를 종합해 대안 모색 → 대안의 긍·부정 결과를 비교·분석해 최적안 선택</td></tr>
+</table></div>
+<p class="sg-note"><b class="sg-k">4단계</b>: 문제 제기·가치문제 확인 / 분석 / 선택 및 결론. 분석을 풀어 쓰면 <b class="sg-k">8단계</b>입니다.<br>
+분석: 개념의 명확화 → 사실의 경험적 확인 → 가치 갈등의 해결(대립 가치 분석) → 비슷한 다른 경우와의 비교 → 대안 모색과 결과의 예측</p>
+
+<h4>논쟁 문제 학습에서 교사의 역할 유형</h4>
+<div class="sg-cols">
+<div><h4>켈리 모형 (4가지)</h4>
+<ul>
+<li><b class="sg-k">배타적 중립형</b>: 논쟁 문제 교수 자체를 반대</li>
+<li><b class="sg-k">배타적 편파형</b>: 한쪽 입장만 학습, 다른 입장은 다루지 않음</li>
+<li><b class="sg-k">중립적 공정형</b>: 다양한 시각 학습, 교사는 어떤 입장도 교육하지 않음</li>
+<li><b class="sg-k">신념을 가진 공정형</b>: 다양한 시각 학습, 교사가 교육적으로 바람직한 방향 제시</li>
+</ul></div>
+<div><h4>하우드 모형 (6가지)</h4>
+<ul>
+<li><b class="sg-k">신념형</b>: 교사가 자유롭게 자기 의견 내세움</li>
+<li><b class="sg-k">관심형</b>: 자기 의견을 말하고, 다양한 의견을 객관적으로 소개</li>
+<li><b class="sg-k">옹호형</b>: 다양한 시각 제시, 이를 종합해 교사 자신의 의견</li>
+<li><b class="sg-k">객관형</b>: 다양한 시각을 모두 서술, 자기 의견은 말하지 않음</li>
+<li><b class="sg-k">공정한 의장형</b>: 교사·학생이 다양한 시각을 토론, 교사 의견은 말하지 않음</li>
+<li><b class="sg-k">악마 옹호형</b>: 교사 의견과 상관없이 학생 의견에 반대 입장만 (반대에 대응하며 입장이 견고해짐)</li>
+</ul></div>
+</div>
+
+<h3>1-6. 협동 학습 모형</h3>
+<p>이질적 집단 구성, 개별적 책무성 부여, 적극적 <b class="sg-k">상호 의존성</b> 강화, 교사의 관리·감독 강화, 평가는 소집단 보상, 사회적 기능 발달 → 인지적·정의적 능력(협력, 의사소통, 토론)을 기릅니다.</p>
+<div class="sg-tbl"><table>
+<tr><th>모형</th><th>핵심 내용</th></tr>
+<tr><td>Jigsaw (원형)</td><td class="sg-wrapc">소집단 구성 → 전문가 학습지(하위 주제) 배부 → 전문가 집단 학습 → 소집단 학습 → 전체 학습지 작성·정답 확인 → 개별 평가·개별 보상<br><b class="sg-k">단점</b>: 하위 주제만 알아 전체 파악이 어렵고, 개별 보상이라 보상을 위한 상호 의존성이 약함</td></tr>
+<tr><td>Jigsaw Ⅱ</td><td class="sg-wrapc">이질적 원모둠 구성 → <b class="sg-k">전체 학습지</b> 배부(단원 맥락 파악 용이), 하위 주제는 모둠원 수에 맞춰 → 전문가 집단 학습(같은 주제 선택자끼리) → 원모둠에서 가르쳐 줌 → 전체 학습지 작성·정답 확인 → 개별 형성평가, <b class="sg-k">향상 점수</b> 높은 모둠 보상</td></tr>
+<tr><td>STAD</td><td class="sg-wrapc">이질적 원모둠 구성 → 교사 안내·학습지 배부 → 모둠 학습(돌아가며 발표·토의) → 학습지 작성·정답 확인 → 개별 형성평가, 향상 점수 높은 모둠 보상<br><b class="sg-k">단점</b>: 집단 간 경쟁 과열, 평가 과정이 번거로움, 평가 자체에 중점</td></tr>
+<tr><td>TGT</td><td class="sg-wrapc"><b class="sg-k">토너먼트</b>식: 각 집단에서 능력 비슷한 학습자끼리 겨루고, 속한 집단의 점수로 환산</td></tr>
+<tr><td>TAI</td><td class="sg-wrapc"><b class="sg-k">팀 보조 개별 학습</b>: 개별 학습 + 집단 학습, 팀 내 개별 과제, 서로 돕도록 격려, 집단 동료끼리 정답 채점</td></tr>
+<tr><td>GI</td><td class="sg-wrapc"><b class="sg-k">집단 조사(집단 프로젝트)</b>: 특정 주제를 깊이 있게 탐구</td></tr>
+</table></div>
+<p class="sg-note">Jigsaw Ⅱ와 STAD 모두 "학생의 실제 점수는 공개하지 않고 향상된 점수만 공개"합니다.</p>
+
+<h3>1-7. 가치 학습 모형</h3>
+<h4>가치 명료화 모형 : 자신의 가치를 분명히 드러내 여러 대안 중 하나 선택</h4>
+<div class="sg-flow"><span>선택하기</span><i>→</i><span>선택을 소중히 여기기</span><i>→</i><span>행동하기</span></div>
+<ul>
+<li>선택하기: 자유롭게, 다양한 대안 중에서, 각 대안의 결과(장단점)를 충분히 검토</li>
+<li>소중히 여기기: 선택을 기쁘게 생각, 다른 사람에게 <b class="sg-k">공언</b>(확신의 근거 제시)</li>
+<li>행동하기: 선택한 대안대로 행동, <b class="sg-k">삶의 유형</b>이 되도록 반복</li>
+</ul>
+<div class="sg-pm">
+<div><b class="sg-p">장점</b><br>가치 혼란의 시대에 정체성·주체성 확립, 선택 책무성 강화</div>
+<div><b class="sg-m">단점</b><br><b class="sg-k">가치 상대주의</b>: 옳고 그른 가치는 없고 개인의 문제일 뿐</div>
+</div>
+<h4>가치 분석 모형 : 가치 명료화 모형을 보완</h4>
+<p>개인이 특수한 가치를 선택할 때 <b class="sg-k">근거와 이유</b>를 충분히 제시해 가치의 정당성을 밝힙니다.</p>
+<div class="sg-flow"><span>문제 제기(가치 문제·갈등 확인)</span><i>→</i><span>대안의 검토와 예측</span><i>→</i><span>가치의 선택과 행동</span></div>
+</section>
+
+<section id="sg-s2">
+<h2><span class="sg-n">02</span>사회과 수업 기법</h2>
+<div class="sg-tbl"><table>
+<tr><th>기법</th><th>핵심 내용</th></tr>
+<tr><td>현장 학습</td><td class="sg-wrapc">교과 내용과 실제 상황을 연결, 학습의 능동적 참여자. 직접(현장 견학)+간접 현장 학습. 학교-지역사회 연계, 협동심, 사회 참여 능력. <b class="sg-k">사전 준비·사후 지도</b> 중시. 자료 수집은 관찰·조사, 녹음·사진 촬영, 면담</td></tr>
+<tr><td>지도 학습</td><td class="sg-wrapc">지도의 본질·목적 이해. <b class="sg-k">지도에 대한 vs 지도를 통한</b> 학습. 도해력(공간 정보·자료를 시각 자료로, 시각 자료 정보를 해석). 위치·방향·기호·거리(상대적 축척 개념)·투영법 학습</td></tr>
+<tr><td>사료 학습</td><td class="sg-wrapc">사료 내용을 해석해 당시 사회상 재구성, 역사적 의미 부여. 다면적 학습 자료. 사실과 견해 구분, 역사 지식의 생성 과정 경험(사료 해석 작업)</td></tr>
+<tr><td>인물 학습</td><td class="sg-wrapc">시대 배경 이해, 행위의 의도·전개·결과 분석 능력, 인간의 역할에 대한 올바른 태도와 가치관</td></tr>
+<tr><td>극화 학습</td><td class="sg-wrapc">복잡한 사회현상을 단순화해 가상적으로 구성</td></tr>
+<tr><td>프로젝트 학습</td><td class="sg-wrapc">학생 스스로 계획을 세워 탐구 활동 수행, 결과물 제작·발표</td></tr>
+<tr><td>신문 활용 학습</td><td class="sg-wrapc"><b class="sg-k">NIE</b>. 다양·생생한 정보를 담은 신문을 학습 자료로 활용. 최신의 사실과 정보로 사회 현상 이해도 향상</td></tr>
+<tr><td>시사 학습</td><td class="sg-wrapc">최신 정보·사회 변동 자료 활용 → 사회 변화 관심, 미래 지향적 사고, 현실 문제 관심. 교과서 내용과 사회 현상 사이의 <b class="sg-k">괴리 방지</b></td></tr>
+<tr><td>체험 학습</td><td class="sg-wrapc">현장 견학을 넘어 사회문제 해결 과정에 참여하는 경험 (환경, 문화재 지킴이 등). 고차적 사고력, 사회적 기능, <b class="sg-k">정치적 효능감</b>, 실천적 행동</td></tr>
+</table></div>
+
+<h3>사료 학습 상세</h3>
+<div class="sg-cols">
+<div><h4>형태상 분류</h4><p>구비전승, 문헌 및 문서, 유물 및 유적, 언어 및 문학적 자료</p>
+<h4>제작 시기</h4>
+<ul><li><b class="sg-k">1차 사료(원사료)</b>: 같은 시기에 제작</li><li><b class="sg-k">2차 사료</b>: 1차 사료를 근거로 나중에 만든 자료</li></ul></div>
+<div><h4>사료 선정 기준</h4>
+<ul><li>학습 내용과 관련, 학습 목표 달성에 유용</li><li>학생의 능력·발달 단계에 적합 (재구성)</li><li>해당 분야 연구자에게 신뢰성 확인</li><li>번역은 내용이 정확해야 함</li></ul></div>
+</div>
+
+<h3>인물 학습 · 극화 학습 상세</h3>
+<div class="sg-cols">
+<div><h4>인물 학습 2유형</h4>
+<ul><li><b class="sg-k">인물에 대한</b> 학습: 역사적 인물의 순수한 인간 탐구, 행위의 의미 이해</li>
+<li><b class="sg-k">인물을 통한</b> 학습: 일생·전기·자서전 이용, 사고·행위를 제약한 제도·관습·환경 조건 조사</li></ul></div>
+<div><h4>극화 학습 2유형</h4>
+<ul><li><b class="sg-k">역할놀이 학습</b>: 감정 이입 능력, 문제 상황을 현실감 있게 인식</li>
+<li><b class="sg-k">모의 학습(시뮬레이션)</b>: 역할 분담, 게임 규칙, 승패. 추상화·단순화, 사실성·유사성</li></ul>
+<p class="sg-note">가상 상황을 통한 학습 기회, 문제해결력</p></div>
+</div>
+</section>
+
+<section id="sg-s3">
+<h2><span class="sg-n">03</span>사회과의 궁극적 목표 : 시민성</h2>
+<p><b class="sg-k">시민성</b> = 시민적·민주시민의·민주시민으로서의 자질</p>
+<div class="sg-tbl"><table>
+<tr><th>구성</th><th>내용</th></tr>
+<tr><td>시민성</td><td class="sg-wrapc">합리적 <b class="sg-k">의사 결정 능력</b> + 결정을 행동으로 옮기는 <b class="sg-k">실천 능력</b></td></tr>
+<tr><td>지식·이해</td><td class="sg-wrapc">(특수적·구체적) <b class="sg-k">사실 → 개념 → 일반화</b> (일반적·추상적)</td></tr>
+<tr><td>과정·기능</td><td class="sg-wrapc">지식·정보 획득, 분석, 조직, 활용 능력 / <b class="sg-k">탐구 능력, 의사 결정 능력, 사회 참여 능력</b></td></tr>
+<tr><td>가치·태도</td><td class="sg-wrapc">개인·사회생활의 민주적 운영, 우리 사회가 당면한 문제에 관심, 개인·지역사회·국가·세계 차원에서 <b class="sg-k">지속가능한 삶</b>을 위해 적극적으로 노력하는 태도</td></tr>
+</table></div>
+</section>
+
+<section id="sg-s4">
+<h2><span class="sg-n">04</span>사회과의 고급(고등, 고차적) 사고력</h2>
+<div class="sg-tbl"><table>
+<tr><th>사고력</th><th>핵심 내용</th></tr>
+<tr><td>반성적 사고</td><td class="sg-wrapc">주어진 문제를 현실적으로 파악, <b class="sg-k">논리·경험적 증거</b>로 결론 도출</td></tr>
+<tr><td>고급 사고력</td><td class="sg-wrapc">불확실·불명확한 상황에서 기준을 응용하고 다양한 방안 중 선택하며 문제를 해결하는 사고 기능</td></tr>
+<tr><td>탐구 능력</td><td class="sg-wrapc">문제 발견 → 가설 설정 → 자료 수집·분석 → 해결 방법. 사회과학적 문제, <b class="sg-k">논리성과 과학성</b></td></tr>
+<tr><td>의사결정 능력</td><td class="sg-wrapc">여러 대안 중 자기가 추구하는 바람직한 목표에 맞는 하나를 선택. <b class="sg-k">사회탐구 + 가치탐구</b></td></tr>
+<tr><td>창조적 사고력</td><td class="sg-wrapc">= 창의적, <b class="sg-k">브레인스토밍</b>. 과거와 다른 새로운 방법으로 문제 해결·상황 변화</td></tr>
+<tr><td>비판적 사고력</td><td class="sg-wrapc">사물·상황·지식의 순수성, 정확성, 허위·진실 등을 평가, 이성적 판단</td></tr>
+<tr><td>메타인지</td><td class="sg-wrapc">자기 사고가 잘 되고 있는가, 어떻게 잘되게 할 수 있는가를 <b class="sg-k">반성</b></td></tr>
+<tr><td>가치교육</td><td class="sg-wrapc">가치 명료화, 가치 분석 / 다원적 사회에 필요한 가치·태도 습득</td></tr>
+</table></div>
+</section>
+
+<section id="sg-s5">
+<h2><span class="sg-n">05</span>사회과 교육의 본질 유형 (모형·전통)</h2>
+<div class="sg-tbl"><table style="min-width:640px">
+<tr><th>유형</th><th>교육 목표</th><th>교육 방법</th><th>장점</th><th>단점</th></tr>
+<tr><td>시민성 전달</td><td class="sg-wrapc"><b class="sg-k">애국심</b> 강한 시민 (국가 충성, 규범 준수, 권위 복종, 의무 이행)</td><td class="sg-wrapc">직접 전달(설명·주입·암기·반복), 간접 전달(잠재적 교육과정), 매우 제한된 탐구</td><td class="sg-wrapc">전통적 가치·신념 전달, 사회 유지와 안정</td><td class="sg-wrapc">지식 주입이 행위로 연결되지 않음, 가치 절대주의 오류, 내용 미화(생략·왜곡·과장), 기존 질서·문화 재생산</td></tr>
+<tr><td>사회과학</td><td class="sg-wrapc"><b class="sg-k">꼬마 사회과학자</b></td><td class="sg-wrapc">탐구학습 (가설 설정, 자료 수집·분석·검증, 일반화)</td><td class="sg-wrapc">개념·일반화 이해 제고</td><td class="sg-wrapc">탐구력이 행위로 실행되지 않음, 가치 관련·구체적 행위 지시 약함</td></tr>
+<tr><td>반성적 탐구</td><td class="sg-wrapc"><b class="sg-k">합리적 의사 결정자</b></td><td class="sg-wrapc">반성적 탐구와 토론 (의사결정, 논쟁문제 학습)</td><td class="sg-wrapc">급변하는 민주 사회의 문제해결에 적합</td><td class="sg-wrapc">결정이 행위로 실행되지 않음, 옳음을 판단할 보편 기준 약함, 학생 흥미 기반 내용 구성의 한계</td></tr>
+<tr><td>사회 비판</td><td class="sg-wrapc"><b class="sg-k">비판적 사고</b></td><td class="sg-wrapc">사회 비판과 토론</td><td class="sg-wrapc">사회 부정의·불평등·차별 문제에 비판적 사고력·대응력</td><td class="sg-wrapc">전통 가치·신념에 대한 과도한 매도</td></tr>
+<tr><td>개인적 발달</td><td class="sg-wrapc"><b class="sg-k">잠재능력</b> 최대한 발현</td><td class="sg-wrapc">학생 중심 교수·학습</td><td class="sg-wrapc">개성·발달 존중, 자기주도적 학습</td><td class="sg-wrapc">사회 문제 관심, 사회성 발달 소홀</td></tr>
+</table></div>
+<div class="sg-tbl"><table>
+<tr><th>유형</th><th>교육 내용</th><th>문제 성격</th></tr>
+<tr><td>시민성 전달</td><td class="sg-wrapc">사회 유지에 필요한 핵심 지식·가치 (소극적 학습자관)</td><td class="sg-wrapc">전통적으로 강조된 문제, 기득권 세력이 중시하는 문제</td></tr>
+<tr><td>사회과학</td><td class="sg-wrapc">사회과학적 탐구 방법, 개념 및 일반화(난이도 높은 지식)</td><td class="sg-wrapc">과학적 문제 = <b class="sg-k">사실 문제</b></td></tr>
+<tr><td>반성적 탐구</td><td class="sg-wrapc">학생의 필요·흥미를 반영한 사회 갈등 문제 (등장 배경: 갈등 문제를 합리적으로 해결할 방법의 필요)</td><td class="sg-wrapc">일상적 문제 = <b class="sg-k">가치 판단 문제(사실+가치)</b></td></tr>
+<tr><td>사회 비판</td><td class="sg-wrapc">사회문제와 자료</td><td class="sg-wrapc">-</td></tr>
+<tr><td>개인적 발달</td><td class="sg-wrapc">진로교육(소질·적성·흥미·관심·능력)</td><td class="sg-wrapc">-</td></tr>
+</table></div>
+</section>
+
+<section id="sg-s6">
+<h2><span class="sg-n">06·07</span>평가 방법과 미래 사회 융합 교육</h2>
+<div class="sg-card"><b>사회과 평가 방법</b><br><b class="sg-k">면접, 토론, 논술, 관찰, (연구) 보고서, 포트폴리오</b></div>
+<div class="sg-card"><b>미래 사회 대비 융합 교육</b><br><b class="sg-k">디지털 시민성 교육</b>(디지털 시민), <b class="sg-k">AI 기반 언플러그드 교육</b></div>
+</section>
+
+<section id="sg-s8">
+<h2><span class="sg-n">08</span>사회과 교육과정의 내용 구성(조직) 원리</h2>
+<div class="sg-tbl"><table>
+<tr><th>원리</th><th>핵심 내용</th></tr>
+<tr><td>환경 확대법의 탄력적 적용</td><td class="sg-wrapc">환경(공간)의 확장을 통한 내용 배열: <b class="sg-k">가족 → 이웃 → 고장 → 지역사회 → 국가 → 지구촌</b>. 하지만 현대 정보화 사회에서는 시간적·경험적 거리가 중요하므로 공간 범위를 넘어서는 조직도 허용(탄력적 환경 확대법)</td></tr>
+<tr><td>주제 중심의 통합적 구성</td><td class="sg-wrapc">사회과의 다양한 영역을 상호 연관지어 구성. <b class="sg-k">3-4학년</b>: 학기에 1개의 대주제, 중주제 간 통합적 접근. <b class="sg-k">5-6학년</b>: 통합이 가능할 경우에 하고, 영역의 특성에 따라 하지 않을 수 있음</td></tr>
+<tr><td>교육과정의 지역화</td><td class="sg-wrapc">학습자가 사는 지역의 자원·소재를 활용. <b class="sg-k">내용의 지역화(목적, 3-4학년)</b>: 거주 지역·고장을 배움 → 지역 정체성, 향토애, 자긍심. <b class="sg-k">방법의 지역화(수단, 5-6학년)</b>: 지역사회 소재·제재를 활용 → 사회 현상의 일반적 원리 이해</td></tr>
+<tr><td>나선형 교육과정</td><td class="sg-wrapc">개념을 <b class="sg-k">누적적으로 반복</b>, 학년이 올라갈수록 심화 (단순 → 복잡, 구체 → 추상)</td></tr>
+</table></div>
+</section>
+
+<section id="sg-s9">
+<h2><span class="sg-n">09</span>역사 영역·지리 영역의 지도</h2>
+<h3>역사: 시간 인지(역사의식) 발달 단계</h3>
+<div class="sg-tbl"><table>
+<tr><th>학년</th><th>단계</th><th>특징</th></tr>
+<tr><td>1-2</td><td><b class="sg-k">시원의식</b></td><td class="sg-wrapc">고금 구분이 불명확, 현실·허구 구분 못함</td></tr>
+<tr><td>3</td><td><b class="sg-k">고금의식·대비의식</b></td><td class="sg-wrapc">옛날 것과 오늘날 것을 구분, 단순 비교, 시간의 거리</td></tr>
+<tr><td>4</td><td><b class="sg-k">변천의식</b></td><td class="sg-wrapc">과거~현재의 시간 흐름 감지, 연표 사용</td></tr>
+<tr><td>5</td><td><b class="sg-k">인과의식</b></td><td class="sg-wrapc">변천의 역사적 의미, 발생 원인·과정·결과 연계, 민족 차원의 문화사 학습 가능</td></tr>
+<tr><td>6</td><td><b class="sg-k">시대의식</b></td><td class="sg-wrapc">인물과 시대 연결, 전기 일화에 관심, 한 시대의 특성 이해, 통사적 학습</td></tr>
+</table></div>
+<div class="sg-tip"><b>암기 팁</b> 학년 순서는 "시-고(대)-변-인-시"로 앞 글자만 이어 외우면 편합니다. (저의 제안이며 원문에는 없는 방법입니다)</div>
+
+<h3>추체험 학습</h3>
+<p>과거의 역사적 사실을 파악할 때 <b class="sg-k">그 시대와 같은 조건·상황을 설정</b>하고 그들의 생각을 미루어 짐작하며 역사적 상상력을 자극합니다. 방법: 역할 놀이, 역사 일기, 주장문, 제작 학습(역사신문, 모형 만들기).</p>
+
+<h3>역사적 사고력</h3>
+<div class="sg-tbl"><table>
+<tr><th>사고력</th><th>핵심 내용</th></tr>
+<tr><td>연대기적 파악력</td><td class="sg-wrapc">사건이 일어난 순서, 시간에 따른 변화 중시. 과거·현재·미래의 구별, 시간 관련 용어, 연표 활용, 연도 계산, 연호, 시대 구분, 연속성·변화·발전</td></tr>
+<tr><td>역사적 탐구력</td><td class="sg-wrapc">사료 → 과거 사건·행위에 대한 해석과 설명.<br><b class="sg-k">일반적 기능</b>: 문제 인지, 자료 수집, 자료 처리, 결론 도출, 일반화<br><b class="sg-k">역사적 기능</b>: 역사적 개념 사용, 역사적 자료 활용, 역사적 연구 방법 수행</td></tr>
+<tr><td>역사적 상상력</td><td class="sg-wrapc">사료에 직접 나오지 않은 사항을 추론·해석.<br><b class="sg-k">구조적 상상</b>: 관련 정보로 증거의 간격을 메움, 새로운 해석<br><b class="sg-k">감정이입적 이해</b>: 동기·이유·사상·감정 파악(삼인칭 관점), 과거 관점에서 사건 인식, 과거 관습·생활방식 이해</td></tr>
+<tr><td>역사적 판단력</td><td class="sg-wrapc">사건·행위의 진위, 경중, 선악 평가 → <b class="sg-k">역사 학습의 궁극적 목표</b>. 고려 요소: 연구 문제 중요성, 사료 적합성, 사료 간 관계, 도덕적 가치 판단</td></tr>
+</table></div>
+
+<h3>지리: 지리적 사고력</h3>
+<div class="sg-tbl"><table>
+<tr><th>사고</th><th>핵심 내용</th></tr>
+<tr><td>분포적 사고</td><td class="sg-wrapc">대상 지역과 그 속의 자연·인문환경이 <b class="sg-k">어디에 어떻게</b> 놓여 있는지 생각 (조망적 시각 → <b class="sg-k">지도</b>)</td></tr>
+<tr><td>관계적 사고</td><td class="sg-wrapc">어떤 대상이 그곳에 있게 된 이유를 주변 요소와 관련지어 해석 (<b class="sg-k">주제도</b>). "왜?"라는 의문을 품고 답을 구하는 사고 과정. 예: 가옥의 구조를 기후와 연결</td></tr>
+<tr><td>지역적 사고</td><td class="sg-wrapc">지역의 <b class="sg-k">특성</b>을 살필 수 있는 능력. 예: 우리나라를 도시와 촌락으로 구분</td></tr>
+</table></div>
+</section>
+
+<section id="sg-s10">
+<h2><span class="sg-n">10</span>사회과 영역명과 역사 영역 공통 내용 체계</h2>
+<div class="sg-tbl"><table>
+<tr><th>영역</th><th>구성</th></tr>
+<tr><td>지리</td><td class="sg-wrapc"><b class="sg-k">지리 인식</b>, 자연환경과 인간생활, 인문환경과 인간생활, 지속가능한 세계</td></tr>
+<tr><td>일반사회</td><td class="sg-wrapc"><b class="sg-k">정치, 법, 경제, 사회·문화</b></td></tr>
+<tr><td>역사</td><td class="sg-wrapc"><b class="sg-k">역사 일반, 지역사, 한국사</b></td></tr>
+</table></div>
+<h3>역사 영역(역사 일반, 지역사, 한국사) 공통 내용 체계 요소</h3>
+<div class="sg-card">
+<b>과정·기능</b>: 역사적 <b class="sg-k">서사</b>를 구성하여 다양한 방식으로 표현하기
+<h4>가치·태도</h4>
+<ul>
+<li>(지역의) 역사에 대한 <b class="sg-k">관심과 흥미</b></li>
+<li>타인의 역사적 해석을 <b class="sg-k">존중</b>하는 태도</li>
+<li>역사에 <b class="sg-k">성찰적</b>으로 접근하는 태도</li>
+</ul></div>
+</section>
+
+<footer>출처: 최혜림(@hzllppy) 원본, 트와일라잇 수정 「사회 기본 이론」 단권화 자료를 재구성했습니다.</footer>
+</main>
+
+
   </div>
 
   <!-- [3-1] 문제&답에서 복습 항목 불러오기 모달 -->
@@ -8402,6 +8845,36 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
     console.error('초기화 에러:', e);
     toast('데이터를 불러오는 중 문제가 발생했습니다.');
   }
+})();
+</script>
+<script>
+(function(){
+  var C=document.getElementById('socialContainer');
+  var tab=document.getElementById('btnModeSocial');
+  var tabs=['btnModePlanner','btnModeDiary','btnModeReview','btnModeNotes'];
+  var conts=['plannerContainer','diaryContainer','reviewContainer','notesContainer'];
+  tab.addEventListener('click',function(){
+    var p=document.getElementById('btnModePlanner'); if(p) p.click();
+    conts.forEach(function(id){var e=document.getElementById(id); if(e) e.style.display='none'});
+    tabs.forEach(function(id){var e=document.getElementById(id); if(e) e.classList.remove('active')});
+    tab.classList.add('active'); C.style.display='block';
+  });
+  tabs.forEach(function(id){var e=document.getElementById(id); if(e) e.addEventListener('click',function(){C.style.display='none';tab.classList.remove('active')},true)});
+  var q=document.getElementById('sgQuizBtn'),r=document.getElementById('sgRevealBtn'),h=document.getElementById('sgHint');
+  function set(on){
+    C.classList.toggle('sg-quiz',on);
+    q.setAttribute('aria-pressed',on?'true':'false');
+    q.textContent=on?'핵심어 보이기':'핵심어 가리기';
+    r.hidden=!on;
+    C.querySelectorAll('.sg-k.sg-on').forEach(function(e){e.classList.remove('sg-on')});
+    h.textContent=on?'칸을 누르면 하나씩 열립니다. 먼저 떠올려 본 뒤 확인하세요.':'핵심어를 가리고 떠올려 보세요. 칸을 누르면 하나씩 열립니다.';
+  }
+  q.addEventListener('click',function(){set(!C.classList.contains('sg-quiz'))});
+  r.addEventListener('click',function(){C.querySelectorAll('.sg-k').forEach(function(e){e.classList.add('sg-on')})});
+  C.addEventListener('click',function(e){
+    var k=e.target.closest('.sg-k'); if(k&&C.classList.contains('sg-quiz')) k.classList.toggle('sg-on');
+    var a=e.target.closest('a[data-sg]'); if(a){e.preventDefault();var t=document.getElementById(a.getAttribute('href').slice(1)); if(t) t.scrollIntoView({behavior:'smooth',block:'start'})}
+  });
 })();
 </script>
 </body>
