@@ -1032,66 +1032,64 @@
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap">
 <style>
-/* 사회과 암기장 (scoped) */
-#socialContainer{--bg:#f5f6fa;--surface:#fff;--fg:#1c2340;--muted:#5d6482;--line:#d9dce8;--accent:#3447b8;--accent-soft:#e4e8fb;--hl:#ffe36e;--hl-fg:#1c2340;--good:#1d7a4d;--bad:#b3372f;--display:"Gowun Batang","Noto Serif KR",serif;font-size:calc(15px*var(--app-font-scale,1));line-height:1.7;color:var(--fg);max-width:980px;margin:0 auto;background:var(--card,#FAFBF8);border:1px solid var(--rule);border-radius:12px;padding:8px 20px 40px}
-#socialContainer .sg-bar{position:static;margin-inline:0;padding-inline:0;border-bottom:1px solid var(--line);background:transparent}
-@media (max-width:560px){#socialContainer{padding-inline:12px}#socialContainer .sg-pm{grid-template-columns:1fr}}
-#socialContainer *{box-sizing:border-box}
-#socialContainer{background:var(--bg);color:var(--fg);font-family:inherit;font-size:15px;line-height:1.7;padding-inline:16px;padding-block:0 64px}
-#socialContainer .sg-wrap{max-width:none}
-#socialContainer header.sg-top{padding-block:28px 12px}
-#socialContainer header.sg-top h1{font-family:var(--display);font-size:clamp(1.7em,5vw,2.4em);line-height:1.25;margin:0 0 6px;text-wrap:balance}
-#socialContainer header.sg-top p{margin:0;color:var(--muted);font-size:.9em}
-
-#socialContainer .sg-bar-in{display:flex;flex-direction:column;gap:8px}
-#socialContainer .sg-toggles{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-#socialContainer button{font:inherit;cursor:pointer}
-#socialContainer .sg-btn{border:1px solid var(--accent);background:var(--surface);color:var(--accent);border-radius:6px;padding:5px 12px;font-size:.85em;font-weight:500}
-#socialContainer .sg-btn[aria-pressed="true"]{background:var(--accent);color:var(--surface)}
-#socialContainer .sg-btn:focus-visible,#socialContainer .sg-nav a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-#socialContainer .sg-hint{font-size:.78em;color:var(--muted)}
-#socialContainer .sg-nav{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:thin}
-#socialContainer .sg-nav a{flex:none;text-decoration:none;color:var(--fg);font-size:.8em;padding:3px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
-#socialContainer .sg-nav a:hover{border-color:var(--accent);color:var(--accent)}
-#socialContainer section{padding-block-start:36px}
-#socialContainer h2{font-family:var(--display);font-size:1.5em;margin:0 0 14px;padding-bottom:6px;border-bottom:2px solid var(--fg);display:flex;gap:10px;align-items:baseline;text-wrap:balance}
-#socialContainer h2 .sg-n{font-family:inherit;font-size:.8em;font-weight:700;color:var(--accent);letter-spacing:.06em}
-#socialContainer h3{font-size:1.05em;margin:26px 0 8px;color:var(--accent)}
-#socialContainer h4{font-size:.92em;margin:16px 0 4px}
-#socialContainer p{margin:6px 0}
-#socialContainer ul{margin:6px 0;padding-left:1.2em}
-#socialContainer li{margin:2px 0}
-#socialContainer .sg-k{background:var(--hl);color:var(--hl-fg);padding:0 3px;border-radius:3px;font-weight:500;font-style:normal;transition:color .15s,background .15s}
-#socialContainer.sg-quiz .sg-k:not(.sg-on){color:transparent;background:var(--accent-soft);cursor:pointer;user-select:none;box-shadow:inset 0 0 0 1px var(--line)}
-#socialContainer.sg-quiz .sg-k.sg-on{cursor:pointer}
-#socialContainer .sg-card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin-block:10px}
-#socialContainer .sg-tbl{overflow-x:auto;margin-block:10px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
-#socialContainer table{border-collapse:collapse;width:100%;min-width:520px;font-size:.9em}
-#socialContainer th,#socialContainer td{padding:8px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
-#socialContainer tr:last-child td{border-bottom:0}
-#socialContainer th{background:var(--accent-soft);font-weight:700;white-space:nowrap}
-#socialContainer td:first-child{white-space:nowrap;font-weight:700}
-#socialContainer td.sg-wrapc{white-space:normal}
-#socialContainer .sg-pm{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-block:10px}
-#socialContainer .sg-pm>div{min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 14px}
-#socialContainer .sg-pm b.sg-p{color:var(--good)}
-#socialContainer .sg-pm b.sg-m{color:var(--bad)}
-#socialContainer .sg-flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-block:10px}
-#socialContainer .sg-flow span{background:var(--surface);border:1px solid var(--accent);color:var(--fg);border-radius:6px;padding:4px 10px;font-size:.88em;font-weight:500}
-#socialContainer .sg-flow i{font-style:normal;color:var(--muted)}
-#socialContainer .sg-tip{border-left:3px solid var(--accent);background:var(--accent-soft);padding:8px 14px;border-radius:0 8px 8px 0;margin-block:12px;font-size:.88em}
-#socialContainer .sg-tip b{color:var(--accent)}
-#socialContainer .sg-note{color:var(--muted);font-size:.82em}
-#socialContainer .sg-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-block:10px}
-#socialContainer .sg-cols>div{min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 14px}
-#socialContainer .sg-cols h4{margin-top:0}
-#socialContainer footer{margin-top:48px;color:var(--muted);font-size:.8em;border-top:1px solid var(--line);padding-top:14px}
-#socialContainer .sg-h1{font-family:var(--display);font-size:clamp(1.5em,5vw,2.1em);line-height:1.25;margin:0 0 6px;text-wrap:balance}
-#socialContainer header.sg-top{padding-block:20px 12px}
-#socialContainer header.sg-top p{margin:0;color:var(--muted);font-size:.9em}
-#socialContainer .sg-btn[hidden]{display:none}
-#socialContainer section{scroll-margin-top:12px}
-
+/* 암기장 (scoped to .sg-root) */
+.sg-root{--bg:#f5f6fa;--surface:#fff;--fg:#1c2340;--muted:#5d6482;--line:#d9dce8;--accent:#3447b8;--accent-soft:#e4e8fb;--hl:#ffe36e;--hl-fg:#1c2340;--good:#1d7a4d;--bad:#b3372f;--display:"Gowun Batang","Noto Serif KR",serif;font-size:calc(15px*var(--app-font-scale,1));line-height:1.7;color:var(--fg);max-width:980px;margin:0 auto;background:var(--bg);border:1px solid var(--rule);border-radius:12px;padding:0 20px 48px}
+.sg-root .sg-h1{font-family:var(--display);font-size:clamp(1.5em,5vw,2.1em);line-height:1.25;margin:0 0 6px;text-wrap:balance}
+.sg-root header.sg-top{padding-block:22px 12px}
+.sg-root header.sg-top p{margin:0;color:var(--muted);font-size:.9em}
+.sg-root .sg-btn[hidden]{display:none}
+.sg-root section{scroll-margin-top:12px}
+.sg-root td[rowspan]{background:var(--accent-soft)}
+@media (max-width:560px){.sg-root{padding-inline:12px}.sg-root .sg-pm{grid-template-columns:1fr}}
+.sg-root *{box-sizing:border-box}
+.sg-root .sg-wrap{max-width:none}
+.sg-root header.sg-top{padding-block:28px 12px}
+.sg-root header.sg-top h1{font-family:var(--display);font-size:clamp(1.7em,5vw,2.4em);line-height:1.25;margin:0 0 6px;text-wrap:balance}
+.sg-root header.sg-top p{margin:0;color:var(--muted);font-size:.9em}
+.sg-root .sg-bar{border-bottom:1px solid var(--line);padding-block:10px}
+.sg-root .sg-bar-in{display:flex;flex-direction:column;gap:8px}
+.sg-root .sg-toggles{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.sg-root button{font:inherit;cursor:pointer}
+.sg-root .sg-btn{border:1px solid var(--accent);background:var(--surface);color:var(--accent);border-radius:6px;padding:5px 12px;font-size:.85em;font-weight:500}
+.sg-root .sg-btn[aria-pressed="true"]{background:var(--accent);color:var(--surface)}
+.sg-root .sg-btn:focus-visible,.sg-root .sg-nav a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sg-root .sg-hint{font-size:.78em;color:var(--muted)}
+.sg-root .sg-nav{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:thin}
+.sg-root .sg-nav a{flex:none;text-decoration:none;color:var(--fg);font-size:.8em;padding:3px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+.sg-root .sg-nav a:hover{border-color:var(--accent);color:var(--accent)}
+.sg-root section{padding-block-start:36px}
+.sg-root h2{font-family:var(--display);font-size:1.5em;margin:0 0 14px;padding-bottom:6px;border-bottom:2px solid var(--fg);display:flex;gap:10px;align-items:baseline;text-wrap:balance}
+.sg-root h2 .sg-n{font-family:inherit;font-size:.8em;font-weight:700;color:var(--accent);letter-spacing:.06em}
+.sg-root h3{font-size:1.05em;margin:26px 0 8px;color:var(--accent)}
+.sg-root h4{font-size:.92em;margin:16px 0 4px}
+.sg-root p{margin:6px 0}
+.sg-root ul{margin:6px 0;padding-left:1.2em}
+.sg-root li{margin:2px 0}
+.sg-root .sg-k{background:var(--hl);color:var(--hl-fg);padding:0 3px;border-radius:3px;font-weight:500;font-style:normal;transition:color .15s,background .15s}
+.sg-root.sg-quiz .sg-k:not(.sg-on){color:transparent;background:var(--accent-soft);cursor:pointer;user-select:none;box-shadow:inset 0 0 0 1px var(--line)}
+.sg-root.sg-quiz .sg-k.sg-on{cursor:pointer}
+.sg-root .sg-card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin-block:10px}
+.sg-root .sg-tbl{overflow-x:auto;margin-block:10px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.sg-root table{border-collapse:collapse;width:100%;min-width:520px;font-size:.9em}
+.sg-root th,.sg-root td{padding:8px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+.sg-root tr:last-child td{border-bottom:0}
+.sg-root th{background:var(--accent-soft);font-weight:700;white-space:nowrap}
+.sg-root td:first-child{white-space:nowrap;font-weight:700}
+.sg-root td.sg-wrapc{white-space:normal}
+.sg-root .sg-pm{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-block:10px}
+.sg-root .sg-pm>div{min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 14px}
+.sg-root .sg-pm b.sg-p{color:var(--good)}
+.sg-root .sg-pm b.sg-m{color:var(--bad)}
+.sg-root .sg-flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-block:10px}
+.sg-root .sg-flow span{background:var(--surface);border:1px solid var(--accent);color:var(--fg);border-radius:6px;padding:4px 10px;font-size:.88em;font-weight:500}
+.sg-root .sg-flow i{font-style:normal;color:var(--muted)}
+.sg-root .sg-tip{border-left:3px solid var(--accent);background:var(--accent-soft);padding:8px 14px;border-radius:0 8px 8px 0;margin-block:12px;font-size:.88em}
+.sg-root .sg-tip b{color:var(--accent)}
+.sg-root .sg-note{color:var(--muted);font-size:.82em}
+.sg-root .sg-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-block:10px}
+.sg-root .sg-cols>div{min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 14px}
+.sg-root .sg-cols h4{margin-top:0}
+.sg-root footer{margin-top:48px;color:var(--muted);font-size:.8em;border-top:1px solid var(--line);padding-top:14px}
 </style>
 </head>
 <body>
@@ -1104,6 +1102,8 @@
       <button class="nav-tab" id="btnModeReview">🧠 복습 주기</button>
       <button class="nav-tab" id="btnModeNotes">🗒️ 필기 모드</button>
       <button class="nav-tab" id="btnModeSocial">📚 사회과 암기장</button>
+      <button class="nav-tab" id="btnModeMusic">🎵 음악 암기장</button>
+      <button class="nav-tab" id="btnModeEnglish">🔤 영어 암기장</button>
       <button class="btn save-btn" id="manualGlobalSaveBtn" title="모든 변경 사항을 저장소에 즉시 동기화합니다.">💾 전체 저장</button>
       
       <button class="btn qa-collect-btn" id="openQACollectorBtn" title="원하는 날짜들의 문제와 정답만 모아서 봅니다.">📚 문제 모아보기</button>
@@ -1568,8 +1568,8 @@
     </div>
   </div>
 
-  <!-- [5] 사회과 교육론 암기장 -->
-  <div id="socialContainer" style="display:none">
+  <!-- 암기장: 사회과 -->
+  <div id="socialContainer" class="sg-root" style="display:none">
 <div class="sg-wrap">
 <header class="sg-top">
   <h1 class="sg-h1">초등 사회과 교육론 암기장</h1>
@@ -1579,18 +1579,18 @@
 
 <div class="sg-bar"><div class="sg-bar-in">
   <div class="sg-toggles">
-    <button class="sg-btn" id="sgQuizBtn" aria-pressed="false">핵심어 가리기</button>
-    <button class="sg-btn" id="sgRevealBtn" hidden>모두 보기</button>
-    <span class="sg-hint" id="sgHint">핵심어를 가리고 떠올려 보세요. 칸을 누르면 하나씩 열립니다.</span>
+    <button class="sg-btn" data-r="quiz" aria-pressed="false">핵심어 가리기</button>
+    <button class="sg-btn" data-r="reveal" hidden>모두 보기</button>
+    <span class="sg-hint" data-r="hint">핵심어를 가리고 떠올려 보세요. 칸을 누르면 하나씩 열립니다.</span>
   </div>
   <nav class="sg-nav" aria-label="목차">
-    <a href="#sg-s1" data-sg>1 교수·학습 모형</a><a href="#sg-s2" data-sg>2 수업 기법</a><a href="#sg-s3" data-sg>3 시민성</a><a href="#sg-s4" data-sg>4 고급 사고력</a><a href="#sg-s5" data-sg>5 교육 유형</a><a href="#sg-s6" data-sg>6~7 평가·융합</a><a href="#sg-s8" data-sg>8 내용 구성</a><a href="#sg-s9" data-sg>9 역사·지리</a><a href="#sg-s10" data-sg>10 영역·체계</a>
+    <a href="#soc-s1" data-sg>1 교수·학습 모형</a><a href="#soc-s2" data-sg>2 수업 기법</a><a href="#soc-s3" data-sg>3 시민성</a><a href="#soc-s4" data-sg>4 고급 사고력</a><a href="#soc-s5" data-sg>5 교육 유형</a><a href="#soc-s6" data-sg>6~7 평가·융합</a><a href="#soc-s8" data-sg>8 내용 구성</a><a href="#soc-s9" data-sg>9 역사·지리</a><a href="#soc-s10" data-sg>10 영역·체계</a>
   </nav>
 </div></div>
 
 <main class="sg-wrap">
 
-<section id="sg-s1">
+<section id="soc-s1">
 <h2><span class="sg-n">01</span>사회과 교수·학습 모형</h2>
 <div class="sg-tbl"><table>
 <tr><th>모형</th><th>한 줄 핵심</th></tr>
@@ -1788,7 +1788,7 @@
 <div class="sg-flow"><span>문제 제기(가치 문제·갈등 확인)</span><i>→</i><span>대안의 검토와 예측</span><i>→</i><span>가치의 선택과 행동</span></div>
 </section>
 
-<section id="sg-s2">
+<section id="soc-s2">
 <h2><span class="sg-n">02</span>사회과 수업 기법</h2>
 <div class="sg-tbl"><table>
 <tr><th>기법</th><th>핵심 내용</th></tr>
@@ -1824,7 +1824,7 @@
 </div>
 </section>
 
-<section id="sg-s3">
+<section id="soc-s3">
 <h2><span class="sg-n">03</span>사회과의 궁극적 목표 : 시민성</h2>
 <p><b class="sg-k">시민성</b> = 시민적·민주시민의·민주시민으로서의 자질</p>
 <div class="sg-tbl"><table>
@@ -1836,7 +1836,7 @@
 </table></div>
 </section>
 
-<section id="sg-s4">
+<section id="soc-s4">
 <h2><span class="sg-n">04</span>사회과의 고급(고등, 고차적) 사고력</h2>
 <div class="sg-tbl"><table>
 <tr><th>사고력</th><th>핵심 내용</th></tr>
@@ -1851,7 +1851,7 @@
 </table></div>
 </section>
 
-<section id="sg-s5">
+<section id="soc-s5">
 <h2><span class="sg-n">05</span>사회과 교육의 본질 유형 (모형·전통)</h2>
 <div class="sg-tbl"><table style="min-width:640px">
 <tr><th>유형</th><th>교육 목표</th><th>교육 방법</th><th>장점</th><th>단점</th></tr>
@@ -1871,13 +1871,13 @@
 </table></div>
 </section>
 
-<section id="sg-s6">
+<section id="soc-s6">
 <h2><span class="sg-n">06·07</span>평가 방법과 미래 사회 융합 교육</h2>
 <div class="sg-card"><b>사회과 평가 방법</b><br><b class="sg-k">면접, 토론, 논술, 관찰, (연구) 보고서, 포트폴리오</b></div>
 <div class="sg-card"><b>미래 사회 대비 융합 교육</b><br><b class="sg-k">디지털 시민성 교육</b>(디지털 시민), <b class="sg-k">AI 기반 언플러그드 교육</b></div>
 </section>
 
-<section id="sg-s8">
+<section id="soc-s8">
 <h2><span class="sg-n">08</span>사회과 교육과정의 내용 구성(조직) 원리</h2>
 <div class="sg-tbl"><table>
 <tr><th>원리</th><th>핵심 내용</th></tr>
@@ -1888,7 +1888,7 @@
 </table></div>
 </section>
 
-<section id="sg-s9">
+<section id="soc-s9">
 <h2><span class="sg-n">09</span>역사 영역·지리 영역의 지도</h2>
 <h3>역사: 시간 인지(역사의식) 발달 단계</h3>
 <div class="sg-tbl"><table>
@@ -1922,7 +1922,7 @@
 </table></div>
 </section>
 
-<section id="sg-s10">
+<section id="soc-s10">
 <h2><span class="sg-n">10</span>사회과 영역명과 역사 영역 공통 내용 체계</h2>
 <div class="sg-tbl"><table>
 <tr><th>영역</th><th>구성</th></tr>
@@ -1945,6 +1945,1203 @@
 </main>
 
 
+  </div>
+
+  <!-- 암기장: 음악 -->
+  <div id="musicContainer" class="sg-root" style="display:none">
+<div class="sg-wrap"><header class="sg-top"><h1 class="sg-h1">초등 음악과 교육론 암기장</h1><p>음악 교과서 요약 자료를 암기 순서에 맞춰 정리했습니다. 노란 표시가 핵심어입니다.</p></header></div>
+<div class="sg-bar"><div class="sg-bar-in"><div class="sg-toggles"><button class="sg-btn" data-r="quiz" aria-pressed="false">핵심어 가리기</button><button class="sg-btn" data-r="reveal" hidden>모두 보기</button><span class="sg-hint" data-r="hint">핵심어를 가리고 떠올려 보세요. 칸을 누르면 하나씩 열립니다.</span></div><nav class="sg-nav" aria-label="목차"><a href="#mus-mu1" data-sg>1 요소·내용체계</a><a href="#mus-mu2" data-sg>2 교육과정·학자</a><a href="#mus-mu3" data-sg>3 평가</a><a href="#mus-mu4" data-sg>4 장단·용어</a><a href="#mus-mu5" data-sg>5 민요</a><a href="#mus-mu6" data-sg>6 서양음악 이론</a><a href="#mus-mu7" data-sg>7 악기 연주법</a><a href="#mus-mu8" data-sg>8 율명·단소·소금</a><a href="#mus-mu9" data-sg>9 궁중음악</a><a href="#mus-mu10" data-sg>10 풍류·성악</a><a href="#mus-mu11" data-sg>11 민속악·음악극</a></nav></div></div>
+<main class="sg-wrap">
+<section id="mus-mu1">
+<h2><span class="sg-n">01</span>음악 요소와 내용 체계</h2>
+<h3>음악 요소 (3~4학년 vs 5~6학년)</h3>
+<div class="sg-tbl"><table>
+<tr><th>영역</th><th>3~4학년</th><th>5~6학년</th></tr>
+<tr><td>리듬</td><td class="sg-wrapc">박, 박자 / 장단, 장단의 세 / 음의 길고 짧음 / <b class="sg-k">간단한 리듬꼴</b> / 장단꼴 / 말붙임새</td><td class="sg-wrapc">박, 박자 / 장단, 장단의 세 / <b class="sg-k">여러 가지 리듬꼴</b> / 장단꼴 / 말붙임새</td></tr>
+<tr><td>가락</td><td class="sg-wrapc">음의 높고 낮음 / <b class="sg-k">차례가기와 뛰어가기</b> / 시김새</td><td class="sg-wrapc">음이름, 계이름, 율명 / <b class="sg-k">장음계, 단음계</b> / 여러 지역의 토리 / 시김새</td></tr>
+<tr><td>화성</td><td class="sg-wrapc">소리의 어울림</td><td class="sg-wrapc"><b class="sg-k">주요 3화음</b> / 다양한 소리의 어울림</td></tr>
+<tr><td>형식</td><td class="sg-wrapc"><b class="sg-k">메기고 받는 형식</b>, ab형식</td><td class="sg-wrapc"><b class="sg-k">긴자진 형식, 시조 형식</b>, aba, AB 등</td></tr>
+<tr><td>셈여림</td><td class="sg-wrapc">셈여림</td><td class="sg-wrapc">셈여림의 변화</td></tr>
+<tr><td>빠르기</td><td class="sg-wrapc">빠르기 / 한배</td><td class="sg-wrapc">빠르기의 변화 / 한배의 변화</td></tr>
+<tr><td>음색</td><td class="sg-wrapc">목소리, 물체 소리, 타악기의 음색</td><td class="sg-wrapc">관악기, 현악기의 음색</td></tr>
+</table></div>
+
+<h3>음악 내용 체계</h3>
+<div class="sg-tbl"><table style="min-width:600px">
+<tr><th>영역</th><th>범주</th><th>3~4학년</th><th>5~6학년</th></tr>
+<tr><td rowspan="3">연주</td><td>지식·이해</td><td class="sg-wrapc">생활 속의 음악 / 기초적인 음악 요소 / 자세와 주법 / 느낌, 여러 소리</td><td class="sg-wrapc">간단한 악곡의 연주 형태 / 음악 요소 / 주법과 표현 기법 / 어울림, 여러 악기</td></tr>
+<tr><td>과정·기능</td><td class="sg-wrapc">노래 부르거나 악기 연주하기 / <b class="sg-k">신체로 표현하고 놀이하기</b> / 발표하고 이야기하기</td><td class="sg-wrapc">노래 부르거나 악기 연주하기 / <b class="sg-k">다양한 방법으로 표현하기</b> / 발표하고 돌아보기</td></tr>
+<tr><td>가치·태도</td><td class="sg-wrapc">연주를 즐기는 태도 / 연주에 대한 관심</td><td class="sg-wrapc">음악으로 함께하는 태도 / 연주 준비와 참여</td></tr>
+<tr><td rowspan="3">감상</td><td>지식·이해</td><td class="sg-wrapc">다양한 종류의 음악 / <b class="sg-k">지역의 음악 국가유산</b> / 기초적인 음악 요소 / 음악적 특징 / 느낌, 분위기, 쓰임</td><td class="sg-wrapc">다양한 종류와 문화권의 음악 / <b class="sg-k">우리나라 음악 국가유산</b> / 음악 요소 / 음악적 특징, 음악의 간단한 구성 / 느낌, 배경, 활용</td></tr>
+<tr><td>과정·기능</td><td class="sg-wrapc"><b class="sg-k">반응하며 듣기 / 탐색하고 발견하기 / 묘사하거나 이야기하기</b></td><td class="sg-wrapc"><b class="sg-k">감지하며 듣기 / 인식하고 구별하기 / 설명하기</b></td></tr>
+<tr><td>가치·태도</td><td class="sg-wrapc">소리와 음악을 즐기는 태도 / 음악에 대한 호기심</td><td class="sg-wrapc">음악의 아름다움에 대한 인식 / 음악에 대한 공감</td></tr>
+<tr><td rowspan="3">창작</td><td>지식·이해</td><td class="sg-wrapc">소리와 음악 / 기초적인 음악 요소 / 간단한 악보 / 느낌, 상상</td><td class="sg-wrapc">간단한 음악 / 음악 요소 / 기초적인 기보, 음악 매체 / 느낌, 아이디어</td></tr>
+<tr><td>과정·기능</td><td class="sg-wrapc"><b class="sg-k">즉흥적으로 표현하기 / 부분적으로 바꾸기 / 모방하여 나타내기</b></td><td class="sg-wrapc"><b class="sg-k">떠올리며 표현하기 / 간단한 조건에 따라 바꾸기 / 활용하여 만들기</b></td></tr>
+<tr><td>가치·태도</td><td class="sg-wrapc">음악에 대한 흥미 / 음악의 새로움을 즐기는 태도</td><td class="sg-wrapc">음악에 대한 자신감 / 음악에 대한 열린 태도</td></tr>
+</table></div>
+<div class="sg-tip"><b>암기 팁</b> 3~4학년은 <b>반응·탐색·묘사</b>(느낌 중심), 5~6학년은 <b>감지·인식·설명</b>(구별과 설명 중심)으로 한 단계 올라갑니다. 연주는 "신체 표현·놀이 → 다양한 방법 표현", 창작은 "즉흥·부분 바꾸기·모방 → 떠올리기·조건에 따라 바꾸기·활용해 만들기"입니다. (저의 정리이며 원문에는 없는 설명입니다)</div>
+</section>
+
+<section id="mus-mu2">
+<h2><span class="sg-n">02</span>음악과 교육과정</h2>
+<h3>교과 역량 (5가지)</h3>
+<div class="sg-flow"><span>감성</span><i>/</i><span>창의성</span><i>/</i><span>자기주도성</span><i>/</i><span>소통</span><i>/</i><span>공동체</span></div>
+<p><b>종괄 목표</b>: 초등학교 &lt;음악&gt; 과목은 음악의 핵심적 지식·이해, 과정·기능, 가치·태도를 포괄하는 다양한 음악 활동으로 감성, 창의성, 자기주도성을 기르고, 일상생활 속 다양한 공동체 안에서 소통할 수 있는 인간 육성을 목표로 합니다.</p>
+<div class="sg-tbl"><table>
+<tr><th>하위 목표</th><th>내용</th></tr>
+<tr><td>감성</td><td class="sg-wrapc">음악의 아름다움이나 가치를 인식하고 <b class="sg-k">정서적 안정</b>을 느낄 수 있는 감성을 기른다.</td></tr>
+<tr><td>창의성</td><td class="sg-wrapc">음악의 의미를 <b class="sg-k">탐색하고 새롭게 표현하며 만들어</b> 갈 수 있는 창의성을 기른다.</td></tr>
+<tr><td>자기주도성</td><td class="sg-wrapc">생활 속 다양한 음악 경험에 <b class="sg-k">스스로 참여</b>할 수 있는 자기주도성을 기른다.</td></tr>
+<tr><td>소통</td><td class="sg-wrapc">협력적 음악 활동을 통해 서로 다른 음악 표현을 <b class="sg-k">존중</b>하며 생활 속에서 소통한다.</td></tr>
+<tr><td>공동체</td><td class="sg-wrapc">다양한 음악 문화와 음악의 역할을 인식하며 자신이 속한 <b class="sg-k">공동체에 기여</b>한다.</td></tr>
+</table></div>
+
+<h3>음악 교육학자 (4명)</h3>
+<div class="sg-tbl"><table>
+<tr><th>학자</th><th>핵심 내용</th></tr>
+<tr><td>달크로즈</td><td class="sg-wrapc"><b class="sg-k">유리드믹스</b>: 리듬 교육 방법 (신체 표현, 제자리 동작/이동 동작)<br><b class="sg-k">솔페주</b>: 고정도법 계명창 (절대음감, 내청 능력)<br>즉흥 연주</td></tr>
+<tr><td>코다이</td><td class="sg-wrapc"><b class="sg-k">음악적 문해력</b><br><b class="sg-k">리듬음절</b>: 타아아, 타아타, 타타타타, 티티티티, 타-이티타-이티, 팀리팀리, 티리리리/티리티리, 타쉬타쉼, 티쉬티쉬티쉬, 트리올라, 티티티, 티리티타 등<br><b class="sg-k">손기호</b>: 음정감 계발, 내청 훈련<br>가창 중심: <b class="sg-k">이동도법</b> + 한정보표, 두문계명, 막대기보법</td></tr>
+<tr><td>오르프</td><td class="sg-wrapc"><b class="sg-k">원초적 음악</b>: 언어 + 신체동작 + 음악<br><b class="sg-k">말(언어)</b>: 일상에서 쓰는 언어에 리듬을 붙여 리듬 지도<br>즉흥 연주: <b class="sg-k">오스티나토</b></td></tr>
+<tr><td>고든</td><td class="sg-wrapc"><b class="sg-k">음악 적성 검사</b><br><b class="sg-k">오디에이션</b>: 이미 들려진 음악뿐 아니라 앞으로 진행될 음악 예상<br>음악 학습의 위계: 변별 학습(암기, 모방) → 추론 학습(변별 응용)</td></tr>
+</table></div>
+<div class="sg-tip"><b>리듬 교육 방법 비교</b> 달크로즈 = <b>유리드믹스</b> / 코다이 = <b>리듬음절</b> / 오르프 = <b>말(언어)</b></div>
+</section>
+
+<section id="mus-mu3">
+<h2><span class="sg-n">03</span>음악과 평가 방법</h2>
+<div class="sg-tbl"><table>
+<tr><th>평가</th><th>내용</th></tr>
+<tr><td>실기 평가</td><td class="sg-wrapc">실기 자체를 보거나 듣거나 느끼면서 질적·양적 판단. 노래 부르기, 악기 연주하기, 신체 표현하기</td></tr>
+<tr><td>관찰 평가</td><td class="sg-wrapc">전반적인 태도·행동을 관찰해 다양한 정보 수집. 체크리스트, 평정법</td></tr>
+<tr><td>실음 지필 평가</td><td class="sg-wrapc">실제 소리를 듣고 시험지 상에 답하여 표현</td></tr>
+<tr><td>서·논술형 평가</td><td class="sg-wrapc">지필 평가 중 서답형. 음악 이론이나 음악 관련 지식·이론·생각을 문장으로 서술</td></tr>
+<tr><td>보고서 평가</td><td class="sg-wrapc">음악 감상 보고서, 음악 활동 보고서, 음악가 조사 보고서</td></tr>
+<tr><td>구술 평가</td><td class="sg-wrapc">어떤 주제·내용에 대해 자기 생각이나 의견을 언어로 발표</td></tr>
+<tr><td>면담 평가</td><td class="sg-wrapc">일대일 혹은 소그룹 대화로 음악적 사고 과정과 정의적 특성 평가</td></tr>
+<tr><td>자기 평가</td><td class="sg-wrapc">학생 스스로 자신에 대해 평가</td></tr>
+<tr><td>동료 평가</td><td class="sg-wrapc">동료 학생을 서로 평가 (= <b class="sg-k">상호 평가</b>)</td></tr>
+<tr><td>포트폴리오 평가</td><td class="sg-wrapc">일정 기간 성과가 담긴 결과물을 <b class="sg-k">누적</b>하여 만든 모음집 평가</td></tr>
+<tr><td>프로젝트 평가</td><td class="sg-wrapc">발표의 전 과정과 도출된 결과물을 종합적으로 평가</td></tr>
+<tr><td>토의·토론 평가</td><td class="sg-wrapc">음악과 관련된 주제를 해결하거나 논의하는 과정 평가. 음악 저작권 문제</td></tr>
+<tr><td>온라인 평가</td><td class="sg-wrapc">평가와 피드백을 온라인 환경에서 제공</td></tr>
+</table></div>
+</section>
+
+<section id="mus-mu4">
+<h2><span class="sg-n">04</span>각론 ① 전통음악: 장단과 용어</h2>
+<h3>장구</h3>
+<ul>
+<li><b class="sg-k">채편</b>: 얇은 가죽, 높은 소리 (<b class="sg-k">열채</b>). 끝이 2시 방향, 복편에서 15° 떨어짐</li>
+<li><b class="sg-k">복편(궁편)</b>: 두꺼운 가죽, 두껍고 낮은 소리 (<b class="sg-k">궁굴채</b>, 손)</li>
+<li><b class="sg-k">조이개</b>: 채편 쪽으로 움직이면 소리가 높아짐</li>
+<li><b class="sg-k">보관</b>: 조이개를 복편 쪽으로 풀어서 가로로 보관 (가운데는 조롱목)</li>
+</ul>
+<div class="sg-tbl"><table>
+<tr><th>구음</th><th>명칭</th><th>연주법</th></tr>
+<tr><td>덩</td><td>합장단</td><td class="sg-wrapc">복편과 채편을 함께 친다</td></tr>
+<tr><td>덕</td><td>채편</td><td class="sg-wrapc">채편만 친다 (열채)</td></tr>
+<tr><td>쿵</td><td>북편</td><td class="sg-wrapc">복편만 친다 (궁굴채)</td></tr>
+<tr><td>더러러러</td><td>채굴림</td><td class="sg-wrapc">채로 채편을 여러 번 굴려 친다</td></tr>
+<tr><td>기덕</td><td>겹채</td><td class="sg-wrapc">채로 채편을 먼저 약하고 짧게 치고 세게 다시 한 번 친다</td></tr>
+</table></div>
+<div class="sg-tbl"><table>
+<tr><th>구분</th><th>반주 장구</th><th>풍물 장구</th></tr>
+<tr><td>쓰임</td><td class="sg-wrapc">노래, 산조</td><td class="sg-wrapc">사물놀이, 풍물놀이</td></tr>
+<tr><td>복편</td><td class="sg-wrapc"><b class="sg-k">손</b>(엄지 복판 끝)</td><td class="sg-wrapc"><b class="sg-k">궁굴채</b>(엄지와 집게 사이)</td></tr>
+<tr><td>위치</td><td class="sg-wrapc">장구가 자기 몸 <b class="sg-k">가운데</b></td><td class="sg-wrapc"><b class="sg-k">채편</b>이 몸 가운데</td></tr>
+</table></div>
+
+<h3>장단 비교</h3>
+<div class="sg-tbl"><table>
+<tr><th>장단</th><th>박자와 빠르기</th><th>특징</th></tr>
+<tr><td>세마치장단</td><td class="sg-wrapc"><b class="sg-k">9/8</b> 박자</td><td class="sg-wrapc">구음: 덩 - 덩 - 덕 쿵 덕</td></tr>
+<tr><td>자진모리장단</td><td class="sg-wrapc"><b class="sg-k">12/8</b> 박자, 빠른 장단</td><td class="sg-wrapc">다는 형 - 맺는 형 두 가지</td></tr>
+<tr><td>굿거리장단</td><td class="sg-wrapc"><b class="sg-k">12/8</b> 박자, 느린 장단 (♪ 많음)</td><td class="sg-wrapc">가락이 풍성, <b class="sg-k">경기 민요</b> 多 (솔라도레미)</td></tr>
+<tr><td>중중모리장단</td><td class="sg-wrapc"><b class="sg-k">12/8</b> 박자, 느린 장단 (♪ 많음)</td><td class="sg-wrapc">가락이 소박, <b class="sg-k">남도 민요</b> 多 (미라시)</td></tr>
+</table></div>
+
+<h3>용어</h3>
+<div class="sg-tbl"><table>
+<tr><th>용어</th><th>뜻</th></tr>
+<tr><td>장단의 세(&gt;)</td><td class="sg-wrapc">강하게 연주하는 지점</td></tr>
+<tr><td>장단꼴</td><td class="sg-wrapc">장단을 이루는 여러 가지 모양</td></tr>
+<tr><td>기본박 익히기</td><td class="sg-wrapc">처음부터 장단을 치기 어렵기 때문에 기본박 <b class="sg-k">손뼉치기</b> 활동</td></tr>
+<tr><td>말붙임새</td><td class="sg-wrapc">장단에 노랫말이 붙어 있는 모양새, 노랫말의 리듬. 바꾸기 활동 유의점: <b class="sg-k">첫소박은 가사가 있어야 함</b></td></tr>
+<tr><td>한배</td><td class="sg-wrapc">빠르고 느린 정도 (한배가 짧다 / 길다)</td></tr>
+<tr><td>시김새</td><td class="sg-wrapc">가락을 꾸며주는 역할. <b class="sg-k">5가지</b>: ① 굵게 떠는 소리 ② 밀어올리는 소리 ③ 흘러내리는 소리 ④ 꺾는 소리 ⑤ 잘게 떠는 소리</td></tr>
+</table></div>
+
+<h3>정간보</h3>
+<ul>
+<li>우리나라 <b class="sg-k">최초의 유량악보</b> (율명, 구음, 부호 등을 적음)</li>
+<li>읽기: <b class="sg-k">위에서 아래, 오른쪽에서 왼쪽</b></li>
+<li>&lt; : 숨표 / △ : 쉼표</li>
+<li>점선은 소박, 실선은 1박 / 1장단 = 4박</li>
+</ul>
+</section>
+
+<section id="mus-mu5">
+<h2><span class="sg-n">05</span>각론 ② 민요</h2>
+<h3>민요의 형식 (2가지)</h3>
+<div class="sg-tbl"><table>
+<tr><th>형식</th><th>내용</th></tr>
+<tr><td>메기고 받는 형식</td><td class="sg-wrapc">놀이요, 노동요. <b class="sg-k">메기는소리</b>: 즉흥적인 가사 창작, 가락 변주 가능(독창). <b class="sg-k">받는소리</b>: 규칙적인 가사와 가락(합창)</td></tr>
+<tr><td>긴·자진 형식</td><td class="sg-wrapc"><b class="sg-k">느린 소리 다음 빠른 소리</b>. 한배에 따른 형식: 긴자진 형식(민요) - 강강술래, 쾌지나 칭칭나네 / 느린 곡부터 점점 빨라지는 곡으로 구성(기악곡) - 영산회상, 산조</td></tr>
+</table></div>
+
+<h3>지역별 민요 (토리)</h3>
+<div class="sg-tbl"><table style="min-width:640px">
+<tr><th>구분</th><th>지역</th><th>토리·음계</th><th>특징·대표곡</th></tr>
+<tr><td>경기 민요</td><td class="sg-wrapc">서울, 경기, 충청 일부</td><td class="sg-wrapc"><b class="sg-k">창부타령조, 경토리</b>, 솔라도레미</td><td class="sg-wrapc">굿거리장단, 세마치장단. 순차 진행, 잔가락多, 긴 음에서 잘 떨어줌. 맑고 깨끗하며 경쾌한 느낌. <b class="sg-k">아리랑, 도라지타령, 풍년가, 닐리리야</b></td></tr>
+<tr><td>남도 민요</td><td class="sg-wrapc">전라도, 충청 일부</td><td class="sg-wrapc"><b class="sg-k">육자배기조, 육자배기토리</b>, 미라시</td><td class="sg-wrapc">미(굵게 떠는음) 라(평으로 내는음) 시(꺾는음). <b class="sg-k">강강술래, 고사리 꺾자, 덕석 몰자, 둥당기타령</b></td></tr>
+<tr><td>동부 민요</td><td class="sg-wrapc">경상도, 강원도, 함경도</td><td class="sg-wrapc"><b class="sg-k">메나리조, 메나리토리</b>, 미(솔)라도레</td><td class="sg-wrapc">솔은 라→미 하행 경과음. <b class="sg-k">쾌지나 칭칭나네, 매롱이 소리, 나물노래, 도움소</b></td></tr>
+<tr><td>서도 민요</td><td class="sg-wrapc">평안도, 황해도</td><td class="sg-wrapc"><b class="sg-k">수심가조, 수심가토리</b>, 레미솔라도</td><td class="sg-wrapc">라(콧소리) 도(흘러내리는소리). <b class="sg-k">긴다래꽁, 싸름, 풍구타령</b></td></tr>
+</table></div>
+<div class="sg-tip"><b>암기 팁</b> 토리 이름은 대표 노래 이름에서 따옵니다. 경기=창부타령, 남도=육자배기, 동부=메나리, 서도=수심가. 음계는 경기 "솔라도레미", 남도 "미라시", 동부 "미라도레", 서도 "레미솔라도"입니다. (저의 정리입니다)</div>
+</section>
+
+<section id="mus-mu6">
+<h2><span class="sg-n">06</span>각론 ③ 서양음악 이론</h2>
+<div class="sg-tbl"><table>
+<tr><th>주제</th><th>내용</th></tr>
+<tr><td>음악 기호</td><td class="sg-wrapc"><b class="sg-k">스타카토</b>: 짧게 끊어서 연주 / <b class="sg-k">테누토</b>: 음의 길이를 충분히 / <b class="sg-k">악센트</b>: 그 음을 특히 세게 / <b class="sg-k">페르마타</b>(늘임표): 음의 길이를 2~3배로</td></tr>
+<tr><td>붙임줄 vs 이음줄</td><td class="sg-wrapc"><b class="sg-k">붙임줄(타이)</b>: 같은 높이의 두 음을 붙여서 한 음같이 연주<br><b class="sg-k">이음줄(슬러)</b>: 높이가 다른 음을 연결하여 끊어지지 않게 부드럽게 이어서 연주</td></tr>
+<tr><td>박, 박자</td><td class="sg-wrapc"><b class="sg-k">박</b>: 음악의 시간적 개념 중 기본이 되는 최소 단위 / <b class="sg-k">박자</b>: 일정한 수의 박이 모인 것 + 셈여림</td></tr>
+<tr><td>박자 젓기</td><td class="sg-wrapc">4분의 2박자, 3박자, 4박자, 8분의 6박자 지휘 모형. 지휘 모형은 <b class="sg-k">한 마디에 1번만</b> 그림</td></tr>
+<tr><td>센내기와 여린내기</td><td class="sg-wrapc"><b class="sg-k">센내기</b>: 갖춘마디, 첫 박이 센박으로 시작 / <b class="sg-k">여린내기</b>: 못갖춘마디, 여린박에서 시작 → 못갖춘마디는 시작과 끝나는 부분을 합하여 한 마디가 됨<br><b class="sg-k">예비박</b>: 음악의 첫 박이 시작되기 전 한 박자(준비)</td></tr>
+<tr><td>3/4 vs 6/8</td><td class="sg-wrapc"><b class="sg-k">3/4박자</b>: 3박자 계통, 한 마디가 둘로 나누어지지 않음 / <b class="sg-k">6/8박자</b>: 2박자 계통, 한 마디가 둘로 나누어짐, 2/4박자로 지휘 가능</td></tr>
+<tr><td>셈여림표</td><td class="sg-wrapc">pp(매우 여리게 피아니시모) &lt; p(여리게 피아노) &lt; mp(조금 여리게 메조피아노) &lt; mf(조금 세게 메조포르테) &lt; f(세게 포르테) &lt; ff(매우 세게 포르티시모). cresc.(크레셴도) 점점 세게, decresc.(데크레셴도) 점점 여리게</td></tr>
+<tr><td>빠르기말</td><td class="sg-wrapc">Andante(느리게) &lt; Andantino(조금 느리게) &lt; Moderato(보통 빠르기) &lt; Allegretto(조금 빠르게) &lt; Allegro(빠르게). 숫자 표시: ♩=120은 4분음표를 1분에 120회 연주하는 빠르기</td></tr>
+<tr><td>음이름 vs 계이름</td><td class="sg-wrapc"><b class="sg-k">음이름</b>: 고정된 이름(다, 라, 마…) / <b class="sg-k">계이름</b>: 조성에 따라 바뀜(도, 레, 미…)<br>이동도법 계이름: 도의 자리 바꾸어 읽기 / 고정도법 계이름: 다장조로 계이름 읽기, 악기 연주 시 편리</td></tr>
+<tr><td>조표 vs 임시표</td><td class="sg-wrapc"><b class="sg-k">조표</b>: 곡의 처음에 표시, 악곡의 조를 나타냄(으뜸음의 위치를 알려줌) / <b class="sg-k">임시표</b>: 해당 마디에서만 적용, 옥타브 위나 아래 음은 적용 안 됨 (올림표, 내림표, 제자리표)</td></tr>
+</table></div>
+
+<h3>음계: 장조 vs 단조</h3>
+<div class="sg-tbl"><table>
+<tr><th>구분</th><th>장조</th><th>단조</th></tr>
+<tr><td>시작·끝</td><td class="sg-wrapc">'도, 미, 솔'로 시작/끝</td><td class="sg-wrapc">'라'로 시작/끝</td></tr>
+<tr><td>느낌</td><td class="sg-wrapc">밝고 명랑한 느낌</td><td class="sg-wrapc">쓸쓸하고 어두운 느낌</td></tr>
+<tr><td>#(올림)</td><td class="sg-wrapc">사</td><td class="sg-wrapc">마</td></tr>
+<tr><td>b(내림)</td><td class="sg-wrapc">바, 내림나, 내림마 (밤나무)</td><td class="sg-wrapc">라, 사, 다</td></tr>
+</table></div>
+<ul>
+<li><b class="sg-k">나란한조</b>: 같은 조표를 가지는 장조와 단조. 나란한조끼리는 계이름을 똑같이 읽는다. 장조에서 <b class="sg-k">3도 내려가면 단조</b>(사장조 → 마단조)</li>
+<li><b class="sg-k">같은으뜸음조</b>: 같은 이름의 음을 으뜸음으로 사용하는 장조와 단조 (라단조와 라장조)</li>
+</ul>
+<div class="sg-tbl"><table>
+<tr><th>단음계</th><th>내용</th></tr>
+<tr><td>자연단음계</td><td class="sg-wrapc">2~3, 5~6음 사이 반음</td></tr>
+<tr><td>화성단음계</td><td class="sg-wrapc">자연단음계의 <b class="sg-k">7번째 음을 반음↑</b></td></tr>
+<tr><td>가락단음계</td><td class="sg-wrapc">올라갈 때는 6, 7음을 반음↑, 내려올 때는 자연단음계</td></tr>
+</table></div>
+<div class="sg-tip"><b>장조/단조 구분 방법</b> ① 장조로 간주하고 첫음과 끝음의 이동도법 계이름 확인 ② '라'음으로 시작/끝 → 나란한조인 단조 찾기 ③ 7음이 #이면 화성단음계, 아니면 자연단음계</div>
+
+<h3>화음</h3>
+<ul>
+<li><b class="sg-k">화음</b>: 어떤 음 위에 3도와 5도의 음을 쌓아서 만든 세 음의 결합. 자리바꿈을 해도 구성음이 변하지 않으면 같은 화음</li>
+<li><b class="sg-k">으뜸화음(Ⅰ)</b>: 도 미 솔 / 라 도 미</li>
+<li><b class="sg-k">버금딸림화음(Ⅳ)</b>: 파 라 도 / 레 파 라</li>
+<li><b class="sg-k">딸림화음(Ⅴ)</b>: 솔 시 레 / 미 솔# 시 (화성단음계)</li>
+</ul>
+
+<h3>악곡의 구조와 형식</h3>
+<div class="sg-tbl"><table>
+<tr><th>단위</th><th>내용</th></tr>
+<tr><td>동기</td><td class="sg-wrapc">악곡을 이루는 가장 작은 단위 (2마디)</td></tr>
+<tr><td>작은악절</td><td class="sg-wrapc">2개의 동기 (4마디)</td></tr>
+<tr><td>큰악절</td><td class="sg-wrapc">2개의 작은 악절 (8마디)</td></tr>
+<tr><td>한도막 형식</td><td class="sg-wrapc">1개의 큰악절(8마디) - ab</td></tr>
+<tr><td>두도막 형식</td><td class="sg-wrapc">2개의 큰악절(16마디) - AB (aa'ba')</td></tr>
+<tr><td>세도막 형식</td><td class="sg-wrapc">3개의 큰악절(24마디) - ABA (aa'bb'aa')</td></tr>
+<tr><td>작은세도막 형식</td><td class="sg-wrapc">3개의 작은악절(12마디) - aba'</td></tr>
+</table></div>
+
+<h3>기타 용어</h3>
+<div class="sg-tbl"><table>
+<tr><th>용어</th><th>뜻</th></tr>
+<tr><td>가락의 흐름</td><td class="sg-wrapc"><b class="sg-k">차례가기(순차진행)</b>: 한 음씩 차례로 이어지는 가락, 부드러운 느낌 / <b class="sg-k">뛰어가기(도약진행)</b>: 3도 이상 도약이 있는 가락, 경쾌한 느낌</td></tr>
+<tr><td>도돌이표</td><td class="sg-wrapc">상황에 맞춰 되돌아가서 연주</td></tr>
+<tr><td>D.C. / D.S. / Fine</td><td class="sg-wrapc"><b class="sg-k">D.C.(다 카포)</b>: 처음부터 다시, 처음으로 돌아가 피네나 페르마타에서 마침 / <b class="sg-k">D.S.(달 세뇨)</b>: 세뇨로 돌아가 피네나 페르마타에서 마침 / <b class="sg-k">Fine(피네)</b>: 끝</td></tr>
+<tr><td>당김음</td><td class="sg-wrapc">한 마디 안에서 센박과 여린박의 규칙성이 뒤바뀌는 리듬 (붙임줄, 쉼표, 악센트, 리듬 등에 의한 당김음)</td></tr>
+<tr><td>오스티나토</td><td class="sg-wrapc">어떠한 일정한 음형을 곡 전체에 걸쳐 끊임없이 반복하는 것 (리듬 오스티나토, 가락 오스티나토)</td></tr>
+<tr><td>프레이징</td><td class="sg-wrapc">음악에서 자연스러운 흐름으로 구분되는 것. 음악으로서의 최소한의 감정과 의미가 나타나는 단위</td></tr>
+<tr><td>바른 자세</td><td class="sg-wrapc">가슴은 펴고, 어깨는 자연스럽게 내린다. 필요성: 바른 자세로 노래하면 울림이 좋은 소리를 낼 수 있다. <b class="sg-k">복식 호흡</b>: 코와 입으로 숨을 깊게 들이쉬면 아랫배가 동그랗게 부풀어 오르고, 내쉴 때는 배가 들어간다</td></tr>
+</table></div>
+
+<h3>돌림 노래와 성부의 어울림</h3>
+<p><b class="sg-k">돌림 노래</b>: 모둠을 나누어 같은 노래를 일정한 시간의 차이를 두고 일부 사람이 먼저 부르면 나머지 사람이 뒤따라 부르며 <b class="sg-k">화음을 이루어 노래</b>하는 것. 겹쳐지는 부분은 화음이 이루어짐. 배우는 이유: 소리의 어울림 느끼기</p>
+<div class="sg-tbl"><table>
+<tr><th>성부의 어울림 노래</th><th>내용</th></tr>
+<tr><td>돌림 노래</td><td class="sg-wrapc">같은 노래를 시간차를 두고 부름</td></tr>
+<tr><td>짝 노래</td><td class="sg-wrapc">같은 화음 구조, 박자, 곡의 길이를 가진 <b class="sg-k">두 개의 서로 다른 노래</b>. 두 악곡의 각 마디에 어울리는 주요 3화음이 같음</td></tr>
+<tr><td>메아리 노래</td><td class="sg-wrapc">한 성부가 음을 지속하는 동안 다른 성부가 가락을 부르면 화음</td></tr>
+</table></div>
+<p class="sg-note">성부: 음악을 구성하는 개별적인 선율 (단성부 음악/다성부 음악)</p>
+</section>
+
+<section id="mus-mu7">
+<h2><span class="sg-n">07</span>악기 연주법</h2>
+<h3>리코더</h3>
+<ul>
+<li>구조: 머리 부분(부는 곳 취구, 소리문), 중간 부분(구멍 0~6), 밑부분(7번)</li>
+<li>종류: <b class="sg-k">바로크식</b>(5번 구멍) / <b class="sg-k">독일식</b>(4번 구멍). 파, 파#, 시b 운지가 다름 (운지표 원문 확인)</li>
+<li>조율 방법: 관의 길이가 길면 낮은 음</li>
+<li>관련 음악 기호: (8) 노래는 악보와 같은 소리, 리코더는 악보보다 <b class="sg-k">한 옥타브 높은</b> 소리 / 8: 악보보다 한 옥타브 높은 소리</li>
+</ul>
+<div class="sg-tbl"><table>
+<tr><th>주법</th><th>내용</th></tr>
+<tr><td>서밍 주법</td><td class="sg-wrapc">왼손 엄지손가락을 조금 구부려 뒷구멍 위쪽에 작은 틈을 만드는 주법. 높은 '마' 이상의 음을 연주할 때 사용. 소프라노 리코더는 낮은 '시' 이하 연주 불가</td></tr>
+<tr><td>텅잉 주법</td><td class="sg-wrapc">혀를 이용하여 소리를 내거나 끊기. 음의 시작과 끝이 분명해지고 본래의 아름다운 소리를 낼 수 있음. 낮은 음역: 많은 양을 느리게(두-) / 중간 음역: 보통 빠르기로(두, 두두) / 높은 음역: 빠르고 세게(티-, 투투)</td></tr>
+</table></div>
+<h4>아티큘레이션 (음악적으로 소리 내기 위한 여러 가지 텅잉 방법)</h4>
+<div class="sg-tbl"><table>
+<tr><th>주법</th><th>내용</th></tr>
+<tr><td>포르타토</td><td class="sg-wrapc">부드럽게 텅잉 ~ 테누토(-), 순차 진행</td></tr>
+<tr><td>스타카토</td><td class="sg-wrapc">가볍고 짧게 끊어 음표의 반 정도 길이 연주 ~ 동음반복</td></tr>
+<tr><td>레가토</td><td class="sg-wrapc">이음줄 앞의 음만 텅잉하고 나머지는 운지만 바꿔줌</td></tr>
+<tr><td>논 레가토</td><td class="sg-wrapc">가볍게 끊어서 연주 ~ 도약, 동음반복</td></tr>
+</table></div>
+
+<h3>멜로디언</h3>
+<p>피아노의 운지법과 같으며 <b class="sg-k">오른손</b>으로 연주. 같은음을 연주할 때는 건반을 계속 누른 채 <b class="sg-k">텅잉 주법</b>으로 연주.</p>
+
+<h3>리듬 악기와 음판 악기</h3>
+<div class="sg-tbl"><table>
+<tr><th>악기</th><th>연주법</th></tr>
+<tr><td>큰북</td><td class="sg-wrapc">북채로 북면의 약간 윗부분 치기. 북채의 방향은 약간 비스듬히 곡선을 이루며 위아래로 치기. 쉼표가 나오면 북면에 손을 대서 울림 막기</td></tr>
+<tr><td>작은북</td><td class="sg-wrapc">북을 약간 경사지게 하기. 양손에 쥔 북채는 90°. 채를 떨어내듯(굴리듯) 가볍게 치기</td></tr>
+<tr><td>트라이앵글</td><td class="sg-wrapc">모서리의 열린 부분이 연주자의 왼쪽. 여린 소리는 변의 모서리가 열린 곳으로 내기. 줄이 너무 길면 악기가 불안정. <b class="sg-k">트레몰로</b> 주법: 막힌 쪽 두 모서리 부분 빠르게 치기</td></tr>
+<tr><td>캐스터네츠</td><td class="sg-wrapc">벌어진 부분을 연주자를 향하게 두기</td></tr>
+<tr><td>탬버린</td><td class="sg-wrapc">비스듬히 잡고 북면치기(♩) or 테치기(음표머리 x). 세게 연주할 때는 주먹이나 손바닥. 트레몰로 주법: 탬버린을 쥔 손을 좌우로 가볍게 흔들어 연주</td></tr>
+<tr><td>우드블록</td><td class="sg-wrapc">한 손으로 악기의 손잡이 부분을 잡고 다른 손 엄지와 검지로 채를 잡아 친다</td></tr>
+<tr><td>카바사</td><td class="sg-wrapc">한쪽 손바닥에 악기를 올려놓고, 다른 손으로 손잡이를 잡은 후 좌우로 움직여 연주</td></tr>
+<tr><td>마라카스</td><td class="sg-wrapc">흔들어서 소리 내기</td></tr>
+<tr><td>귀로</td><td class="sg-wrapc">다른 손으로 채를 이용하여 악기 겉면을 긁어서 소리내기</td></tr>
+<tr><td>음판 악기</td><td class="sg-wrapc">길이가 다른 여러 개의 음판을 순서대로 나열한 악기. <b class="sg-k">금속 음판</b>: 글로켄슈필, 메탈로폰 / <b class="sg-k">나무 음판</b>: 실로폰, 마림바. 두 채의 각도 90°, 손목과 음판이 수평. 음판의 한가운데를 채로 가볍게 튕기듯이 친다</td></tr>
+<tr><td>핸드벨</td><td class="sg-wrapc">유율 타악기(=선율 타악기: 음높이가 있는 타악기). <b class="sg-k">링</b>: 손목의 힘으로 원을 그리며 벨을 울리기 / <b class="sg-k">댐프</b>: 어깨에 대어 소리 멈추기 / <b class="sg-k">셰이크</b>: 손잡이를 잡고 상하나 좌우로 흔들기</td></tr>
+</table></div>
+</section>
+
+<section id="mus-mu8">
+<h2><span class="sg-n">08</span>12율명, 단소, 소금</h2>
+<h3>12율명</h3>
+<div class="sg-flow"><span>황종</span><span>대려</span><span>태주</span><span>협종</span><span>고선</span><span>중려</span><span>유빈</span><span>임종</span><span>이칙</span><span>남려</span><span>무역</span><span>응종</span></div>
+<ul>
+<li>율명 왼쪽에 <b class="sg-k">삼수변(氵)</b>이 하나 붙으면 한 옥타브 위의 음</li>
+<li><b class="sg-k">사람인변(亻)</b>이 하나 붙으면 한 옥타브 아래 음</li>
+<li>중배성(亻亻) → 배성(亻) → 중성 → 청성(氵) → 중청성(氵氵)</li>
+</ul>
+
+<h3>단소</h3>
+<ul>
+<li>구조: 취구 1개, 지공(원문 표기: 앞 1개, 뒤 4개). 손가락(왼 123 / 오 3). <span class="sg-note">일반적으로 단소는 앞 4개·뒤 1개 지공으로 알려져 있으니 교재로 한 번 확인해 보세요.</span></li>
+<li>바른 자세: 입술 양 끝을 펴서 주름이 생기지 않게 하기 / 바람의 반은 취구 안으로, 반은 취구 밖으로 / 침을 약간 바른 후에 소리내기 / 낮은음일수록 몸쪽으로 바람을 불어넣어야 함(높은음은 반대)</li>
+<li><b class="sg-k">기본음</b>: 중 임 무 황 태 (입김의 세기를 약하게 한다)</li>
+<li><b class="sg-k">높은음</b>: 청중 청임 청무 청황 청태 (입김의 세기를 세게 한다)</li>
+</ul>
+<div class="sg-tbl"><table>
+<tr><th>반복되는 음 연주</th><th>내용</th></tr>
+<tr><td>혀 치기</td><td class="sg-wrapc">혀끝으로 입술을 툭 쳐준다</td></tr>
+<tr><td>손 치기</td><td class="sg-wrapc">한 음 아래의 구멍을 가볍게 친다</td></tr>
+<tr><td>숨 끊기</td><td class="sg-wrapc">반복 음 나오면 숨을 끊고 그 음을 재빨리 불어줌</td></tr>
+</table></div>
+
+<h3>소금</h3>
+<ul>
+<li>가로로 부는 악기, <b class="sg-k">관악기 중 가장 높은 음역</b></li>
+<li>취구 1개, 지공 6개, <b class="sg-k">칠성공</b>(음높이를 맞추기 위한 것). 손가락(왼 234 / 오 234)</li>
+<li>바른 자세: 오른쪽으로 30° 정도 돌려서 앉기(머리를 왼쪽으로 30~45° 돌리기) / 아랫입술의 가운데에 취구가 오도록 하기 / 입김의 반은 취구 안으로 나머지 반은 취구 밖으로 / '휘' 발음의 입김(두두 X, 리코더 텅잉) / <b class="sg-k">복식 호흡</b></li>
+<li>주로 쓰는 음: 임 남 (무) 황 고 (중). 저취(약하게 불기) / 평취(보통으로 불기) / 역취(세게 불기)</li>
+<li>반복되는 음 연주: 소리를 끊지 않고 혀끝을 튕겨서 연주 (단소는 혀치기)</li>
+</ul>
+</section>
+
+<section id="mus-mu9">
+<h2><span class="sg-n">09</span>주요 감상곡 ① 궁중음악</h2>
+<h3>대취타</h3>
+<div class="sg-card"><b>Point</b> 임금의 행차나 군대의 행진에서 연주(행진곡, 행악, 군악) / 조금 느리게 걸어가는 느낌 / '불고 친다'는 뜻 → <b class="sg-k">관악기, 타악기</b> / 편성: 관악기(나발, 나각, 태평소) + 타악기(용고, 자바라, 징) + 장구 / 장단: 한 장단 12박, 7박과 8박에서 작게 연주 / 시작: 명금일하 대취타 → 징 → 용고 / 끝: 허라금(훤화금)</div>
+<div class="sg-tbl"><table>
+<tr><th>악기</th><th>특징</th></tr>
+<tr><td>나발</td><td class="sg-wrapc">쇠로 만든 관악기, 지공 없음, 한 음을 길게 분다</td></tr>
+<tr><td>나각</td><td class="sg-wrapc">소라 껍데기에 취구를 만들어 끼운 악기, 한 음만 연주</td></tr>
+<tr><td>태평소</td><td class="sg-wrapc">대취타에 쓰이는 관악기 중 <b class="sg-k">유일하게 가락 연주</b>. 음량이 크고 음고가 높아 야외 연주에 적합 = 쇄납, 호적, 날라리</td></tr>
+<tr><td>용고</td><td class="sg-wrapc">한삼을 하고 양손에 채를 들고 연주. 북에 화려한 용 그림. 집사의 구호와 징 연주 뒤에 가장자리를 쳐서 음악 시작</td></tr>
+<tr><td>자바라</td><td class="sg-wrapc">쇠로 만든 악기, 두 짝을 마주쳐 소리내기 (=제금)</td></tr>
+<tr><td>징</td><td class="sg-wrapc">쇠로 만든 악기, 헝겊을 싼 채로 치기 때문에 부드럽고 장중한 소리. 집사의 구호가 끝나면 징을 한 번 치고 연주를 시작함</td></tr>
+</table></div>
+<p>나발과 나각은 한 장단씩 교대로 연주. 연주 순서: 집사(명금일하 대취타) → 악대 대답(예이) → 징(→용고) → 전체 연주 → 집사(허라금/훤화금). 집사는 취타대를 이끌며 등채(지휘봉)를 들고 음악의 시작과 끝을 알린다.</p>
+
+<h3>종묘 제례악</h3>
+<div class="sg-card"><b>Point</b> 조선 시대 역대 왕과 왕비의 제사 때 쓰이는 음악과 무용 일체 / 노래, 춤, 악기연주를 모두 갖춘 종합 예술 / 향악 토대 잔치 음악(세종) → 제사 절차에 맞게 고쳐 종묘 제례악(세조) / <b class="sg-k">유네스코 인류무형문화유산</b> / 사용 악기: <b class="sg-k">박(지휘자 역할), 축(시작), 어(끝)</b>, 장구, 절고, 진고, 방향, 편경, 편종(선율 타악기), 태평소, 당피리, 대금, 해금, 아쟁</div>
+<div class="sg-tbl"><table>
+<tr><th>구분</th><th>정대업</th><th>보태평</th></tr>
+<tr><td>노래(악장)</td><td class="sg-wrapc">왕의 <b class="sg-k">무공</b>을 찬양</td><td class="sg-wrapc">왕의 <b class="sg-k">문덕</b>을 찬양</td></tr>
+<tr><td>춤(일무)</td><td class="sg-wrapc"><b class="sg-k">무무</b></td><td class="sg-wrapc"><b class="sg-k">문무</b></td></tr>
+<tr><td>춤의 성격</td><td class="sg-wrapc">강하고 힘찬 무인 성격의 춤</td><td class="sg-wrapc">정적인 문인 성격의 춤</td></tr>
+<tr><td>곡 수</td><td class="sg-wrapc">(15곡→) 11곡</td><td class="sg-wrapc">11곡</td></tr>
+</table></div>
+<ul>
+<li>박: 지휘자 역할의 악기 / 축: 시작(채: 지), 바닥을 두드려 한 번에 3번 총 9번의 소리 냄 / 어: 끝(채: 진), 호랑이 머리를 3번 치고 톱니를 한 번 긁는 것을 3번 반복</li>
+<li>방향, 편경, 편종: 선율을 연주하는 타악기. 편경: 16개의 돌, 돌이 두꺼울수록 높은 음</li>
+<li>연주 순서: 집사("드오") → 휘를 든다 → 박, 축, 절고가 연주한다</li>
+</ul>
+
+<h3>수제천</h3>
+<div class="sg-card"><b>Point</b> <b class="sg-k">삼현육각 편성</b>(무용반주) - 향피리 2개, 대금, 해금, 북, 장구 / 궁중무용(처용무) / <b class="sg-k">연음 형식</b></div>
+<ul>
+<li>궁중의 연례 또는 정재(궁중무용)를 출 때 연주하던 곡. 백제 시대의 노래인 '정읍사'를 기원으로 하며, 조선 중기 이후 기악합주곡으로 전승</li>
+<li>궁중무용인 처용무의 시작 부분에서 다섯 처용이 입장할 때 반주 음악으로 사용</li>
+<li>총 4장, 연음 형식. 삼현육각(향피리 2개, 대금, 해금, 북, 장구)으로 연주하는 것이 원칙이지만, 근래에는 소금, 아쟁, 박을 덧붙여 연주</li>
+<li>감상: 한배가 길다(느리다), 웅장하다, 여러 악기가 연주되기도 하고 한 악기가 연주되기도 한다</li>
+<li>편성 악기 분류: 음악의 시작을 알리는 악기(지휘자 역할) = 박 / 장단 연주 악기 = 장구, 좌고 / 가락 연주 악기 = 관악기(향피리, 대금, 소금) / 현악기(해금, 아쟁)</li>
+<li><b class="sg-k">연음 형식</b>: 주된 가락을 연주하는 향피리가 연주하다가 쉬면, 그 뒤를 대금, 해금, 아쟁 등이 가락을 이어받아 연주하는 기법</li>
+</ul>
+</section>
+
+<section id="mus-mu10">
+<h2><span class="sg-n">10</span>주요 감상곡 ② 성악·풍류음악</h2>
+<h3>시조 ('동창이', '태산이')</h3>
+<div class="sg-card"><b>Point</b> 시조시에 가락을 붙인 노래. 종장의 마지막 세 글자는 생략 / <b class="sg-k">58858박</b>의 혼합장단 / 무릎장단 또는 장구 장단에 맞추어 부름</div>
+<ul>
+<li>초장, 중장, 종장 3장 형식의 시조시에 가락을 붙인 노래 (시조창, 단가, 시절가 등으로도 불림)</li>
+<li>조선 중기 이후 발달. 처음에는 선비, 중인들이 주로 불렀으나(풍류음악), 후에 대중화되어 평민층까지 불렀던 소박한 노래</li>
+<li>특별한 반주 없이 무릎장단 또는 장구 장단에 맞추어 부르거나 장구와 대금 등의 한두 개의 악기로 반주하기도 함. 음이 끊어지지 않고 길게 연결, 여유롭고 편안하며 음의 변화가 크지 않음, 한배가 길다</li>
+<li>초장에 쓰이는 음은 황, 중의 2음이지만, 중을 소리낼 때 임에 가깝게 떨어 소리내므로 가락선보에는 '황, 중, 임'이 모두 표시</li>
+<li><b class="sg-k">'동창이'</b>: 5박, 8박 장단(혼합장단). 황, 중, 임의 3음. 음을 치켜올려 떨어주거나 잔잔하고 가늘게 흔들어주는 시김새. 여유롭고 한가로우며 편안한 분위기. 내용: 부지런한 생활, 농촌 생활</li>
+<li><b class="sg-k">'태산이'</b>: 5박, 8박 장단(혼합장단). 내용: 핑계 대지 말고 열심히 노력하라</li>
+<li>시조 장단: [초장] 5 8 8 5 8 [중장] 5 8 8 5 8 [종장] 5 8 5 8. 무릎치기: 덩(양손), 쿵(왼손), 덕(오른손), 짚기(왼손 검지). 한배가 길어서 박을 놓치기 쉬우므로 빈박에 넣음</li>
+</ul>
+<div class="sg-tbl"><table>
+<tr><th>구분</th><th>가곡</th><th>시조</th></tr>
+<tr><td>정의</td><td class="sg-wrapc">양반·사대부 등 지식인 계층의 풍류방에서 연주되던 성악곡. 시조시를 노랫말로 삼아 부르는 성악곡</td><td class="sg-wrapc">시조시를 노랫말로 삼아 부르는 성악곡</td></tr>
+<tr><td>반주</td><td class="sg-wrapc"><b class="sg-k">관현악기의 실내악(줄풍류) 편성</b></td><td class="sg-wrapc"><b class="sg-k">무릎장단 or 장구 장단 or 장구와 대금</b> 등 한두 개 악기로 반주</td></tr>
+<tr><td>형식</td><td class="sg-wrapc"><b class="sg-k">5장</b> 형식</td><td class="sg-wrapc"><b class="sg-k">3장</b> 형식</td></tr>
+</table></div>
+
+<h3>영산회상</h3>
+<div class="sg-card"><b>Point</b> 현악 영산회상(줄풍류), 관악 영산회상(대풍류) / 한배에 따른 형식 / 타령장단</div>
+<ul>
+<li>원래 '영산회상불보살'이라는 불교적 내용의 노랫말이 있던 성악곡이었으나 후에 노랫말이 없어지고 기악곡화</li>
+<li><b class="sg-k">현악 영산회상</b>: 거문고 중심의 <b class="sg-k">줄풍류</b> 편성. 세악 편성(실내악 편성) / <b class="sg-k">관악 영산회상</b>: 향피리 중심의 <b class="sg-k">대풍류</b> 편성 / <b class="sg-k">평조회상</b>: 현악 영산회상을 4도 아래로 낮춘 관현합주 편성</li>
+<li>현악 영산회상(9곡): 상영산, 중영산, 세영산, 가락덜이, 삼현 도드리, 하현 도드리, 염불 도드리, 타령, 군악 (타령, 군악은 타령장단 사용) / 관악 영산회상(8곡), 평조회상(8곡): 하현 도드리 x</li>
+</ul>
+<div class="sg-tbl"><table>
+<tr><th>구분</th><th>현악 영산회상 '타령'</th><th>관악 영산회상 '타령'</th></tr>
+<tr><td>편성</td><td class="sg-wrapc"><b class="sg-k">줄풍류</b> 편성</td><td class="sg-wrapc"><b class="sg-k">대풍류</b> 편성</td></tr>
+<tr><td>악기</td><td class="sg-wrapc">거문고, 가야금, 해금, 대금, 세피리, 장구 (+단소 or 양금)</td><td class="sg-wrapc">향피리, 대금, 해금, 장구, 좌고 (+소금 or 아쟁)</td></tr>
+<tr><td>분위기</td><td class="sg-wrapc">조용하고 화려(실내악 편성)</td><td class="sg-wrapc">씩씩하고 웅장</td></tr>
+<tr><td>장구 연주</td><td class="sg-wrapc">장구의 <b class="sg-k">변죽</b> 연주</td><td class="sg-wrapc">장구의 <b class="sg-k">복판</b> 연주</td></tr>
+</table></div>
+<p class="sg-note">타령장단(천년만세에도 나옴): 덩 - 기덕 - 덕 쿵 - 기덕 - 더. 열채는 장구의 변죽(채편의 가장자리)을 연주. '더'는 열채 끝으로 채편을 가볍게 찍어서 연주</p>
+
+<h3>줄풍류 vs 대풍류 vs 삼현육각</h3>
+<div class="sg-tbl"><table>
+<tr><th>구분</th><th>줄풍류</th><th>대풍류</th></tr>
+<tr><td>중심</td><td class="sg-wrapc"><b class="sg-k">거문고</b> 중심의 악기 편성</td><td class="sg-wrapc"><b class="sg-k">향피리</b> 중심의 악기 편성</td></tr>
+<tr><td>악기</td><td class="sg-wrapc">거문고, 가야금, 해금, 대금, 세피리, 장구 (+단소 or 양금)</td><td class="sg-wrapc">향피리 2, 대금, 해금, 장구, 좌고 (+소금 or 아쟁) = <b class="sg-k">삼현육각</b> 악기 편성</td></tr>
+</table></div>
+<ul>
+<li>풍류: 풍치가 있고 멋스럽게 노는 일, 음악의 예스러운 단어</li>
+<li>풍류 음악: <b class="sg-k">현악기(줄풍류)</b>: 현악 영산회상, 천년만세 / <b class="sg-k">관악기(대풍류)</b>: 관악 영산회상 / + 시조(무릎 장단, 장구 장단)</li>
+<li>대풍류 vs 삼현육각 <b class="sg-k">공통점</b>: 악기 편성, 연주하는 음악 / <b class="sg-k">차이점</b>: 춤 반주 = 삼현육각, 감상용 = 대풍류. 삼현육각: 가락 악기 3개, 연주자 6명</li>
+</ul>
+
+<h3>천년만세</h3>
+<div class="sg-card"><b>Point</b> 줄풍류 / 천년만년 살기를 기원 / <b class="sg-k">모음곡</b>: 계면 가락 도드리, 양청도드리, 우조 가락 도드리</div>
+<ul>
+<li>줄풍류: 거문고 중심의 세악 편성</li>
+<li>계면 가락 도드리: 흐느끼는 느낌의 타령장단 / 양청도드리: 빠른 한배의 경쾌한 분위기, 양청도드리장단 / 우조 가락 도드리: 양청도드리의 변주곡. 타령장단</li>
+<li><b class="sg-k">한배의 변화</b>: 계면 가락 도드리(느림) → 양청도드리(빠름) → 우조 가락 도드리(느림)</li>
+<li>활동: 손뼉으로 일정박 치며 율명 말하기 / 가락선 악보 보고 손으로 음이 짚으며 율명 말하기 / 악곡 들으며 손으로 가락선 표현하고 율명으로 노래하기 / 노랫말 만들어 부르기</li>
+</ul>
+</section>
+
+<section id="mus-mu11">
+<h2><span class="sg-n">11</span>주요 감상곡 ③ 민속악</h2>
+<h3>풍물놀이 vs 사물놀이</h3>
+<div class="sg-tbl"><table>
+<tr><th>구분</th><th>풍물놀이</th><th>사물놀이</th></tr>
+<tr><td>장소</td><td class="sg-wrapc"><b class="sg-k">야외</b> 연주</td><td class="sg-wrapc"><b class="sg-k">무대</b> 공연 (앉거나 서서)</td></tr>
+<tr><td>악기</td><td class="sg-wrapc">꽹과리, 장구, 북, 징, <b class="sg-k">소고, 태평소</b></td><td class="sg-wrapc">꽹과리, 장구, 북, 징</td></tr>
+<tr><td>특징</td><td class="sg-wrapc">대형을 만들며 연주(진법놀이). 마을에 크고 작은 의식이 있을 때, 농사 일을 할 때</td><td class="sg-wrapc">풍물놀이를 실내공연에 맞게 만든 것</td></tr>
+</table></div>
+<ul>
+<li>풍물놀이 연주자의 모습: 악기를 치면서 원이나 다른 모양을 만든다. <b class="sg-k">원진</b>(시계 반대 방향 원), <b class="sg-k">을자진</b>(지그재그), <b class="sg-k">덕석몰이</b>(달팽이 모양으로 안으로 감으며 걷는다), <b class="sg-k">덕석풀기</b>(달팽이 모양을 풀면서 밖으로 나온다)</li>
+<li>진법놀이: 줄지어 모양(대형)을 만드는 것. 상쇄: 꽹과리 연주자 중 우두머리, 지휘자 역할</li>
+<li><b class="sg-k">삼채장단</b>: 가락이 구성지고 흥을 돋움. 풍물놀이와 사물놀이에서 많이 연주되는 장단. 삼채장단 1과 2를 이어서 구음 함주를 한다</li>
+</ul>
+<div class="sg-tbl"><table>
+<tr><th>재료에 따라</th><th>악기</th><th>연주 방법에 따라</th><th>악기</th></tr>
+<tr><td>쇠</td><td class="sg-wrapc">꽹과리, 징</td><td rowspan="2">관악기</td><td rowspan="2">태평소</td></tr>
+<tr><td>가죽+나무</td><td class="sg-wrapc">장구, 북, 소고</td></tr>
+<tr><td>쇠+나무</td><td class="sg-wrapc">태평소</td><td>타악기</td><td class="sg-wrapc">꽹과리, 장구, 북, 징, 소고</td></tr>
+</table></div>
+<div class="sg-tbl"><table>
+<tr><th>사물 악기</th><th>소리가 나타내는 것</th></tr>
+<tr><td>꽹과리</td><td>천둥, 번개</td></tr><tr><td>장구</td><td>비</td></tr><tr><td>북</td><td>구름</td></tr><tr><td>징</td><td>바람</td></tr>
+</table></div>
+<div class="sg-tbl"><table>
+<tr><th>악기</th><th>연주 자세와 주법</th></tr>
+<tr><td>장구</td><td class="sg-wrapc">채편이 몸의 중앙(<b class="sg-k">반주 장구는 몸의 정면</b>). 궁굴채로 북편, 열채로 채편</td></tr>
+<tr><td>꽹과리</td><td class="sg-wrapc">한 손은 채, 다른 손의 엄지손가락은 고리에 걸고 나머지 손가락은 꽹과리 안쪽에 대거나 떼어서 울림 조절. <b class="sg-k">'갠'</b>: 복판을 길거나 강하게 치기 / <b class="sg-k">'개'</b>: 짧거나 약하게 치기</td></tr>
+<tr><td>징</td><td class="sg-wrapc">한 손으로 채를 잡고 징의 중앙을 부드럽게 밀듯이 치기. '징': 복판을 강하게 치기</td></tr>
+<tr><td>북</td><td class="sg-wrapc">한 손으로 북을 잡고 다른 한 손은 채를 잡아 가죽의 중앙을 치기. <b class="sg-k">'둥'</b>: 복판을 길거나 강하게 치기 / <b class="sg-k">'두'</b>: 짧거나 약하게 치기</td></tr>
+</table></div>
+
+<h3>여러 지역에서 전승되는 국악 관련 문화유산</h3>
+<div class="sg-tbl"><table>
+<tr><th>유산</th><th>내용</th></tr>
+<tr><td>탈춤</td><td class="sg-wrapc">탈을 쓰고 악기연주에 맞추어 추는 춤(탈놀이). 북청 사자놀음(함경도), 하회 별신굿 탈놀이(경북 안동), 양주 별산대놀이(서울, 중부지방), <b class="sg-k">봉산탈춤(황해도)</b></td></tr>
+<tr><td>강강술래(전라도)</td><td class="sg-wrapc">서로 손을 잡고 원을 그리며 노는 놀이와 노래. <b class="sg-k">유네스코 인류무형문화유산</b></td></tr>
+<tr><td>강릉 단오제</td><td class="sg-wrapc">단옷날을 전후하여 펼쳐지는 강릉 지역의 향토 제례 의식</td></tr>
+<tr><td>동래 학춤(부산)</td><td class="sg-wrapc">맑고 우아한 학의 움직임을 흰 도포를 입고 표현</td></tr>
+<tr><td>제주 칠머리당 영등굿</td><td class="sg-wrapc">바다의 평온과 풍작 및 풍어를 기원하기 위해 음력 2월에 시행하는 제주도의 세시 풍속</td></tr>
+</table></div>
+
+<h3>봉산탈춤</h3>
+<div class="sg-card"><b>Point</b> 일곱 마당 / 5월 단오에 행해지던 세시 풍속의 하나 / <b class="sg-k">삼현육각</b> / <b class="sg-k">자진타령장단</b> / 추임새(얼~쑤, 절~쑤)</div>
+<ul>
+<li>국가무형유산. 조선시대 양반들의 모습을 풍자하여 익살스럽게 표현한 탈춤, 황해도 봉산 지역에서 전해 내려옴. 일곱 마당으로 구성</li>
+<li>주로 농민과 장터의 상인들을 대상으로 하였으며, 관아의 경사스러운 행사나 중국 사신을 영접할 때에도 특별히 행해짐. 감상: 가락이 화려하고 복잡. 씩씩하고 시원한 느낌</li>
+<li>반주 악기: <b class="sg-k">삼현육각</b>(향피리 두 대, 대금, 해금, 장구, 북 +꽹과리, 징). 악기 편성은 지역에 따라 부분 변동 가능. 장단: <b class="sg-k">자진타령장단</b>(=타령장단)</li>
+<li><b class="sg-k">추임새</b>: 탈춤을 구경하는 사람들이 장단에 맞추어 흥을 돋우기 위해 넣는 소리. 연주자와 관객 간에 소통할 수 있고 공감대를 형성한다</li>
+<li>동작 따라 하기: 기본 동작 = 오금질(무릎을 살짝 굽혔다 폈다), 발 디딤새. <b class="sg-k">붙림</b>: 악사들에게 춤에 필요한 반주를 해달라는 신호. '낙양동천 이화정'이라고 크게 외치며 오른쪽에서 왼쪽으로 한삼을 뿌리며 한 장단에 두 번 앉았다 일어선다. 그 밖의 동작: 황소걸음, 고개잡이, 외사위, 발 들기, 양사위</li>
+</ul>
+
+<h3>판소리</h3>
+<div class="sg-card"><b>Point</b> 소리꾼 한 명, 고수 한 명 / 인류무형문화유산 / 구성요소: 소리, 아니리, 발림, 추임새 / 통성 발성 / 추임새</div>
+<ul>
+<li>'판'(여러 사람이 모인 장소)과 '소리'(노래)가 합쳐진 말. 국가무형유산, 인류무형문화유산. 현재 전승되는 판소리 다섯 마당: <b class="sg-k">춘향가, 심청가, 흥보가, 수궁가, 적벽가</b></li>
+<li>소리꾼 한 명이 고수 한 명의 북장단에 맞춰 긴 이야기를 소리와 몸짓을 곁들여 여러 시간에 걸쳐 부른다</li>
+<li><b class="sg-k">구성요소</b>: 소리(=창): 소리꾼이 부르는 노랫가락 / 아니리: 소리꾼이 말하듯이 대화나 설명하는 것 / 발림(=너름새): 소리꾼이 하는 동작이나 몸짓 / 추임새: 고수나 청중이 하는 흥을 돋우는 말 (청중이 음악을 감상하기만 하는 입장이 아니라 판소리의 흥을 돋우기 위해 때로는 추임새를 넣어 소리꾼을 격려해 주는 역할)</li>
+<li><b class="sg-k">통성 발성</b>: 힘차게 나오는 소리, 성대를 약간 스쳐 좀 쉰 듯한 목소리가 좋은 소리 (cf. 두성발성 - 서양악곡)</li>
+</ul>
+
+<h3>산조</h3>
+<div class="sg-card"><b>Point</b> 기악 독주곡 / 연주자의 즉흥성 강조 (←판소리, 시나위) / 한배에 따른 형식</div>
+<ul>
+<li>장구 반주에 맞춰 연주하는 기악 독주곡. 조선 후기 판소리와 시나위를 바탕으로 만들어짐. '흐트러진 음악'이라는 뜻, 연주자의 즉흥성 강조</li>
+<li><b class="sg-k">진양조장단</b>으로 시작하여 점점 빨라지는 '한배에 따른 형식'. 진양조장단, 중모리장단, 자진모리장단을 기본으로 하여 각 장단의 사이사이나 끝에 중중모리장단, 굿거리장단, 단모리장단, 휘모리장단 등의 장단이 더해짐</li>
+<li>가야금 산조가 가장 먼저 만들어졌으며, 이후에 거문고, 대금, 해금, 피리, 아쟁, 퉁소, 단소의 산조가 연주됨. 각 가락에 처음으로 그 가락을 만들어 연주한 사람의 이름을 따서 '~류'라고 부름 (ex. 성금연류 가야금 산조)</li>
+<li>시나위: 무속 음악과 관련 있는 민속기악곡, 연주자들이 서로 다른 선율을 연주하면서 음악이 조화롭게 이어지는 특징</li>
+</ul>
+
+<h3>음악극</h3>
+<p><b class="sg-k">음악극(극음악)</b>: 음악과 함께 무대, 대사, 연기 등의 연극적인 요소가 조화를 이루는 종합 예술</p>
+<div class="sg-tbl"><table>
+<tr><th>구분</th><th>판소리</th><th>창극</th></tr>
+<tr><td>구성</td><td class="sg-wrapc">소리꾼 한 명, 고수 한 명. 별도의 무대 장치 x. 소리, 아니리, 발림으로 이야기 구연</td><td class="sg-wrapc">여러 명의 소리꾼. 관악기, 현악기, 타악기 반주와 무대 장치. 두창: 줄거리의 전개를 돕는 해설자</td></tr>
+<tr><td>공통</td><td class="sg-wrapc" colspan="2"><b class="sg-k">통성 발성</b>, 추임새를 청중과 함께 호응, 같은 이야기를 토대로 만들어짐, 전통문화를 토대로 만들어진 음악극. 창극 구성: 노래하는 사람, 반주하는 사람, 청중</td></tr>
+</table></div>
+
+<h3>다른 나라의 음악극</h3>
+<div class="sg-tbl"><table>
+<tr><th>갈래</th><th>용어</th><th>뜻</th></tr>
+<tr><td rowspan="6">오페라 - 마술피리</td><td>서곡</td><td class="sg-wrapc">막이 오르기 전 극의 분위기를 암시해 주는 관현악곡</td></tr>
+<tr><td>간주곡</td><td class="sg-wrapc">막과 막 사이에 연주되는 짧은 관현악곡</td></tr>
+<tr><td>레치타티보</td><td class="sg-wrapc">대사를 읊듯이 부르는 노래</td></tr>
+<tr><td>아리아</td><td class="sg-wrapc">주요 등장인물이 부르는 서정적인 노래</td></tr>
+<tr><td>중창</td><td class="sg-wrapc">두 사람 이상이 서로 대화하듯이 부르는 노래</td></tr>
+<tr><td>합창</td><td class="sg-wrapc">군중의 역할을 맡은 여러 사람이 부르는 노래</td></tr>
+<tr><td rowspan="7">뮤지컬 - 캣츠</td><td>서곡</td><td class="sg-wrapc">막이 오르기 전 극의 분위기를 암시해 주는 관현악곡</td></tr>
+<tr><td>오프닝 넘버</td><td class="sg-wrapc">작품 전체의 분위기를 표현하는 노래</td></tr>
+<tr><td>제시</td><td class="sg-wrapc">주요 캐릭터 소개. 앞으로 전개 설명하는 노래</td></tr>
+<tr><td>프로덕션 넘버</td><td class="sg-wrapc">주요 장면에서 부르는 노래. 모든 뮤지컬 요소 동원</td></tr>
+<tr><td>쇼 스토퍼</td><td class="sg-wrapc">익살스러운 노래나 연기. 분위기 전환</td></tr>
+<tr><td>아리아</td><td class="sg-wrapc">주요 등장인물이 부르는 서정적인 노래</td></tr>
+<tr><td>커튼콜</td><td class="sg-wrapc">공연 종료 후 관객들의 환호에 답하여 극 중 음악을 편곡하여 부르는 노래</td></tr>
+<tr><td>경극(중국) - 패왕별희</td><td colspan="2" class="sg-wrapc">노래, 대사, 동작, 무술 등으로 구성. 의상으로 인물의 신분, 직업</td></tr>
+<tr><td>가부키(일본) - 추신구라</td><td colspan="2" class="sg-wrapc">노래, 춤, 연기를 함께 함. 분장: 적색-선인 / 청색-악인. 의상으로 역사적 인물/일반인 구분</td></tr>
+</table></div>
+</section>
+
+<footer>원본 자료를 암기용으로 재구성했습니다.</footer></main>
+  </div>
+
+  <!-- 암기장: 영어 -->
+  <div id="englishContainer" class="sg-root" style="display:none">
+<div class="sg-wrap"><header class="sg-top"><h1 class="sg-h1">초등 영어교육론 암기장</h1><p>영어 기본이론 단권화 자료를 암기 순서에 맞춰 정리했습니다. 노란 표시가 핵심어입니다.</p></header></div>
+<div class="sg-bar"><div class="sg-bar-in"><div class="sg-toggles"><button class="sg-btn" data-r="quiz" aria-pressed="false">핵심어 가리기</button><button class="sg-btn" data-r="reveal" hidden>모두 보기</button><span class="sg-hint" data-r="hint">핵심어를 가리고 떠올려 보세요. 칸을 누르면 하나씩 열립니다.</span></div><nav class="sg-nav" aria-label="목차"><a href="#eng-en1" data-sg>1 언어 습득 이론</a><a href="#eng-en2" data-sg>2 교수법</a><a href="#eng-en3" data-sg>3 학습자 변인</a><a href="#eng-en4" data-sg>4 공통 지도</a><a href="#eng-en5" data-sg>5 듣기·읽기</a><a href="#eng-en6" data-sg>6 말하기·쓰기</a><a href="#eng-en7" data-sg>7 요소별 지도</a><a href="#eng-en8" data-sg>8 활동·교사언어</a><a href="#eng-en9" data-sg>9 평가</a></nav></div></div>
+<main class="sg-wrap">
+<section id="eng-en1">
+<h2><span class="sg-n">01</span>언어 습득 이론</h2>
+<h3>제1 언어 습득 이론 (모국어 습득 이론)</h3>
+<div class="sg-tbl"><table style="min-width:600px">
+<tr><th>이론</th><th>핵심 내용</th><th>한계·특징</th></tr>
+<tr><td>Behaviorism<br>(행동주의, Watson &amp; Raynor)</td><td class="sg-wrapc">모든 학습은 습관 형성, 조건화의 결과. <b class="sg-k">stimulus → response(mimicry·imitation) → reinforcement</b> → correct habit formation / conditioning → repetition(drill), accuracy</td><td class="sg-wrapc">유기체 = <b class="sg-k">tabula rasa</b>, 외부 environment = 절대적. 창의·창조적 언어 습득을 설명하지 못함</td></tr>
+<tr><td>Nativism / Innatism<br>(생득주의, Chomsky)</td><td class="sg-wrapc">언어 습득 장치 <b class="sg-k">LAD(Language Acquisition Device)</b>. Input 자연스러운 언어 환경 → LAD 자연·무의식적 규칙 습득 및 내면화 → Output 규칙 조합, 무한한 발화</td><td class="sg-wrapc">specific innate ability → discover underlying rules</td></tr>
+<tr><td>Constructivism<br>(구성주의, Piaget &amp; Vygotsky)</td><td class="sg-wrapc">환경과 유기체 간 <b class="sg-k">상호작용</b>에 주목, 학습자의 능동적 역할. 학습 = <b class="sg-k">cognitive dimension</b>(내적 구성, 새로운 지식 재구성) / <b class="sg-k">social dimension</b>(타인과의 상호작용). Teacher-centered → <b class="sg-k">Student-centered</b></td><td class="sg-wrapc"><b class="sg-k">Functional Approach(기능적 접근)</b>: 언어의 기능 = 의사소통(목적)을 위한 수단. form(Generative linguistics) → functions(사회적 맥락, 화용론)</td></tr>
+</table></div>
+
+<h3>제2 언어 습득 이론: Krashen의 Five Hypotheses</h3>
+<div class="sg-tbl"><table style="min-width:620px">
+<tr><th>가설</th><th>핵심 내용</th></tr>
+<tr><td>① Acquisition-Learning<br>(습득-학습 가설)</td><td class="sg-wrapc"><b class="sg-k">Acquisition</b>: Natural communication, "Picking up", subconscious·implicit, form &lt; meaning, fluency·intuition<br><b class="sg-k">Learning</b>: Formal teaching, "Knowing about", conscious·explicit, attend to form<br>→ <b class="sg-k">non-interface position</b>, mutually exclusive. ∴ do as much acquiring as possible in order to achieve communicative fluency</td></tr>
+<tr><td>② The Monitor Hypothesis<br>(모니터 가설)</td><td class="sg-wrapc">Learning → Output 전후 <b class="sg-k">monitor, editor</b> (polish). plenty of time, learned the relevant rules, is concerned about producing correct language 일 때 작동</td></tr>
+<tr><td>③ The Input Hypothesis<br>(입력 가설)</td><td class="sg-wrapc"><b class="sg-k">Comprehensible input (i+1)</b> (= intelligible). finely-tuned input(미세 조절 입력): X / roughly-tuned input(어림 조절 입력): O<br>교사의 전략: <b class="sg-k">modified input</b> - 짧고 간단한 문장(syntactic modification), 자주 사용되는 어휘(lexical modification), Pedagogical Aids(realia, picture), 현재·지금에 대해 설명, 천천히 명확하게 발음<br>Optimal Input = comprehensible, interesting·relevant, Grammatical Sequenced X, Sufficient Quantity<br><b class="sg-k">Silent Period</b> → 어느 정도 규칙 쌓이면 발화(강요 X), should not be forced to speak until they ready</td></tr>
+<tr><td>④ The Affective Filter<br>(정의적 여과막 가설)</td><td class="sg-wrapc">습득을 방해하는 심리적 장벽: <b class="sg-k">motivation↓ confidence↓ anxiety↑</b> → Filter↑ → 습득 저해 (well-disposed to processing input)</td></tr>
+<tr><td>⑤ The Natural Order<br>(자연적 순서 가설)</td><td class="sg-wrapc">-ing, be V, -s 복수형 → be 진행형 조동사, 관사 a/the → 불규칙 과거형 → 규칙 과거형, 3인칭 단수 s, 소유격 's. 단순성에 의해 결정, independent of the class order. 문법 교육 필요 X → <b class="sg-k">Zero Option(Position)</b>. Devopmentally ready: 발달적 준비</td></tr>
+</table></div>
+
+<h3>그 밖의 가설</h3>
+<div class="sg-tbl"><table style="min-width:620px">
+<tr><th>가설</th><th>핵심 내용</th></tr>
+<tr><td>Output Hypothesis<br>(출력 가설, Swain)</td><td class="sg-wrapc">comprehensible input만큼 <b class="sg-k">comprehensible output</b>도 필요. Input = semantic process(어휘적), Output = syntactic process(어법적) → 서로 다른 처리 과정<br><b class="sg-k">Output의 3가지 기능</b>: ① <b class="sg-k">Noticing Function</b>: 목표어와 나의 출력 사이 오류 확인 ② <b class="sg-k">Hypothesis-testing Function</b>: test various hypotheses ("try out") ③ <b class="sg-k">Metalinguistic Function</b>: 문법에 대해 사고하는 기능<br>(Pushed Output) 현재 구사력보다 약간 더 ↑ accuracy</td></tr>
+<tr><td>Interaction Hypothesis<br>(상호작용 가설, Long)</td><td class="sg-wrapc">Interaction = 입출력을 정확하게 할 수 있는 기회. <b class="sg-k">Modified Interaction → Meaning Negotiation</b>(의사소통의 단절이 있을 때 pronunciation, vocabulary, morpho-syntactic, pragmatic 등으로 의미 협상)<br>① <b class="sg-k">Comprehension Check 이해 점검</b> 화자: "Do you know what I mean?" ② <b class="sg-k">Confirmation Check 확인 점검</b> 청자, 반복·되묻기: "Are you mean X?" ③ <b class="sg-k">Clarification Request 명료화 요구</b> 청자: "Pardon?" "What do you mean?" (wh- / yes-no / tag question)<br>Meaning Negotiation이 언어 습득에 미치는 영향: ① Input: Modified input (unmodified / premodified / interactionally modified) ② Output: corrective feedback → 수정된 발화</td></tr>
+<tr><td>Sociocultural Theory<br>(사회문화적 가설, Vygotsky)</td><td class="sg-wrapc"><b class="sg-k">근접 발달 영역 ZPD</b>(Zone of Proximal Development): 학습자가 아직 혼자 기능하지 못하지만 도움(scaffolded help)으로 원하는 결과를 달성할 수 있는 지식·기술의 영역 (actual developmental level ~ potential developmental level)<br>교수학습은 ZPD 내에서 이루어져야 한다 → <b class="sg-k">Scaffolding</b>: simplifying tasks, guiding learners in appropriate directions, marking critical features of language, structuring task for success. two-way street = social interaction = collaborate effort</td></tr>
+<tr><td>인지주의 이론</td><td class="sg-wrapc">지식의 2가지 종류: <b class="sg-k">declarative / explicit knowledge</b>(의식적, 초보 운전) / <b class="sg-k">procedural / implicit knowledge</b>(무의식적, 경력 10년). <b class="sg-k">Automatization</b>: declarative → procedural. 학습→습득 <b class="sg-k">Interface</b>: O(strong: Automatization, weak: Focus on Forms) / X(Krashen: non-interface position)</td></tr>
+</table></div>
+</section>
+
+<section id="eng-en2">
+<h2><span class="sg-n">02</span>영어 교수법</h2>
+<h3>개요</h3>
+<div class="sg-tbl"><table>
+<tr><th>접근</th><th>교수법</th></tr>
+<tr><td>연역적 (deductive)</td><td class="sg-wrapc"><b class="sg-k">GTM</b></td></tr>
+<tr><td>귀납적 (inductive)</td><td class="sg-wrapc"><b class="sg-k">DM, ALM, TPR, NA, CLT, TBLT, WLA</b></td></tr>
+</table></div>
+
+<h3>전통적 교수법</h3>
+<div class="sg-tbl"><table style="min-width:620px">
+<tr><th>교수법</th><th>핵심 내용</th></tr>
+<tr><td>GTM<br>(문법-번역)</td><td class="sg-wrapc">일반원리 → 예시: deductive(연역적). <b class="sg-k">accuracy↑, decontextualized</b>(탈맥락화). 고립된 어휘와 문법 목록에 주의. 문자언어 Reading → exclusive focus. taught in the students' L1 / Translation exercises (L2 → L1)</td></tr>
+<tr><td>Direct Method<br>(DM, 직접)</td><td class="sg-wrapc">GTM 반대. 문법 분석·번역 X, <b class="sg-k">문자언어 X</b>. 음성언어 oral communication and listen skills → 듣기·말하기, 질문·대답. 모국어 사용 X, exclusively in the L2 → realia, picture, pantomime. 문법 inductive(귀납적)</td></tr>
+<tr><td>Audiolingual Method<br>(ALM, 청화식)</td><td class="sg-wrapc">Drill - listen and repeat, pattern drill. <b class="sg-k">accuracy↑, form &gt; meaning</b><br><b>언어 이론</b>: ① Structural linguistic 구조주의 언어학(음소, 형태소, 단어, 문장을 구성하는 pattern) ② <b class="sg-k">Contrastive analysis 대조 분석</b>(L1 → L2 transfer(positive, negative), negative transfer = interference(간섭), 공통점/차이점 분석 → 간섭현상 예측)<br><b>학습 이론</b>: <b class="sg-k">Behaviorism</b>. 오류 → 즉각적 수정(부적 강화 X). extrinsic approval, praise, intrinsic self-satisfaction → reinforcement. mechanical habit formation: 이해 X<br><b>목표</b>: 듣기, 정확한 발음 → 원어민처럼 언어 사용, linguistic competence(grammatical competence)<br><b>교수요목</b>: contrastive analysis → <b class="sg-k">structural syllabus</b>(구조 중심 교수요목)<br><b>활동</b>: pattern → dialogue에 녹임, contextualizing Key structures, drill, memorization<br><b>자료</b>: tape recorder → accurate models<br><b>절차</b>: ① Key structures 포함한 model dialogue 들려줌 ② 학생: repeat and memorize, 교사: direct and immediate correction ③ certain Key structures → pattern drills<br><b>장단점</b>: + 경제성↑(많은 인원) / - 정확성 강조 → 실제 상황으로 전이 X, 기계적인 연습에 흥미 X</td></tr>
+</table></div>
+
+<h4>Drill의 종류</h4>
+<div class="sg-tbl"><table>
+<tr><th>종류</th><th>내용</th></tr>
+<tr><td>minimal pair</td><td class="sg-wrapc">1) 분절음의 수가 같음 2) 한 곳의 분절음만 다름 3) 다른 분절음의 위치 같음</td></tr>
+<tr><td>substitution</td><td class="sg-wrapc"><b class="sg-k">cue(지시 단어)</b>를 넣어 말함</td></tr>
+<tr><td>transformation</td><td class="sg-wrapc">평서문 → 의문문</td></tr>
+<tr><td>backward build-up</td><td class="sg-wrapc">rhythm group(리듬 단위)</td></tr>
+<tr><td>chain</td><td class="sg-wrapc">대화를 체인과 같이 연결</td></tr>
+</table></div>
+
+<h3>대안적 교수법</h3>
+<div class="sg-tbl"><table style="min-width:620px">
+<tr><th>교수법</th><th>핵심 내용</th></tr>
+<tr><td>TPR<br>(전신반응 교수법, Asher)</td><td class="sg-wrapc">말 하면 대꾸 → 도저히 발화 X → 반응을 완전 신체 반응으로 하게끔 하자! <b class="sg-k">command / imperative → 의미 이해 → physical response</b>. ∴ 발화 강요 X 스트레스↓(Affective filter↓). Krashen "NA 초기에 TPR 활용해라!" 초등학교 Techniques<br><b>이론</b>: the skillful use of imperative → 문법구조, 어휘 습득 / ① <b class="sg-k">Bio-program</b>: listening competence → ability to speak ∴ comprehension-based approach (1. precede productive skills 2. teaching of speaking should be delayed until comprehension skills are established 3. listening skills transfer to other skills 4. teaching should emphasize meaning 5. teaching should minimize learner stress) ② Reduction to stress(Affective Filter↓) ③ Brain-based education: 우뇌(이해, 감각 운동) → 좌뇌(발화, 분석·논리)<br><b>목표</b>: oral proficiency 구어 능숙도, 말하기 ← 이해(수단). <b>교수요목</b>: sentence-based syllabus 문장 중심 교수요목, 문법 inductive<br><b>활동</b>: imperative drill, interrogative(의문문). <b>자료</b>: 초기에는 X, 수준 상승 → 교실 물건(책, 펜, 컵, 가구)<br><b>절차</b>: ① 복습 ② 새로 배울 명령문 ③ 역할 전환. 교사: director(active, direct role), 학생: listener, performer / novel combination 인식·반응 → 말하기 시작 / produce novel combination, 교사 오류 교정 X<br><b>장단점</b>: + 교사: 의미를 동작으로 명확히 제시, 학생 이해 수준 즉각 평가 / 학생: 움직임 → 수업 학습 불안↓, 신체활동과 연계 → 기억력↑ / - 추상적인 내용, 상위 수준↓, 교수법으로서의 독립적인 지위↓</td></tr>
+<tr><td>Natural Approach<br>(NA, 자연 교수법, Krashen·Terrell)</td><td class="sg-wrapc">Basic personal communicative skill. <b class="sg-k">input 강조 → comprehension-based approach</b><br><b>언어 이론</b>: 언어 = 어휘 + 구조 + 메시지(의사소통) ① NA → communicative approach 성질 가짐 ② meaning 강조 (Language is essentially its lexicon(어휘), 문법은 how the lexicon is exploited to produce messages) ③ Natural order → 언어 구조 단계별 숙달(자연 순서)<br><b>학습 이론</b>: <b class="sg-k">Five Hypotheses</b>, exposure to a wide range of vocabulary, visual aids are useful, relaxed classroom atmosphere → meaningful communication<br><b>목표</b>: Basic personal communicative skill, 의사소통 ← situation + topic + function. <b>교수요목</b>: learner needs에 따라 situation, topic 결정 (grammatical sequence X)<br><b>활동</b>: <b>comprehensible input, affective filter↓ 활동</b>(TPR, DM 마임 제스처 맥락, CLT 모든 활동). <b>자료</b>: 교실 활동 → meaningful, 실물, 그림, 시각 자료<br><b>절차</b>: ① <b class="sg-k">Preproduction stage</b> 발화 이전(교사: 이해 가능한 입력, 학생: 발화 필요 X 활동(TPR, 그림 가리키기)) ② <b class="sg-k">Early production stage</b> 초기 발화(교사: 오류 수정 X(unless errors block meaning), 학생: 많은 오류) ③ <b class="sg-k">Extending production stage</b> 발화 확장(교사: fluency↑, 오류 수정 X(sparse), 학생: role play, game, 모둠 활동)<br><b>장단점</b>: + 영어 교육 발달에 큰 영향, CLT의 바탕 / - Krashen의 반대 입장(문법 교육이 도움 됨), 끝까지 발화 x → <b class="sg-k">Fossilization(화석화)</b></td></tr>
+</table></div>
+
+<h3>의사소통적 교수법</h3>
+<h4>CLT (Communicative Language Teaching, 의사소통 중심 교수법)</h4>
+<ul>
+<li>Function = 의사소통의 목적. <b class="sg-k">Communicative competence</b> = 교수의 목적. 학생 → 문법학자 X, 언어를 use 의사소통</li>
+<li>균형: <b class="sg-k">accuracy</b>(conforming to language system) vs <b class="sg-k">fluency</b>(operating language quickly, 우선적 관심)</li>
+<li>4 language skills의 interdependence = <b class="sg-k">skill integration</b>, generating <b class="sg-k">unrehearsed</b> language performance "out there"</li>
+<li><b>언어 이론</b>: ① 언어 = system for the expression of meaning ② 언어 = 의사소통의 수단 ③ 언어 교수 → for communicative competence</li>
+</ul>
+<div class="sg-tbl"><table>
+<tr><th>Communicative competence 구성요소 (Canale·Swain)</th><th>내용</th></tr>
+<tr><td>Grammatical<br>(= linguistic, 한 문장)</td><td class="sg-wrapc">문법적으로 올바른 문장을 이해, 표현, 문법성 판단. linguistic forms, structure of language</td></tr>
+<tr><td>Discourse<br>(여러 문장)</td><td class="sg-wrapc">말을 조리 있게 연결, 문장/발화 간의 관계. <b class="sg-k">cohesion</b> 응집·결속성(형태적 연결: 지시(대명사·관사), substitution, ellipsis(생략), 어휘: 반복·동의어) / <b class="sg-k">coherence</b> 일관성(의미상 연결성·통일성)</td></tr>
+<tr><td>Socio-linguistic</td><td class="sg-wrapc">관계, 주제, 상황 고려 appropriacy. <b class="sg-k">sociocultural rules</b> 사회문화적 규약 / <b class="sg-k">pragmatic rules</b> 화용 규칙(intend meaning(진의), function 파악). register: 언어가 사용되는 방식(직업군, 집단 내), 격식의 정도를 포함. ex. lunch 대신 luncheon이라고 말함</td></tr>
+<tr><td>Strategic</td><td class="sg-wrapc">for 의사소통 효과↑ 대화 단절 X. 언어적·비언어적 <b class="sg-k">communicative strategies</b></td></tr>
+</table></div>
+<ul>
+<li><b>학습 이론</b>: ① <b class="sg-k">Communicative Principle</b>(실제 의사소통) ② <b class="sg-k">Task Principle</b> ③ <b class="sg-k">Meaningfulness Principle</b></li>
+<li><b>목표</b>: Communicative Competence. <b>교수요목</b>: <b class="sg-k">Notional-Functional Syllabus</b> → Functional Syllabus 기능을 조직 단위로 함. Function = 언어를 통해 성취하고자 하는 목적. 1 form → functions / 1 function ← forms</li>
+<li><b>활동</b>: 의사소통 중심, 자신이 가진 언어 지식을 실험·사용 기회 제공. fluency = accuracy 균형, skill integration. <b>자료</b>: text·task·realia-based materials, technology-supported materials</li>
+<li><b>절차</b>: 교사 = <b class="sg-k">Facilitator(촉진자)</b>, 오류 기록. 학생 = communicator, 적극적인 의미 협상, 자신의 학습에 책임</li>
+<li><b>장단점</b>: + 의사소통 능력의 모든 구성요소에 초점, 연습 X 교실 밖에서의 언어 이해·사용, <b class="sg-k">autonomous learner</b> 자주적 학습자 양성 / - 교사의 높은 영어 구사력 요구, 수업 시간 제한, 영어 사용 기회↓, 학생의 현실적 요구 vs 교수법의 목표</li>
+</ul>
+<h4>CLT 활동 - Pica의 상호작용과 의사소통 목적에 따른 과업</h4>
+<div class="sg-tbl"><table>
+<tr><th>활동</th><th>내용</th></tr>
+<tr><td>Jigsaw (직소·맞추기)</td><td class="sg-wrapc">서로 다른 정보 교환(통합) = <b class="sg-k">two-way information gap 양방향</b></td></tr>
+<tr><td>Information gap (정보차)</td><td class="sg-wrapc">너는 아는데 나는 몰라… = <b class="sg-k">One-way information gap 일방향</b></td></tr>
+<tr><td>Problem-solving (문제 해결)</td><td class="sg-wrapc">하나의 해결책 <b class="sg-k">convergent</b>. 정해진 답 O</td></tr>
+<tr><td>Decision-making (결정)</td><td class="sg-wrapc">다양한 결론 → 토론, 타협 하나의 결론. must choose one through negotiation discussion <b class="sg-k">convergent</b>. 정해진 답 X</td></tr>
+<tr><td>Opinion exchange (의견 교환)</td><td class="sg-wrapc">토론, 의견 교환 <b class="sg-k">divergent</b>. 여러 개의 결론(정답 X)</td></tr>
+</table></div>
+
+<h4>CLT vs ALM</h4>
+<div class="sg-tbl"><table>
+<tr><th>구분</th><th>CLT</th><th>ALM</th></tr>
+<tr><td>목표</td><td class="sg-wrapc">communicative competence</td><td class="sg-wrapc">linguistic competence</td></tr>
+<tr><td>초점</td><td class="sg-wrapc">Acceptable language, accuracy ← context, abstract X</td><td class="sg-wrapc">Accuracy, formal correctness</td></tr>
+<tr><td>발음</td><td class="sg-wrapc">Comprehension</td><td class="sg-wrapc">Native-like pronunciation</td></tr>
+<tr><td>맥락</td><td class="sg-wrapc">contextualization</td><td class="sg-wrapc">not necessarily…</td></tr>
+<tr><td>순서</td><td class="sg-wrapc">interest</td><td class="sg-wrapc">Principles of linguistic complexity</td></tr>
+<tr><td>의사소통 언제?</td><td class="sg-wrapc">encouraged from the very beginning</td><td class="sg-wrapc">after a long process of rigid drill</td></tr>
+<tr><td>읽기·쓰기</td><td class="sg-wrapc">start from the first day (if desired)</td><td class="sg-wrapc">deferred till speech is mastered</td></tr>
+<tr><td>교수학습</td><td class="sg-wrapc">struggling to communicate</td><td class="sg-wrapc">patterns of system</td></tr>
+<tr><td>오류</td><td class="sg-wrapc">through trial and error</td><td class="sg-wrapc">must be prevented at all costs</td></tr>
+<tr><td>언어적 다양성</td><td class="sg-wrapc">Linguistic variation = central concept</td><td class="sg-wrapc">recognized but emphasized X</td></tr>
+</table></div>
+
+<h4>TBLT (Task-Based Language Teaching, 과업중심 교수법)</h4>
+<ul>
+<li><b class="sg-k">Task</b>: 비언어적 목적 성취를 위해 언어를 사용하는 활동 (meaning exchange) / strong version of CLT</li>
+<li><b class="sg-k">Target / Real-world Task</b>: 교실 밖에서 수행 / <b class="sg-k">Pedagogical Task</b>: 수행할 수 있도록 고안한 교실 활동</li>
+<li><b>언어 이론</b>: ① 언어 = 의미를 만드는 수단 ② 언어 = achieving real-world goals. Language Proficient = 목적 달성을 위한 수단 ∴ 학습자의 communicative needs 중심, skill integration</li>
+<li><b>학습 이론</b>: ① 언어 학습 ← 학습자 내부의 습득 과정 ② Interaction Hypothesis - meaning negotiation ③ notice the gap(학습자의 제2 언어와 실제 제2 언어 차이) ④ Sociocultural Hypothesis - scaffolded learning ⑤ Task → motivation↑ ⑥ focus-on-form</li>
+<li><b>목표</b>: <b class="sg-k">needs analysis</b> 반영, 요구 X → 일반적 communicative competence. <b>교수요목</b>: ① needs analysis → target task ② task type 구분 ③ pedagogical task 도출 ④ 선정, 배열 → <b class="sg-k">Task syllabus, task-based syllabus 과업중심 교수요목</b> (Tasks are sequenced according to difficulty). Nunan의 과업: Real-world(요구 분석, 실생활에서 중요하다고 판단된 과업 → 수업 예행하도록 고안) / Pedagogical(실생활 반영 X, 수업을 목적으로 고안. Psycholinguistic basis in SLA theory)</li>
+<li><b>자료</b>: authentic materials / technology</li>
+<li><b>절차 (Willis)</b>: process &gt; product. ① <b class="sg-k">Pre-task 과업 전</b>: Introduction to topic and task, 배경지식, 절차, 결과물 ② <b class="sg-k">Task Cycle 과업 수행</b>: Task - Planning - Report / 돕되, 오류 수정 X (<b class="sg-k">Fluency</b>) ③ <b class="sg-k">Language Focus (post-task) 언어 초점</b>: analysis 문법에 대한 의식적 생각 - practice (<b class="sg-k">Accuracy</b>)</li>
+<li><b>장단점</b>: + 단순 암기 X, 자기 말을 함, 과제 선택과 수행에 능동적인 역할 → 동기↑ / - 상급자에게 적합</li>
+</ul>
+
+<h3>Whole Language Approach (WLA, 총체적 교수법)</h3>
+<ul>
+<li>Phonics 반대 (f + a + t = fat, bottom-up approach). 학습은 전체에서 부분으로 진행된다. <b class="sg-k">Top-down approach</b></li>
+<li><b>언어 이론</b>: ① 언어 = 의사소통을 이루기 위한 도구 ② <b class="sg-k">authenticity(실제성)</b> 강조 (ex. '사과하기' 기능 → 사과할 필요가 있는 실제 상황 요구) ③ <b class="sg-k">skill integration(separate X)</b></li>
+<li><b>학습 이론</b>: ① <b class="sg-k">Humanistic approach 인본주의적 접근</b> (authentic, personalized, collaborate) ② <b class="sg-k">Constructivist learning 구성주의적 학습</b> (create meaning, learn by doing, work collaboratively in mixed groups)</li>
+<li><b>목표</b>: ① authentic literature 사용 ② 이해력과 실제적 목적을 위한 읽기 ③ student-produced text 사용 ④ 학습자가 읽고 쓰는 것에 선택권 가짐 (<b class="sg-k">student-centered</b>) ⑤ skill integration</li>
+<li><b>활동</b>: organize the day in larger blocks of time → engage in meaningful pursuits. <b>자료</b>: authentic materials</li>
+<li><b>장단점</b>: + experiences and activities → relevant to learners' lives, needs / authentic materials, 제2 언어의 모든 측면의 발달 도움 / - 읽기: 자연적 X → 소리, 소리 기호에 대해 체계적으로 배워야…</li>
+</ul>
+
+<h3>PPP 수업 모형 (Presentation - Practice - Production)</h3>
+<p>교실에서 연습한 내용 → 실제 상황 적용, ALM 보완(+ production phase). 문법 측면의 교수법에서도 사용 가능.</p>
+<div class="sg-tbl"><table>
+<tr><th>단계</th><th>내용</th></tr>
+<tr><td>① Presentation 제시 단계</td><td class="sg-wrapc">교사 = <b class="sg-k">informant</b>. Introduce language items in contexts → dialogue / passage. dialogue: 초등, contextualization, 연습 용이. matching a language form with a meaning (예: 조동사 must-의무). example → meaningful / visual aids, mime, gesture</td></tr>
+<tr><td>② Practice 연습 단계</td><td class="sg-wrapc">교사 = <b class="sg-k">conductor / monitor</b>. 1) Controlled Practice Stage 통제 연습 단계 <b class="sg-k">accuracy</b>: 언어와 내용 모두 통제, 학습자 선택권 X / 발음, 문장 구성, 언어 사용 교정. <b class="sg-k">chorus work</b> 제창 연습(두려움·부담감·정의적 여과막↓, 학습효과↑), <b class="sg-k">cue-response practice</b> 대치 연습(substitution drill)<br>2) Guided Practice Stage 유도 연습 단계 <b class="sg-k">accuracy + fluency</b></td></tr>
+<tr><td>③ Production 발화 단계</td><td class="sg-wrapc">교사 = <b class="sg-k">manager, guide</b>. 영어를 목적 달성의 수단으로 사용하는가(의미 전달 &gt; 언어 연습 활동). 자신이 알고 있는 언어 지식을 총동원 / 피드백 ↓(의사소통 내용 &gt; 언어 형태). 학생들 사이에 상호작용 활발하게 일어나도록 활동 고안(class survey). personalize, relevant to students' life experience</td></tr>
+</table></div>
+<div class="sg-tbl"><table>
+<tr><th>PPP</th><th>TBLT</th></tr>
+<tr><td><b class="sg-k">accuracy → fluency</b></td><td><b class="sg-k">fluency → accuracy</b></td></tr>
+</table></div>
+</section>
+
+<section id="eng-en3">
+<h2><span class="sg-n">03</span>학습자 변인</h2>
+<h3>초등 학습자의 일반적 특성 (Halliwell)</h3>
+<div class="sg-tbl"><table>
+<tr><th>특성</th><th>내용</th></tr>
+<tr><td>의미 파악 능력</td><td class="sg-wrapc">개별 단어의 의미 X 말의 의미 해석. ← context 억양, 제스처, 표정, 행동. ∴ 의미 있는 context 제공(시각적 단서나 맥락) → realia, 그림, 제스처, 표정</td></tr>
+<tr><td>간접 학습 능력</td><td class="sg-wrapc">indirectly·무의식적 학습(간접적 상황). 게임, 다양한 활동. <b class="sg-k">"언어에 대해 system X" "언어를 가르친다"</b></td></tr>
+<tr><td>풍부한 상상력</td><td class="sg-wrapc">ready imagination. 괴물 draw and describe</td></tr>
+<tr><td>제한된 언어 자원, 창의적 사용</td><td class="sg-wrapc">영어에서 실제로 사용 X → 비문. using limited language creatively (ex. What's your like color?)</td></tr>
+<tr><td>놀이와 즐거움에 대한 본능</td><td class="sg-wrapc">finding and creating fun</td></tr>
+<tr><td>말하고자 하는 본능</td><td class="sg-wrapc">great delight in talking and doing. 짝 활동, 모둠 활동</td></tr>
+</table></div>
+
+<h3>Cognitive Domain 인지적 요인</h3>
+<h4>1. Learning Styles 학습 스타일</h4>
+<div class="sg-tbl"><table>
+<tr><th>스타일</th><th>내용</th></tr>
+<tr><td>Field Independence<br>(FI, 장 독립성)</td><td class="sg-wrapc">전체와 부분을 잘 구분, 관계 파악 / 주변 환경 영향↓. <b class="sg-k">particularistic(구체적), analytic(분석적)</b>. find solutions to problems for themselves. <b class="sg-k">인위적 학습 환경, 성인</b></td></tr>
+<tr><td>Field Dependence<br>(FD, 장 의존성)</td><td class="sg-wrapc">장을 하나의 통일체로 인식, 각 부분 개별 인식↓. <b class="sg-k">global, holistic(전체적), sociable</b>, work in groups. <b class="sg-k">자연, 실제적인 의사소통 언어 환경, 어린이</b></td></tr>
+<tr><td>Reflectivity 숙고성</td><td class="sg-wrapc">반응시간↑ 정확성↑ accuracy think deeply. 모든 변수를 체계적으로 고려하여 대처 / 문법, 문자언어</td></tr>
+<tr><td>Impulsivity 충동성</td><td class="sg-wrapc">반응시간↓ 정확성↓ fluency, <b class="sg-k">어린이</b>. 직관적이고 충동적으로 해결책 모색. 음성언어, 영어 발화 기회↑ 오류 두려워하지 않음 (trials and errors → provide feedback on them)</td></tr>
+<tr><td>Visual, Auditory, Kinesthetic</td><td class="sg-wrapc"><b class="sg-k">Visual</b>: charts, drawings, other graphic information / <b class="sg-k">Auditory</b>: listening to lectures, audiotapes / <b class="sg-k">Kinesthetic</b>: demonstrations(실연), physical activity involving bodily movement (+ tactile: 촉각의)</td></tr>
+<tr><td>Ambiguity tolerance<br>(모호함에 대한 관용)</td><td class="sg-wrapc">자신의 믿음, 지식에 상반되는 생각을 쉽게 수용하는 정도. ambiguity tolerance vs intolerance. 제2 언어 → 모호함↑ <b class="sg-k">어린이 유리!!</b> deal with ambiguous new stimuli without frustration(좌절), appeals to authority(도움)</td></tr>
+</table></div>
+
+<h4>2. Learner Strategies 학습자 전략</h4>
+<p>자신이 어떤 style, 어떤 strategies? → 교사 도움 X 스스로 <b class="sg-k">autonomous learner(autonomy)</b>. input → intake → acquisition → access → output (학습전략(input) / 의사소통 전략(output))</p>
+<div class="sg-tbl"><table style="min-width:600px">
+<tr><th>분류</th><th>전략</th><th>내용</th></tr>
+<tr><td rowspan="9">Learning Strategies 학습전략<br>- metacognitive 상위 인지 전략<br>(higher order executive skills 전 과정)</td><td>advance organizers (사전 조직)</td><td class="sg-wrapc">오스벨 - 선행 조직자(설명 조직자, 비교 조직자). 일반적, 포괄적 사전 검토 ex. 토론, 전체적 개요 설명</td></tr>
+<tr><td>selective attention (선택된 주의집중)</td><td class="sg-wrapc">입력의 특정 측면, 상황적 세부 사항에 집중 → cue the retention of language input</td></tr>
+<tr><td>directed attention (유도된 주의집중)</td><td class="sg-wrapc">학습 과업에 집중, 무관한 주의 방해 요소 X</td></tr>
+<tr><td>functional planning (기능적 계획)</td><td class="sg-wrapc">필요한 언어 요소 계획, 예행연습</td></tr>
+<tr><td>delayed production (지연된 발화)</td><td class="sg-wrapc">말하기는 미루기로 의식적으로 결정</td></tr>
+<tr><td>self management (자기관리)</td><td class="sg-wrapc">자신의 학습을 돕는 상황·상태 이해, 조정</td></tr>
+<tr><td>self-monitoring (자기 감시)</td><td class="sg-wrapc">특정 환경·사람 관련 적절성, 발음·문법·어휘 정확성을 고려해 발화 수정</td></tr>
+<tr><td>self-evaluation (자기 평가)</td><td class="sg-wrapc">완전한, 정확한 내적 기준 → 자신의 언어 학습 점검</td></tr>
+<tr><td>(planning)</td><td class="sg-wrapc">위 전략들은 planning 범주에 속함</td></tr>
+<tr><td rowspan="14">cognitive strategies 인지 전략<br>(직접적으로 관여, 직접적인 학습 자료 조작)</td><td>deduction (연역)</td><td class="sg-wrapc">제2 언어 이해를 위해 의식적으로 규칙 적용</td></tr>
+<tr><td>contextualization (문맥화)</td><td class="sg-wrapc">단어·구를 문장·단락과 같은 유의미한 언어 단위 안에 배열</td></tr>
+<tr><td>transfer (전이)</td><td class="sg-wrapc">이전에 습득한 언어적·개념적 지식 사용</td></tr>
+<tr><td>inferencing (추론)</td><td class="sg-wrapc">추측, 예측, 빠진 정보(행간의 의미)</td></tr>
+<tr><td>elaboration (상세한 설명, 정교화)</td><td class="sg-wrapc">새로운 정보를 기존 다른 개념과 연관 association</td></tr>
+<tr><td>Keyword (핵심어)</td><td class="sg-wrapc">① L2 단어와 발음이 유사한 L1 단어 ② 이미 알고 있는 단어, 새 단어의 관계를 쉽게 기억할 수 있는 이미지</td></tr>
+<tr><td>note taking (노트 정리)</td><td class="sg-wrapc">구두, 문자로 제시된 정보의 주요 내용, 요점, 기록</td></tr>
+<tr><td>imagery (형상화)</td><td class="sg-wrapc">친숙한 심상, 관용구, 위치 소재를 통해 시각적 개념과 연관시킴</td></tr>
+<tr><td>recombination (재결합)</td><td class="sg-wrapc">이미 아는 요소들을 새 방식으로 조합</td></tr>
+<tr><td>repetition (반복)</td><td class="sg-wrapc">소리, 속으로 언어 모델 <b class="sg-k">반복</b>(overt 공연한 practice / silent rehearsal)</td></tr>
+<tr><td>grouping (집단화)</td><td class="sg-wrapc">공통 속성 common attributes 를 근거로 reordering, reclassifying, labeling</td></tr>
+<tr><td>translation (번역)</td><td class="sg-wrapc">L2 이해·산출 근거로 L1 활용</td></tr>
+<tr><td>auditory representation (청각적 표상)</td><td class="sg-wrapc">단어, 구, 더 긴 언어 단위의 발음, 유사한 발음 기억 (retention of a similar sound)</td></tr>
+<tr><td>resourcing (자료 활용)</td><td class="sg-wrapc">모르는 단어 → 목표 언어 참고 <b class="sg-k">자료 활용</b></td></tr>
+<tr><td rowspan="2">Socioaffective strategies 사회·정의적 전략</td><td>cooperation (협동)</td><td class="sg-wrapc">피드백, 정보 취합, 언어활동 모델 제시 → 동료와 함께 학습</td></tr>
+<tr><td>question for clarification (확인 질문)</td><td class="sg-wrapc">반복, 바꿔 말하기, 설명이나 예를 요청하는 전략 → clarification request</td></tr>
+</table></div>
+
+<h4>Communication Strategies (= Strategic competence) 의사소통 전략</h4>
+<p>더 유창하게 표현, 자신의 실력보다 더 높은 수준의 대화. solving what to an individual presents itself as a problem in reaching a particular communicative goal.</p>
+<div class="sg-tbl"><table style="min-width:600px">
+<tr><th>분류</th><th>전략</th><th>내용</th></tr>
+<tr><td>avoidance strategies<br>회피 전략</td><td>syntactic, lexical, phonological(음운론적), topic avoidance / message abandonment, topic avoidance</td><td class="sg-wrapc"><b class="sg-k">message abandonment</b>(메시지 포기)를 포함</td></tr>
+<tr><td rowspan="3">compensatory strategies<br>보상 전략<br>(L2-based)</td><td>circumlocution (우회적 표현)</td><td class="sg-wrapc">Describing, exemplifying (corkscrew → open bottles with)</td></tr>
+<tr><td>approximation (근접 대체어)</td><td class="sg-wrapc">= 유의어, 근접한 대안적 용어. using an alternative term (ship → sailboat)</td></tr>
+<tr><td>word-coinage (단어 만들기)</td><td class="sg-wrapc">L2에 존재 X → 그럴듯한 규칙으로 창조</td></tr>
+<tr><td rowspan="3">compensatory<br>(L1-based)</td><td>code-switching (언어 전환)</td><td class="sg-wrapc">using a L1 word while speaking in L2 (I'm so 목말라.)</td></tr>
+<tr><td>literal translation (직역)</td><td class="sg-wrapc">L1을 L2로 그대로 직역해서 표현 (시험을 보다 → see an exam)</td></tr>
+<tr><td>foreignizing (외국어화)</td><td class="sg-wrapc">L1 단어 → L2 음운론 체계(phonology) → L2 형태론 체계(morphology)</td></tr>
+<tr><td rowspan="6">기타</td><td>prefabricated patterns (조립식 문형)</td><td class="sg-wrapc">memorized chunks (문법 구성 모름, 표현을 채로 암기)</td></tr>
+<tr><td>use of all-purpose words (다목적어 사용)</td><td class="sg-wrapc">특별한 의미가 없는 일반적 어휘를 구체적 어휘가 필요한 상황에서까지 확대해서 사용. thing, stuff (cf. 한국어: 거시기)</td></tr>
+<tr><td>appeal for help / to authority (도움 요청)</td><td class="sg-wrapc">직간접적으로 도움 요청</td></tr>
+<tr><td>stalling or time-gaining (시간 벌거나 끌기)</td><td class="sg-wrapc">using filters or hesitation devices: well, now let's see, uh…</td></tr>
+<tr><td>nonlinguistic / nonverbal signals (비언어적 신호)</td><td class="sg-wrapc">mime, gesture, facial expression, sound imitation(소리 모방)</td></tr>
+</table></div>
+
+<h3>Affective Factors 정의적 요인</h3>
+<h4>1. Motivation 동기</h4>
+<p>동기↑ → 스스로 노출의 양과 사용의 기회를 늘리고자 함 (determines the direction, magnitude of behavior)</p>
+<div class="sg-tbl"><table>
+<tr><th>종류</th><th>내용</th></tr>
+<tr><td>instrumental motivation</td><td class="sg-wrapc"><b class="sg-k">도구적 동기</b>: 영어 → 어떤 목적 성취를 위한 도구. 직장 입사, 시험 utilitarian 실용적 (specific purpose that brings rewards)</td></tr>
+<tr><td>integrative motivation</td><td class="sg-wrapc"><b class="sg-k">통합적 동기</b>: 목표어 집단에 대한 긍정적 감정. 목표어 화자들이나 문화에 통합</td></tr>
+<tr><td>intrinsic motivation</td><td class="sg-wrapc"><b class="sg-k">내재적 동기</b>: 학습자 내부, 역량↑, 자아실현, 즐거움 (reward → the activity itself)</td></tr>
+<tr><td>extrinsic motivation</td><td class="sg-wrapc"><b class="sg-k">외재적 동기</b>: 학습자 외부, 학점, 돈, 칭찬, 처벌 X (reward from outside beyond the self)</td></tr>
+</table></div>
+<p><b>motivational strategies 동기 유발 전략</b>: ① <b class="sg-k">role model</b> → 내재적 동기↑, 모범 보이기 ② <b class="sg-k">autonomy 자율권</b> → 학습에 능동적으로 참여 ③ 칭찬, 격려 → self-confidence, 학습 결과물(portfolio) → 성취감 ④ 즐거움, 안정감, <b class="sg-k">rapport 형성</b>, 협동 장려 ⑤ 흥미로운 활동, 선호 차이 고려 → 다양한 종류의 활동, 여러 감각을 사용하게 하는 다양한 유형의 자료 ⑥ 실생활 관련, 실제 언어 사용 활동</p>
+
+<div class="sg-tbl"><table>
+<tr><th>요인</th><th>내용</th></tr>
+<tr><td>2. Inhibition 억제 심리</td><td class="sg-wrapc">자신의 자아를 보호하고자 하는 억제 심리 (build sets of defenses to protect the ego). 억제 심리↓ → <b class="sg-k">소집단 활동</b></td></tr>
+<tr><td>3. Anxiety 불안감</td><td class="sg-wrapc"><b class="sg-k">debilitating(harmful) effect</b> 부정적 효과↓: to flee the learning task to avoid the source of anxiety / <b class="sg-k">facilitating(helpful) effect</b> 긍정적 효과↑: to fight the new learning task, to make extra efforts to overcome their anxiety</td></tr>
+<tr><td>4. Risk-taking 모험심</td><td class="sg-wrapc">언어 습득에서 모험 → 시행착오를 통해 언어를 배우는 것. 어린이는 성인에 비해 모험심↑. Learners have to be able to gamble a bit, to be willing to try out hunches about the language and take the risk of being wrong</td></tr>
+</table></div>
+</section>
+
+<section id="eng-en4">
+<h2><span class="sg-n">04</span>기능별 언어 지도 ① 공통</h2>
+<h3>1. MAP 과정: 교수·학습에 필요한 요소</h3>
+<div class="sg-tbl"><table>
+<tr><th>요소</th><th>내용</th></tr>
+<tr><td>Motivation</td><td class="sg-wrapc">영어 학습에 흥미·관심 야기, 도전 의식 부여 → 적극 참여. 활동: 게임, 챈트, 노래, 그림, 스토리텔링</td></tr>
+<tr><td>Activation 및 Long-term memorization</td><td class="sg-wrapc"><b class="sg-k">(Schema) Activation</b>: schema 인간의 사전 경험, 사전 지식. pre-listening, pre-reading activities↑<br>스키마의 유형: <b class="sg-k">Content Schema(ta)</b>(배경지식, sociocultural knowledge) / <b class="sg-k">Formal Schema(ta)</b>(how discourse is organized with respect to genres, topics, or purpose) / <b class="sg-k">Long-term memorization</b>(새롭게 입력된 정보 기능, 언어 형식을 장기 기억으로 부호화하는 과정)</td></tr>
+<tr><td>Personalization 개별화</td><td class="sg-wrapc">주어진 상황, 화제에 적합한 언어를 자신의 언어로 표현. 제약↓ 학습자가 실제성 있는 언어를 구현할 기회 제공. linking the content to the student's lives, involving students in developing, choosing content</td></tr>
+</table></div>
+
+<h3>2. Fluency vs Accuracy</h3>
+<p>학습 초기에 유창성 강조 → 점차 정확성 신장에 중점</p>
+<div class="sg-tbl"><table>
+<tr><th>구분</th><th>내용</th></tr>
+<tr><td>Fluency (의사소통 활동)</td><td class="sg-wrapc">언어 체계를 빠르게 작동하는 것. 머뭇거림 없이 말의 단위를 연결하는 능력, 의사소통 활동. disruptive pauses, restarts, breakdown X, being distracted X. "언어를 유창하게" → 정확성 전제 ∴ 균형!! 학습자가 자신이 하는 말의 의미를 알아야 함. 친숙함, 자신감 → 함정, 반복(기계적 X) internalization. <b class="sg-k">message-oriented</b>(= language use)</td></tr>
+<tr><td>Accuracy (통제 연습)</td><td class="sg-wrapc">언어 체계에 부합하는 것. 학생의 발화 오류에 대해 피드백 제공 통제연습. <b class="sg-k">language-oriented</b>(= language usage 용법)</td></tr>
+</table></div>
+
+<h3>3. Skill Integration</h3>
+<p>실제 의사소통 상황에서는 각 영역 뚜렷하게 구분 X → 두 가지 기능 이상을 통합적으로 사용하는 수업. Authentic language와 유사한 환경 제공. incremental language skill in tandem. <b class="sg-k">Integrated-skill approach</b> = interact naturally; a real means of interaction, sharing among people.</p>
+
+<h3>4. CALL (Computer-Assisted Language Learning)</h3>
+<p>풍부하고 다양한 형태의 input / 강한 학습 동기. T-S, S-S 실제적 상호작용 기회 제공. 개별화된 학습 내용, 자기 주도적 학습 환경.</p>
+<div class="sg-tbl"><table>
+<tr><th>유형</th><th>내용</th></tr>
+<tr><td>CMC</td><td class="sg-wrapc"><b class="sg-k">Computer-Mediated Communication</b> 매개. use target language for authentic and meaningful purpose. <b class="sg-k">synchronous</b>: messenger, zoom 실시간 / <b class="sg-k">asynchronous</b>: email, discussion forum</td></tr>
+<tr><td>Blended (= hybrid)</td><td class="sg-wrapc">온라인 + 오프라인(face-to-face, brick-and-mortar). control over the time and pace</td></tr>
+<tr><td>Flipped (= 거꾸로)</td><td class="sg-wrapc">traditional classroom instruction → viewed at home independently / collaborative, communicated, differentiated learning → class time</td></tr>
+</table></div>
+</section>
+
+<section id="eng-en5">
+<h2><span class="sg-n">05</span>기능별 언어 지도 ② 듣기·읽기</h2>
+<h3>듣기 지도</h3>
+<div class="sg-tbl"><table style="min-width:600px">
+<tr><th>처리 방식</th><th>내용</th></tr>
+<tr><td><b class="sg-k">bottom-up processing</b><br>상향식 정보 처리</td><td class="sg-wrapc">듣기 자료 자체에 대해 정보 처리. 입력 자체를 음성·단어·구문·문장 순으로 <b class="sg-k">decoding</b> (linear fashion: smallest units → complete texts). meaning: derived as the last step in the process. ① 입력을 들으며 알고 있는 단어가 있는지 주목 ② 음성의 흐름 → 구성요소로 나눔 ③ 정보의 초점 → 음운적으로 중요한 부분·단어에 주목 ④ 문법적 단서 사용<br>유형: 음소 구별하기(bear / pear, laid / lead) / 문장의 억양 구별하기 / 형태론적 어미 선택적으로 듣기(-ed) / 단어 식별하기</td></tr>
+<tr><td><b class="sg-k">top-down processing</b><br>하향식 정보 처리</td><td class="sg-wrapc">activation of schemata, context 스키마, 맥락적 지식의 활성화. deriving meaning 의미 도출 global understanding 전체적 이해. interpretation of a text 텍스트 해석. contextual knowledge → specific listening situation, ongoing discourse. ① 상호작용: 특정 기능 및 목적에 할당 ② 인과 관계, 말의 주제, 사건 간 연결, 빠진 부분 추론 ③ 결과 기대. 정서적 반응 파악하기 / 주제 파악하기</td></tr>
+<tr><td><b class="sg-k">interactive processing</b><br>상호작용식</td><td class="sg-wrapc">상향식 + 하향식 듣기 전략을 모두 사용 → 정확한 이해, 전체적인 의미 파악. build a semantic network of word associations</td></tr>
+</table></div>
+
+<h4>교실 듣기 유형</h4>
+<div class="sg-tbl"><table>
+<tr><th>유형</th><th>내용</th></tr>
+<tr><td>responsive 반응</td><td class="sg-wrapc">교사 발화 즉시 이해, 적절히 즉각 반응. asking, command, seeking clarification, checking comprehension</td></tr>
+<tr><td>reactive 반사적</td><td class="sg-wrapc">단순히 따라 말하기 위해 들음. 의미 이해 X → 발음, 듣고 따라 말하기 연습. choral / individual drills(pronunciation)</td></tr>
+<tr><td>selective 선택적</td><td class="sg-wrapc">보다 긴 담화 → 특정 정보를 위해 선택적으로 듣기. 많은 정보 중에서 필요한 정보만 → 전반적 내용 X. 연설, 방송, 일화 등에서 이름, 날짜, 위치. listening cloze(blank), information transfer(listen → see)</td></tr>
+<tr><td>intensive 집중적</td><td class="sg-wrapc">특정 음소·단어·억양·담화 표지(discourse marker) 구별. bottom-up processing. she/he → phonemic, missed/miss → morphological, can(모음 약화)/can't(모음 약화 X) → stress</td></tr>
+<tr><td>extensive 확장적</td><td class="sg-wrapc">긴 강의, 대화, 이야기 → 전체적 의미, 목적. top-down processing. note taking, retelling</td></tr>
+<tr><td>interactive 상호작용적</td><td class="sg-wrapc">discussion, debate, conversation, role-play. pair and group work → 듣기 유형 모두(말하기 기능과 통합)</td></tr>
+<tr><td>selective vs intensive</td><td class="sg-wrapc">selective listening: 언어의 <b class="sg-k">내용적</b> 측면에 초점 / intensive listening: 언어의 <b class="sg-k">형식적</b> 측면에 초점</td></tr>
+</table></div>
+
+<h4>과정 중심 듣기 지도 - 전·중·후</h4>
+<div class="sg-tbl"><table>
+<tr><th>단계</th><th>내용</th></tr>
+<tr><td>Pre-Listening 듣기 전 활동</td><td class="sg-wrapc">듣기 자료와 관련한 내용적, 언어적 지식 활성화. essential background information, <b class="sg-k">schema</b>. 듣기 주제, 소재 이야기 / 관련 어휘 및 표현 익히기(unknown vocabulary - central, which cannot be guessed form context) / 관련 그림을 보며 들을 내용 예측(select a suitable purpose, strategy)</td></tr>
+<tr><td>While-Listening 듣기 중 활동</td><td class="sg-wrapc">듣기 내용에 대해 이해. 들은 내용에 해당하는 그림 찾기, 도표/그림 완성하기 / 순서대로 그림 배열하기, 세부 정보 및 중심 내용 파악. help to process the meaning of the text. task that requires too much reading or writing X</td></tr>
+<tr><td>Post-Listening 듣기 후 활동</td><td class="sg-wrapc">들은 내용에 포함된 언어를 활용 및 확장. 다른 언어 기능 활동과 연계. 노래·챈트·게임·기도 / 들은 내용에 대해 말하거나 글쓰기. check students' understanding of a text. involve a microanalysis of sections of the text. recognize <b class="sg-k">features</b> that they were unable to process (blends, reduced words…). skill integration - make links to other skills. bottom-up - return to the text, examine some of its structure, grammar, vocabulary</td></tr>
+</table></div>
+
+<h3>읽기 지도</h3>
+<div class="sg-tbl"><table>
+<tr><th>처리 방식</th><th>내용</th></tr>
+<tr><td>bottom-up<br>상향식</td><td class="sg-wrapc">음소와 문자의 대응 관계 인식 → 어휘, 문법, 의미, 담화 속 관계 파악. 문자를 상응하는 음성으로(철자-소리) <b class="sg-k">decoding</b>. recognize multiplicity of linguistic signals ← impose order</td></tr>
+<tr><td>top-down<br>하향식</td><td class="sg-wrapc">기존에 가지고 있는 지식에 의존(inference) → 필자가 전하는 의미 이해. background knowledge, make(confirm / reject) prediction. all individual words are understood X. meaning-generating activity → mastery of bottom-up skill</td></tr>
+<tr><td>interactive<br>상호작용식</td><td class="sg-wrapc">상향식의 정보 인식 방식 + 하향식의 오류 반복. 빠르고 효율적인 단어 인지 + 배경지식</td></tr>
+</table></div>
+
+<h4>읽기의 단계</h4>
+<div class="sg-tbl"><table>
+<tr><th>단계</th><th>내용</th></tr>
+<tr><td>1. Literal</td><td class="sg-wrapc">문자 그대로 이해. 명시적, 직접적으로 쓰인 그대로의 뜻</td></tr>
+<tr><td>2. 해석적 이해 (Interpretive / Inferential)</td><td class="sg-wrapc">문장에 쓰이지 않은 더 깊은 뜻 파악(정보 + 배경지식 이용). making generalizations 일반화하기. reasoning cause and effect 인과 관계 추론하기. anticipating endings 결말 예상하기</td></tr>
+<tr><td>3. 비판적 이해 (Critical)</td><td class="sg-wrapc">가치관, 수준, 사실의 정확성, 글의 질, 진실성 평가·판단. evaluate, pass personal judgment on the quality, values, accuracy, truthfulness</td></tr>
+<tr><td>4. 창의적 이해 (Creative)</td><td class="sg-wrapc">이해는 물론이고, 읽은 것에 토대 → 새로운 것 생각. applying information to new situations. 글에 대해 정의적으로 반응 responding emotionally</td></tr>
+</table></div>
+
+<h4>읽기 전략</h4>
+<div class="sg-tbl"><table>
+<tr><th>전략</th><th>내용</th></tr>
+<tr><td>Scanning</td><td class="sg-wrapc">미리 찾고자 하는 특정 정보를 염두에 두고 집중적으로 선택해 읽기 (사전, 전화번호부, 신문에서 필요한 광고, bus timetable). ex. "When did Mary die?" "Who ate the cake?"</td></tr>
+<tr><td>Skimming</td><td class="sg-wrapc">글의 전체적 윤곽, 중심 생각, 핵심적 요지 등을 파악하기 위해 세부 사항에 크게 구애 X 전체적으로 빠르게 읽기 (rapidly reading a text to get the gist, main ideas). ex. "What is the topic?" "Which title fits best?"</td></tr>
+<tr><td>Guessing / Inferencing</td><td class="sg-wrapc">guess: the meaning of a word / grammatical relationship, discourse relationship / content message. infer: implied meaning, read between the lines 행간의 의미</td></tr>
+<tr><td>Semantic mapping 의미망</td><td class="sg-wrapc">(= a form of graphic organizer) 지문 속 여러 가지 사건, 생각을 관련된 것끼리 묶어 의미론적 지도 그리기. words, meanings, images, propositional content 사이의 관계 표현</td></tr>
+<tr><td>Thinking Aloud</td><td class="sg-wrapc">소리 내서 생각!: model how a good reader thinks about text while reading. student → learn to monitor their thinking</td></tr>
+</table></div>
+
+<h4>과정 중심 읽기 지도 - 전·중·후</h4>
+<div class="sg-tbl"><table>
+<tr><th>단계</th><th>내용</th></tr>
+<tr><td>Pre-reading 읽기 전</td><td class="sg-wrapc">읽기의 목적, 배경지식, 흥미 유발, 필요한 어휘 제시. 텍스트의 주제 단서를 보고 brainstorming / 텍스트의 그림, 사진, 표, 소제목 등만 보고 내용 예측 / 읽을 내용과 관련된 어휘, 표현 익히기. reduce the difficulty level of the text → apply reading skills, strategies while reading</td></tr>
+<tr><td>While-reading 읽기 중</td><td class="sg-wrapc">읽은 내용에 대해 이해 → 의미 있는 과업 제시, 적극 참여 유도(ex. 의미망). reading aloud / silent reading / 구조 도식화 tree 완성, discourse marker 찾기 / 읽은 내용에 해당하는 그림 찾기, 세부 정보 및 중심 내용 파악. narrative → number the sequence(non-sequentially) / information-based text → information-transfer task</td></tr>
+<tr><td>Post-reading 읽기 후</td><td class="sg-wrapc">글에 포함된 언어를 활용 및 확장, 다른 언어 기능 활동과 연계. 문법, 어휘, 구조 및 담화 특성 bottom-up / 노래, 챈트, 게임, 토론, 역할극 / imagining, changing / 쓰기와 통합: 읽은 내용 그룹별 요약 / 읽은 내용에 관하여 자신의 의견 말하기. review of the strategies / remembering↑</td></tr>
+</table></div>
+
+<h4>읽기의 유형</h4>
+<div class="sg-tbl"><table>
+<tr><th>유형</th><th>내용</th></tr>
+<tr><td>intensive 정독, 자세히 읽기</td><td class="sg-wrapc">정확하고 자세한 내용 파악, 언어 표현과 문법에 주의 깊게 따짐. 이후의 독서를 위한 훈련 과정, 교실 읽기(수능) / 계약서. classroom-oriented activity. focus on linguistic, semantic(지시, 지칭…) detail</td></tr>
+<tr><td>extensive 다독, 많이 읽기</td><td class="sg-wrapc">교양 증진, 재미, 양적으로 많은 글을 읽기. 글의 전체적이고 개략적인 내용 파악, 즐거움. 학습자가 스스로 읽을 책 고르기, 교실 도서관. general understanding, outside class time</td></tr>
+<tr><td>reading aloud 소리내어읽기</td><td class="sg-wrapc">소리와 문자를 연결 짓는 훈련 과정(분절음, 초분절음). 발음 능력, 전체 구사력 측정. 실제성↓ / 발음에 주의력 치중 → 내용 이해↓. 한 아동 읽기 → 나머지 듣지 않음, 좋지 않은 모범독일 위험. 오래 진행될 경우 싫증</td></tr>
+<tr><td>silent reading 묵독</td><td class="sg-wrapc">(= 묵독) 발음에 대한 부담 X 이해에 초점. 이전에 들어 알고 있는 이야기, 관심 끌 수 있는 내용</td></tr>
+<tr><td>repeated reading</td><td class="sg-wrapc">readers' theatre 참고(활동 중심 수업 - 교실 드라마). fluency 상승</td></tr>
+</table></div>
+
+<h4>Sight Words (= high frequency word) 일견 어휘 (= 시각 어휘)</h4>
+<p>통째로 한 번에 보고 인식할 수 있는 낱말 'the, an, is were, if, have'… look and say 방법으로 지도. memorize as a whole by sight, automatically recognize.</p>
+
+<h4>Phonics Approach 음철법</h4>
+<p>symbol 철자-sound relationship을 바탕으로 단어 읽음. 문자의 배열에 따른 경향성을 이해, 처음 보는 단어도 소리 내어! 자음 → 모음 → 통합적 접근 rhyme / onset 분석. 뜻 이해 X 문자와 소리의 관계만 중심으로 다루는 음성 decoding.</p>
+<div class="sg-tbl"><table>
+<tr><th>용어</th><th>내용</th></tr>
+<tr><td>phonological</td><td class="sg-wrapc">음운론적: 분절 음운 + 초분절 음운</td></tr>
+<tr><td>phonemic</td><td class="sg-wrapc">phonological의 하위 분류 중 하나. 음소적: 의미를 구별</td></tr>
+<tr><td>prosodic</td><td class="sg-wrapc">phonological의 하위 분류 중 하나. 운율적: 초분절 음운 관련. 의미를 구별하는 기능을 할 때 phonemic 지위를 가짐</td></tr>
+</table></div>
+<div class="sg-tbl"><table>
+<tr><th>지도 단계</th><th>내용</th></tr>
+<tr><td>① 알파벳 음소에 대한 인식</td><td class="sg-wrapc">cat = K / æ / t</td></tr>
+<tr><td>② 철자-소리의 상관관계 인식</td><td class="sg-wrapc">c=[K] a=[æ] t=[t]</td></tr>
+<tr><td>③ 구체적 낱말 읽기</td><td class="sg-wrapc">cat을 [kæt]로 읽음</td></tr>
+<tr><td>④ 인지 낱말의 확장</td><td class="sg-wrapc">fat, cat, sat, mat 인지</td></tr>
+<tr><td>⑤ 어구(낱말+낱말) 읽기</td><td class="sg-wrapc">the fat cat</td></tr>
+<tr><td>⑥ 문장 읽기</td><td class="sg-wrapc">the fat cat sat on mat</td></tr>
+<tr><td>⑦ 독립적인 읽기 (상향식)</td><td class="sg-wrapc">스스로 문장을 읽음</td></tr>
+</table></div>
+<div class="sg-tbl"><table>
+<tr><th>구분</th><th>Phonics Approach</th><th>Whole Language Approach</th></tr>
+<tr><td>방향</td><td class="sg-wrapc">bottom-up / learning</td><td class="sg-wrapc">top-down / acquisition</td></tr>
+<tr><td>초점</td><td class="sg-wrapc">focus on form</td><td class="sg-wrapc">focus on meaning</td></tr>
+<tr><td>자료</td><td class="sg-wrapc">specially designed materials</td><td class="sg-wrapc">authentic literature</td></tr>
+</table></div>
+<div class="sg-tbl"><table>
+<tr><th>텍스트 종류</th><th>내용</th></tr>
+<tr><td>decodable (= controlled)</td><td class="sg-wrapc">small, beginner-oriented books. immediately apply phonics elements. simple sentence structures. controlled letter-sound correspondence, spelling patterns, irregular sight words</td></tr>
+<tr><td>predictable</td><td class="sg-wrapc">repetition of core structures, chunk. repetitive language(+ illustrations). delay acquisition of phonics skill (just guess)</td></tr>
+<tr><td>trade</td><td class="sg-wrapc">used to build academic knowledge, vocabulary for enjoyment, motivation↑</td></tr>
+</table></div>
+
+<h4>읽기 지도 방법</h4>
+<div class="sg-tbl"><table>
+<tr><th>방법</th><th>내용</th></tr>
+<tr><td>dictated stories</td><td class="sg-wrapc">학생들이 불러주는 이야기를 교사가 칠판에 받아 적는 활동</td></tr>
+<tr><td>reading aloud</td><td class="sg-wrapc">교사에 의한 소리 내어 읽어주기</td></tr>
+<tr><td>shared reading</td><td class="sg-wrapc">학생들 전체가 볼 수 있도록 big book을 준비</td></tr>
+<tr><td>sustained silent reading</td><td class="sg-wrapc">혼자서 읽는 묵독. 읽고 싶은 책을 자유롭게 읽음</td></tr>
+</table></div>
+</section>
+
+<section id="eng-en6">
+<h2><span class="sg-n">06</span>기능별 언어 지도 ③ 말하기·쓰기</h2>
+<h3>말하기 지도</h3>
+<h4>말하기의 특성</h4>
+<ul>
+<li><b class="sg-k">information gap</b>: 의사소통의 본질 = information 교환 → 화자와 청자 사이에 정보차(정보차 활동의 사용 권장). T(연필을 보여주며) What's this? S: It's a pen. 정보차 X</li>
+<li><b class="sg-k">interaction</b> 상호작용: 의미 협상, 명료화, 말의 순서 교대, 주제 선정, 말의 종결. 자신의 의사를 명확하게 표현하는 것은 물론 상대방의 의사도 이해·대처해야 함</li>
+</ul>
+<h4>말하기 연습 활동 (Drill)</h4>
+<div class="sg-tbl"><table>
+<tr><th>유형</th><th>내용</th></tr>
+<tr><td>Mechanical 기계적</td><td class="sg-wrapc">답 1개, 완전히 통제됨. 학습 초기 단계에서 학습자가 문장 의미 이해 X. memorize the pattern(mistake X)</td></tr>
+<tr><td>Meaningful 유의적</td><td class="sg-wrapc">2가지 이상 형태, 통제 조절. (학습자가 말할 내용 알고 있음, 정보차 X) 말하는 구문, 전체 의미 이해 O. less suitable for choral drilling 제창 연습에 적합 X</td></tr>
+<tr><td>Communicative 의사소통</td><td class="sg-wrapc">통제 X 구조 사용에 대해 어느 정도 통제된 말하기 연습. 자신이 말하고 싶은 것 선택하여 자유롭게 말함. add new information about real world. (학습자가 말할 내용 예측 불가능, 정보차 O)</td></tr>
+</table></div>
+
+<h4>Interlanguage (= learner language) 중간언어</h4>
+<p>a transitional point between L1 and L2 과도기. Independent system, not simply a degenerate form of L2.</p>
+<div class="sg-tbl"><table>
+<tr><th>단계</th><th>내용</th></tr>
+<tr><td>① pre-systematic stage 체계 전 단계</td><td class="sg-wrapc">random errors, 체계적 질서 존재를 어렴풋이 인식</td></tr>
+<tr><td>② emergent stage 출현 단계</td><td class="sg-wrapc">오류 지적 → 수정 X. <b class="sg-k">backsliding 현상</b>(seems to have grasped a rule, and then regresses to a previous stage) / <b class="sg-k">U-shaped learning</b>: 옳음 → 오류 → 다시 옳음 형태로 돌아옴</td></tr>
+<tr><td>③ systematic stage 체계적 단계</td><td class="sg-wrapc">발화에 더 일관성, 오류 지적 → 수정 가능</td></tr>
+<tr><td>④ stabilization / post-systematic stage 안정화 / 체계 후 단계</td><td class="sg-wrapc">유창, 스스로 수정 / △ <b class="sg-k">Fossilization 화석화</b> (recurring errors permanent features of learner's speech)</td></tr>
+</table></div>
+
+<h4>말하기 오류 지도</h4>
+<div class="sg-tbl"><table>
+<tr><th>분류</th><th>내용</th></tr>
+<tr><td>Global error 포괄적/전체적</td><td class="sg-wrapc">의사 전달에 지장을 초래하는 정도에 따른 분류. impede communication, incomprehensible ("Look at the widow."). <b class="sg-k">Fluency</b></td></tr>
+<tr><td>Local error 부분적/지엽적</td><td class="sg-wrapc">문법적으로 틀린 오류(accurate guess). <b class="sg-k">Accuracy</b>. 즉각적 오류 수정, 다양한 교정적 피드백 제공 ("I'm study English everyday.")</td></tr>
+<tr><td>Interference 간섭 오류</td><td class="sg-wrapc">= transfer error, interlingual error. 모국어의 간섭, 전이로 발음/어휘/구문/화용 오류</td></tr>
+<tr><td>Developmental 발달 오류</td><td class="sg-wrapc">= intralingual error. 목표어 자체의 규칙을 overgeneralization(과잉일반화) 하여 적용. 형태소/의문문/종속절 어순 오류</td></tr>
+</table></div>
+<ul>
+<li>오류의 원인: ① interlingual transfer 언어 간 전이 → interference error ② intralingual transfer 언어 내 전이 → developmental error ③ communication strategies 의사소통 전략</li>
+<li>오류의 수정: <b class="sg-k">CLT</b> - 전체 오류 O 지엽적 오류 X / <b class="sg-k">PPP</b> - 발화: 전체적 오류, 연습: 지엽적 오류</li>
+</ul>
+
+<h4>Categories of Error Treatment 오류 처리 유형</h4>
+<div class="sg-tbl"><table>
+<tr><th>유형</th><th>내용</th></tr>
+<tr><td>Explicit correction 명시적 교정</td><td class="sg-wrapc">Clear indication that form is incorrect. 교정된 형태 제공 (provision of a correct form). "No. You have to say -."</td></tr>
+<tr><td>Recast 고쳐 말하기</td><td class="sg-wrapc">의사소통 흐름 단절 X, 오류 수정해서 말해주는 암시적 피드백. reformulate, expand ill-form(unobtrusive way)</td></tr>
+<tr><td>Metalinguistic feedback 상위언어적</td><td class="sg-wrapc">올바른 언어 표현에 관한 질문·정보 제공(형태 제시 X). "What is the past tense form of go?"</td></tr>
+<tr><td>Repetition</td><td class="sg-wrapc">억양을 바꿔서 학습자 발화의 오류 반복</td></tr>
+<tr><td>Clarification Request</td><td class="sg-wrapc">이해 X, 잘못된 것이 있다는 것, 반복·재발화가 필요함을 알림. Pardon? Excuse me. What do you mean by -?</td></tr>
+<tr><td>Elicitation 유도해내기</td><td class="sg-wrapc">오류 직전에 전략적으로 멈춤 (I have three_?) / "How do we say ~ in English?" / 발화 답이 말할 것 요구</td></tr>
+</table></div>
+<div class="sg-tbl"><table>
+<tr><th></th><th>implicit</th><th>explicit</th></tr>
+<tr><td>input-providing</td><td class="sg-wrapc">recast</td><td class="sg-wrapc">explicit correction</td></tr>
+<tr><td>output-prompting</td><td class="sg-wrapc">repetition, clarification</td><td class="sg-wrapc">metalinguistic, elicitation</td></tr>
+</table></div>
+<p><b class="sg-k">uptake</b>: 교사 피드백에 바로 이어지는 수정된 학생 발화. 종류: 오류의 수정이 된 발화 / 여전히 수정이 필요한 발화 (예. 오류 개수 2개 → 1개). cf. topic communication: 오류 수정을 무시하는 경우</p>
+
+<h3>쓰기 지도</h3>
+<div class="sg-tbl"><table>
+<tr><th>접근</th><th>내용</th></tr>
+<tr><td>결과 중심 쓰기<br>product-oriented, product approach</td><td class="sg-wrapc">단답적 쓰기, 결과물 중시, 정확한 낱말·구문 → 의미 표현. model(모범 글) 읽고 분석·모방 / 교사가 글 수정</td></tr>
+<tr><td>과정 중심 쓰기<br>process-oriented, process approach</td><td class="sg-wrapc">pre-writing 초고 쓰기 → drafting → rewriting 고쳐 쓰기. recursive, cyclical 순환적 (improve writing at any, all stage). model 제시 지양, 자유롭고 창의적으로 생각·표현·수정하는 과정 중시. 의미·내용(초기) → 문법·철자 교정(편집). produce more than one draft for feedback, evaluation</td></tr>
+</table></div>
+<div class="sg-tbl"><table>
+<tr><th>단계 (-writing)</th><th>내용</th></tr>
+<tr><td>pre</td><td class="sg-wrapc">필요한 낱말·언어 형식 지도, 사전 경험 활성화, 동기유발, 샘플 제공. ① <b class="sg-k">Planning 계획</b>: 쓸 내용을 계획, 구상. 주제 선정, brainstorming, 정보 수집, outlining</td></tr>
+<tr><td>while</td><td class="sg-wrapc">② <b class="sg-k">Drafting 쓰기</b>: 계획을 바탕으로 초안, 오류 X. first - messy. correctness gets in the way 방해가 됨</td></tr>
+<tr><td>post</td><td class="sg-wrapc">③ <b class="sg-k">Revising 수정</b>: 교사·동료의 피드백 검토 / 내용·표현 수정 ④ <b class="sg-k">Editing 편집</b>: mechanics(철자법, 대문자 등) 중심 점검·수정 ⑤ <b class="sg-k">Publishing 출판</b>: 전시, 발표</td></tr>
+<tr><td>Feedback</td><td class="sg-wrapc">Peer review: 동료 의사소통, 건설적인 피드백(실제 독자). Conference: T → give feedback, improvement. formative 형성적 &gt; summative 총괄적. Error correction code(ECC)</td></tr>
+</table></div>
+
+<h4>단계별 쓰기 활동 (controlled to free writing)</h4>
+<div class="sg-tbl"><table>
+<tr><th>단계</th><th>내용</th></tr>
+<tr><td>① Controlled writing 통제 작문 - 결과 중심</td><td class="sg-wrapc">완전한 통제, 선택권 X / 활동 졸업 - 교사의 의도, 오류 X, 쓰기에 자신감. copying, dictation, 제시된 문장 복사하여 알맞은 단어를 채워 넣기</td></tr>
+<tr><td>② Guided writing 유도 작문 - 결과 중심</td><td class="sg-wrapc">어느 정도 선택권, 통제 O / 활동 결과 - 완전 일치 X / 언어 형태에 관심. 빈칸 채우기, 받아쓰기(반 불러줌), 편지·카드·초대장(형식 알려주고 쓰기). 예시 따라 쓰기(example 주고 새로 바꾸어 문장 만들기, 내용 생각, 어휘 제공)</td></tr>
+<tr><td>③ Free writing 자유 작문 - 과정 중심(수정됨)</td><td class="sg-wrapc">교사 도움 X, 언어연습 X / 의사 표현·content에 초점 / self-expression. 교정 지도: 쓰기 과정에서 학습자가 스스로 오류 인지, 스스로 고칠 수 있도록, 의미 전달에 문제가 있는 중대한 오류만 고치도록. 쇼핑 목록, 시간표, 일기, 만화 대사, 편지나 쪽지, 역할극 대본</td></tr>
+<tr><td>④ Corrective feedback (= negative evidence) 교정적 피드백</td><td class="sg-wrapc"><b class="sg-k">direct feedback</b>: 교사가 고침, 바로 알아보지만 기억↓, 의미↓ → 목표 표현 제시, 정확성 연습 (자유롭게 쓰기). <b class="sg-k">indirect feedback</b>: 틀린 부분 표시 자신의 오류 파악/고칠 기회, 기억↑. cf. positive evidence: 무엇이 가능한지를 알려주는 정보</td></tr>
+</table></div>
+</section>
+
+<section id="eng-en7">
+<h2><span class="sg-n">07</span>요소별 언어 지도</h2>
+<h3>Pronunciation 발음</h3>
+<p>발음 지도의 목표: 의미를 알아들을 수 있을 정도 <b class="sg-k">intelligibility</b></p>
+<div class="sg-tbl"><table>
+<tr><th>구분</th><th>내용</th></tr>
+<tr><td>분절 음소 (segmental phoneme)</td><td class="sg-wrapc">분절하여 인식할 수 있는 음, <b class="sg-k">consonant 자음 + vowel 모음</b> → 철자 표기. 최소 대립쌍 맥락화 contextualized / meaningful minimal pair</td></tr>
+<tr><td>초분절 음소 (suprasegmental phoneme)</td><td class="sg-wrapc">분절 인식, 철자 표기 X</td></tr>
+<tr><td>stress 강세</td><td class="sg-wrapc">syllable prominence 두드러짐. 강세 X → [ə] (schwa)<br>① <b class="sg-k">word stress</b>: 2음절 이상 단어 → 한 음절에 강세. 강세 위치에 따라 품사(record), 뜻(object) 바뀌기도…<br>② <b class="sg-k">sentence stress</b>: 내용어(content word)에 강세, 기능어(function word)는 강세↓. 유동적 → 화자의 의도에 따라 달라짐</td></tr>
+<tr><td>rhythm 리듬</td><td class="sg-wrapc">① <b class="sg-k">syllable-timed language</b> 음절 박자 언어: 문장 내의 음절 수에 따라 시간 다름, 한국어 ② <b class="sg-k">stress-timed language</b> 강세 박자 언어: 등시간성이 → 강세 수에 따라 시간 다름, 영어</td></tr>
+<tr><td>intonation 억양</td><td class="sg-wrapc">melody of language - pattern of pitch change. ① <b class="sg-k">falling intonation</b> 하강조(고음 → 저음): 서술문, WH-의문문, 확인 부가 의문문, 선택 의문문 ② <b class="sg-k">rising intonation</b> 상승조(고음 → 유지): Yes-No 의문문, 반복 의문문, 질문의 부가 의문문</td></tr>
+</table></div>
+
+<h3>Vocabulary 어휘</h3>
+<h4>1. 어휘 중심 접근법 (Lexical Approach)</h4>
+<p>언어 습득과 의사소통 체계의 구축 단위는 단어의 결합이다. <b class="sg-k">prefabricated chunk</b>(multi-word combinations) 미리 조합된 말뭉치</p>
+<h4>2. 어휘 분류</h4>
+<div class="sg-tbl"><table>
+<tr><th>분류</th><th>내용</th></tr>
+<tr><td>passive vs active vocabulary</td><td class="sg-wrapc"><b class="sg-k">수동적 어휘</b>: 이해 O, 쉽고 빠른 표현 X / <b class="sg-k">능동적 어휘</b>: 이해 O, 쉽고 빠른 표현 O. 능동적 어휘 지도 → 수동적 어휘를 능동적 어휘로 전환하도록 연습 기회</td></tr>
+<tr><td>content word vs function word</td><td class="sg-wrapc"><b class="sg-k">내용어</b>: 명·형·동·부사, 지시사, 의문사 - 독립적인 의미 / <b class="sg-k">기능어</b>: 조동사·전치사·접속사·관사 - 문법적 기능</td></tr>
+<tr><td>chunk 말뭉치</td><td class="sg-wrapc">둘 이상의 낱말이 결합하여 고정된 meaningful unit = 여러 단어 묶은 단위. 의미 단위 전체를 통째로 익히기 (상황식 X) 자신의 실력↑ 의사소통. <b class="sg-k">collocation 연어</b>(함께 어울리는 단어들의 조합, 잘못 사용 → 문법 옳아도 어색한 표현) / <b class="sg-k">phrasal verbs 구 동사</b>(동사 + 부사(전치사), 그 구성요소와는 다른 의미를 갖는 동사. look after: 돌보다) / <b class="sg-k">sentence frame 문장틀</b>(would you mind if…? the thing is…) / <b class="sg-k">discourse marker 담화 표지</b>(before and what comes after, on the other hand, once upon a time) / <b class="sg-k">idiom 관용구</b>(두 개 이상의 단어가 특수한 의미) / saying 속담</td></tr>
+</table></div>
+<h4>3. 어휘 선정 및 지도 방법</h4>
+<ul>
+<li>① 어휘 선정: 학습자의 필요, 수준, 학습 목적에 따라 지도 어휘 선정. 어휘의 frequency, <b class="sg-k">corpus</b>(실제로 사용된 언어를 모아 만든 text) 사용 고려</li>
+<li>② <b class="sg-k">word identification 어휘 식별 지도</b>: 즉각적 식별 immediate identification = sight word / 분석적 식별 mediated identification = phonics 바탕으로 지도</li>
+<li>③ <b class="sg-k">context를 활용한 어휘 지도 = inferencing</b>: 의미 있는 context 내에서 습득될 수 있도록 학습자의 배경지식과 연계</li>
+<li>④ <b class="sg-k">3C (Convey, Check, Consolidate)</b>: 1) Convey meaning 의미 제시: 실물, 그림, 사진, 마임, 동의어, 일화 → 다양한 테크닉에 의존하여 의미 제시 2) Check understanding 이해점검: 1단계 단어와 관련된 일련의 질문 3) Consolidate 강화: 연습을 통해 강화, 능동적 어휘로서 사용. 의미 있는 맥락에서 사용할 기회 제공</li>
+</ul>
+<h4>4. 학습 전략</h4>
+<div class="sg-tbl"><table>
+<tr><th>전략</th><th>내용</th></tr>
+<tr><td>의미 알아내기 전략<br>(discovering the meaning of words)</td><td class="sg-wrapc">Vocabulary analysis: suffix 접미사, prefix 접두사 사용 / Using context: inferencing, 소재, 전후 단어, 문장에 의한 정보 사용 / Using resources: 사전, glossary 용어집</td></tr>
+<tr><td>기억하기 전략<br>(remembering words that have been encountered)</td><td class="sg-wrapc">Recording: 모국어로 번역된 의미, 용례 기억 / Organizing: semantic map을 활용하여 어휘를 관련 군집별로 조직 / Practicing and producing: 말하기, 쓰기로 어휘 사용해보기</td></tr>
+</table></div>
+<h4>5. 명시적 학습과 묵시적 학습</h4>
+<div class="sg-tbl"><table>
+<tr><th>유형</th><th>내용</th></tr>
+<tr><td>explicit / intentional</td><td class="sg-wrapc">Direct vocabulary instruction. the focused study of words 직접적 관심</td></tr>
+<tr><td>implicit / incidental</td><td class="sg-wrapc">picked up, focused on language use. by-product, depend upon the frequency of encounter (encounter words)</td></tr>
+</table></div>
+
+<h3>Grammar 문법</h3>
+<ul>
+<li>지도 내용: '언어적 정확성' <b class="sg-k">form, meaning, use</b>의 균형</li>
+<li>문법 제시 방법: <b class="sg-k">deductive 연역</b> vs <b class="sg-k">inductive 귀납</b></li>
+<li>초등학생 특성을 고려한 문법 지도: Piaget: metalanguage X, 문법이 복잡할수록 inductive 방법 사용. Cameron: 의미 있는 언어 사용! 문법 중심 X, 의사소통 활동을 통해~</li>
+</ul>
+<h4>Form-Focused Instruction</h4>
+<div class="sg-tbl"><table>
+<tr><th>유형</th><th>내용</th></tr>
+<tr><td>focus on forms</td><td class="sg-wrapc"><b class="sg-k">decontextualized</b>(탈맥락화), 하나씩 지도</td></tr>
+<tr><td>focus on meaning</td><td class="sg-wrapc">언어 형태 초점 X</td></tr>
+<tr><td>focus on form</td><td class="sg-wrapc">전반적 초점 → 의미, 의사소통 / 부수적 언어 형태 의식. <b class="sg-k">reactive approach 반응적 접근</b>. noticing / consciousness-raising → 특정 문법 형태나 패턴에 주목</td></tr>
+</table></div>
+<div class="sg-tbl"><table>
+<tr><th>분류</th><th>활동</th><th>내용</th></tr>
+<tr><td rowspan="3">input-based</td><td>input enhancement</td><td class="sg-wrapc">highlighting(boldface) certain nonsalient grammatical forms, oral → stress</td></tr>
+<tr><td>input flooding</td><td class="sg-wrapc">a particular construction is especially <b class="sg-k">frequent</b> → saliency↑, noticing</td></tr>
+<tr><td>input processing</td><td class="sg-wrapc">구조가 유의미하게 사용되는 활동. push to attend to properties of language. make better form-meaning connections</td></tr>
+<tr><td>output-based</td><td>dictogloss task</td><td class="sg-wrapc">dictogloss: 받아쓰기(dictation)와 주석(gloss)이 합성된 개념. 목표 언어 요소의 많은 예시가 담긴 짧은 글 work to reconstruct the text form</td></tr>
+</table></div>
+<ul>
+<li><b class="sg-k">Consciousness-raising task (CR task)</b>: 학습자가 주어진 데이터를 보고 문법적 일반화를 도출(과업의 목) / 특정 언어 특징 자료 제시 → 분석 안내 → 규칙을 명시적으로 진술하도록 요구. Procedural Knowledge 개발 목적</li>
+<li><b class="sg-k">garden-path strategy</b>: 일부 정보만 제공해 두 과잉 일반화 오류를 범할 때 교정을 하는 것. 예외 항목에 대해 효과적으로 학습하게 될 가능성이 높음. 후속 의사소통 활동이 없으므로 Focus on Form에 해당 X</li>
+</ul>
+
+<h3>Culture 문화</h3>
+<ul>
+<li><b class="sg-k">intercultural communicative competence</b> 문화 간 의사소통 능력: intercultural speaker 문화 간 화자 양성. intercultural competence 필요, 다른 의사소통 능력과 영향. <b>attitude</b> 태도 / <b>knowledge</b> 지식 / <b>skills of interpreting and relating</b> 해석·관계 기술 / <b>skills of discovery and interaction</b> 발견과 상호작용 기술 / <b>critical cultural consciousness</b> 비판적 문화 의식</li>
+<li>교실 활동: 문화 TPR (Audio-motor unit) - contextual dimension. 문화 TPR = 기존 TPR + 명령들이 유의미하게 연결 + 문화 지도에 응용</li>
+</ul>
+</section>
+
+<section id="eng-en8">
+<h2><span class="sg-n">08</span>활동 중심 수업과 교사 언어</h2>
+<h3>Chant, Song → tonal memory</h3>
+<div class="sg-tbl"><table>
+<tr><th>구분</th><th>내용</th></tr>
+<tr><td>챈트</td><td class="sg-wrapc">리듬 O, 멜로디 X. 반복되는 리듬으로 말하는 것</td></tr>
+<tr><td>노래</td><td class="sg-wrapc">리듬 O, 멜로디 O</td></tr>
+<tr><td>효과</td><td class="sg-wrapc">① 구어체의 자연스러운 리듬 반영 → 언어의 운율적 특성, 듣·말 도구 ② 휴식, 재미 제공 → 지루함, 부담감↓ ③ 동작 → 의미 이해 도움 ④ 지루하지 않은 반복 → 기억력, 집중력↑</td></tr>
+</table></div>
+
+<h3>Games</h3>
+<div class="sg-tbl"><table>
+<tr><th>구분</th><th>내용</th></tr>
+<tr><td>유용성</td><td class="sg-wrapc"><b class="sg-k">authenticity 의사소통 실제성</b>: 게임에는 목적 O, 언어 = 목적 달성 도구 (실제 의사소통과 닮음) / <b class="sg-k">정의적 이유</b>: interest↑ 의사소통 욕구, 학습 동기↑ 불안감↓ / <b class="sg-k">unpredictability 비예측성</b>: 실제 의사소통처럼 언어 즉흥적 사용 / <b class="sg-k">연습 효과</b>: 같은 구문 짝·지루하지 않게 무의식적 언어연습</td></tr>
+<tr><td>선정 기준</td><td class="sg-wrapc">학습 목표에 부합, 협동 유발(경쟁 → 역효과)</td></tr>
+<tr><td>accuracy-focused games<br>정확성 개발 게임<br>(= language control)</td><td class="sg-wrapc">발음·어휘·문법·구문 연습 / 이해+표현. chunks - memorized (repetition), 목표 = score, winner. 눈덩이 게임</td></tr>
+<tr><td>fluency-focused games<br>유창성 개발 게임<br>(= communication)</td><td class="sg-wrapc">언어 사용 상황 설정 / collaboration 짝·그룹 협동. must have some endpoint 최종 목표 시점. non-linguistic 비언어적: promote language use → fascinated by the task, self-consciousness, fear↓. disparity(차이) of information: automatic need to communicate. 추측하기 게임</td></tr>
+</table></div>
+
+<h3>Storytelling</h3>
+<p>이야기를 듣고, 말하기 활동에 사용 - 교재 X, 구연화.</p>
+<ul>
+<li><b>수업 적용</b>: ① refrain 후렴구적 표현 반복 등장 → <b class="sg-k">choral speaking</b> 합창독 (a short, simple part of a song, repeated many times) + Rhyme 각운 - use of words that have same sounds ② 다양한 목소리, 몸동작, 손동작 ③ 이야기책 직접 넘기며, 그림, 실물, 동작 시각적 단서 → 이해·기억 ④ <b class="sg-k">TPR 스토리텔링</b> - 몸으로 이야기 표현</li>
+<li><b>효과</b>: ① context - 언어를 배우기 좋은 input(모르는 단어의 의미 추론) ② 단순화·반복·억양·속도 조절, 시각 자료 활용 → comprehensible input ③ storyline, 의미 이해에 집중 → 언어 형태 무의식적 배움</li>
+</ul>
+
+<h3>교실 드라마</h3>
+<div class="sg-tbl"><table>
+<tr><th>유형</th><th>내용</th></tr>
+<tr><td>역할극 Role-play</td><td class="sg-wrapc">situation, role, useful expression. 이점: ① 언어의 사회적 기능 - turn-taking 대화 주고받기 ② 학습자가 질문과 대답 등 - 실생활 대화와 유사한 환경 ③ 억양, 몸짓, 얼굴 표정 등을 이용해 효과적인 의사소통 (practice to speak target language before they must do so in a real environment). 방법: ① 정해진 대본대로 읽는 방법 <b class="sg-k">role-taking</b> ② 상황만 제공, 나머지는 화자가 자유롭게 발화하도록 하는 방법 <b class="sg-k">role-making</b></td></tr>
+<tr><td>대본극 readers' theater</td><td class="sg-wrapc">암기 X, 대본을 읽으면서 연기. 무대 장치, 소품, 의상, 조명 등의 노력 비용 X. 같은 텍스트 반복 → 읽기 능력↑, 공연 목적 → 동기↑. focus: dialogue(action X). authentic way of repeated reading. model, practice all aspects of prosody 운율<br><b class="sg-k">Repeated reading</b>: 유창, 오류가 없을 때까지 같은 텍스트 반복 읽기 / <b class="sg-k">Fluency in reading</b>: 70% 이해, 정확, 빠르고 쉽게 읽음</td></tr>
+</table></div>
+
+<h3>교사 언어 (Teacher talk)</h3>
+<p>학습자들의 이해도↑ 위해 학생의 수준에 맞게 조정하여 하는 말</p>
+<div class="sg-tbl"><table>
+<tr><th>구분</th><th>내용</th></tr>
+<tr><td>기능</td><td class="sg-wrapc">① 인지적 기능: 학습 내용 가르침, scaffolding → 과업 수행 도움 ② 언어적 기능: comprehensible input, 영어 사용 실제 모델 ③ 정의적 기능: 교사 언어에 따라 좌절 or 용기</td></tr>
+<tr><td>특징</td><td class="sg-wrapc">반복적(redundancy 부연 설명), 천천히, 명확한 발음(축약형 발음↓). 어휘 조정(관용구↓), 문법 조정, 담화 조정(교사 자문자답)</td></tr>
+</table></div>
+
+<h4>교사의 질문</h4>
+<p>참여 유도, 상호작용 끌어냄, 이해도 점검. 수업 참여 유도, 흥미 자극, 집중, 이해점검, 학습자가 말한 내용 명확하게 확인</p>
+<div class="sg-tbl"><table>
+<tr><th>구분</th><th>내용</th></tr>
+<tr><td>Display questions 전시적 질문</td><td class="sg-wrapc">교사가 이미 답을 알고 있으면서 학습자의 이해나 발화 가능 여부 확인. real question X, elicit language practice</td></tr>
+<tr><td>Referential questions 정보적 질문</td><td class="sg-wrapc">일상 대화, 모르는 정보를 얻기 위해(정보 전달) - CLT에 부합. communicative authenticity - genuinely meaningful</td></tr>
+<tr><td>Closed questions 폐쇄형 질문</td><td class="sg-wrapc">미리 정해진 하나의 답 유도. only one acceptable answer in mind. 짧고 간단한 답 → 초보 학습자에게 적합</td></tr>
+<tr><td>Open questions 개방형 질문</td><td class="sg-wrapc">어떠한 답변이든 허용하는 열린 질문 유형. 길고 정교한 대답 → 발화량↑. no particular answer: a number of different answers</td></tr>
+</table></div>
+
+<h3>TEE (Teaching English in English): 영어를 영어로 가르치는 수업</h3>
+<div class="sg-tbl"><table>
+<tr><th>구분</th><th>내용</th></tr>
+<tr><td>TEE 수업의 필요성</td><td class="sg-wrapc">input의 양↑. EFL: 교실에서 최대한 노출, comprehensible input↑. 학생들의 영어 학습 기회↑. Halliwell: 의미 추측 본능, 간접 학습 능력, 실제 의사소통, input↑</td></tr>
+<tr><td>교실 영어 사용 전략</td><td class="sg-wrapc">① <b class="sg-k">routine</b>: 일상적으로 반복되는 수업의 과정, 순서 → 새 표현 쉽게 이해, scaffolding이 일어나도록 하는 요인 ② 시각 자료와 제스처의 사용 ③ <b class="sg-k">modeling</b> 시범 보이기: use of clear illustrations, examples, demonstrate, show the task</td></tr>
+</table></div>
+<div class="sg-tbl"><table>
+<tr><th>대화</th><th>내용</th></tr>
+<tr><td>업무적 대화 / 사교적 대화</td><td class="sg-wrapc"><b class="sg-k">transactional dialogue</b> / <b class="sg-k">interpersonal dialogue</b></td></tr>
+<tr><td>동의어 / 반의어</td><td class="sg-wrapc">synonym / antonym</td></tr>
+<tr><td>상위어 / 하위어 (hyponymy)</td><td class="sg-wrapc">hypernym(= superordinate) / hyponym(= subordinate)</td></tr>
+</table></div>
+</section>
+
+<section id="eng-en9">
+<h2><span class="sg-n">09</span>평가</h2>
+<p>평가 활동 = 수업 활동 + 평가 기준 + 피드백</p>
+<h3>평가의 요건</h3>
+<div class="sg-tbl"><table>
+<tr><th>요건</th><th>내용</th></tr>
+<tr><td>Practicality 실용도</td><td class="sg-wrapc">돈·시간↓, 실행·채점·해석이 쉬운 평가</td></tr>
+<tr><td>Reliability 신뢰도</td><td class="sg-wrapc">오차 X, consistent results. 요인: test, test taker 수험자, rater 채점자, the administration of a test 테스트의 실행. 채점자: <b class="sg-k">intra-rater reliability</b>: 1명의 채점자 / <b class="sg-k">inter-rater reliability</b>: 2명 이상의 채점자</td></tr>
+<tr><td>Validity 타당도</td><td class="sg-wrapc">평가의 목적 부합도, content validity. measure what it is supposed to measure</td></tr>
+<tr><td>Authenticity 진정성</td><td class="sg-wrapc">언어 평가 과업 - 실제 목표어 과업의 특징 간 일치 정도. natural, contextualized, interesting. Thematic organization to items. represent real-world task</td></tr>
+<tr><td>Washback effect 환류 효과</td><td class="sg-wrapc">평가 → 교수·학습에 미치는 영향 (교수·학습의 속도와 순서 / 내용 및 방법에 대한 태도). 평가 전에도 영향, 학습 중단·간섭 X. Informal 비공식적 평가 → interactive feedback. 긍정적 환류 효과 vs 부정적 환류 효과(수능). 점수만 제시 X, 평가 수행 구체적 설명 / 약점에 대해 건설적 비평, 강점에 대해 칭찬 / 특정 요소 어떻게 향상시킬 전략적 요령 제시</td></tr>
+</table></div>
+
+<h3>평가의 목적에 따른 분류 (test)</h3>
+<div class="sg-tbl"><table>
+<tr><th>유형</th><th>내용</th></tr>
+<tr><td>Proficiency 숙달도 평가</td><td class="sg-wrapc">전반적 언어 능력 측정 → 교육과정, 교과서 관계 X. global competence. 하나의 언어 기능에 국한 X</td></tr>
+<tr><td>Diagnostic 진단 평가</td><td class="sg-wrapc">학습자의 강점, 약점 파악. diagnose a particular aspect of a language</td></tr>
+<tr><td>Placement 배치 평가</td><td class="sg-wrapc">이미 가진 지식 측정 → 비슷한 수준끼리 같은 반에 배치. place a student into an appropriate level</td></tr>
+<tr><td>Achievement 성취도 평가</td><td class="sg-wrapc">상당한 기간에 걸친 과거의 학습을 되돌아보고 점검하는 summative 총괄 평가적 기능. limited to particular material covered in a curriculum within a particular time frame</td></tr>
+</table></div>
+
+<h3>평가의 시기(function)에 따른 분류 (assessment)</h3>
+<div class="sg-tbl"><table>
+<tr><th>유형</th><th>내용</th></tr>
+<tr><td>Summative 총괄평가</td><td class="sg-wrapc">학기말, 학년말 일정 기간의 수업이 끝났을 때. 교수의 결과로서 나타난 학생들의 학업 성취도를 측정. grasped at the end of a course. <b class="sg-k">결과중심</b></td></tr>
+<tr><td>formative 형성평가</td><td class="sg-wrapc">교수학습 과정 중, 수시로 평가, 교수학습 개선에 활용. evaluating students in the process of 'forming' their competencies. <b class="sg-k">과정중심</b></td></tr>
+<tr><td>결과 중심 평가 모형</td><td class="sg-wrapc">수업과 평가 단계 구분. 교육과정 → (교수계획) 교수 → (평가계획) 평가</td></tr>
+<tr><td>과정 중심 평가 모형</td><td class="sg-wrapc">수업과 평가 단계 구분 X, 평가는 수업의 일부. 학습 점검, 새로운 조치 취할지/계속 진도 나갈지 결정. 교육과정 → (교수 및 평가계획) 수업 ⟷ 평가</td></tr>
+</table></div>
+
+<h3>평가 방식에 따른 분류 (test)</h3>
+<div class="sg-tbl"><table>
+<tr><th>유형</th><th>내용</th></tr>
+<tr><td>Direct test 직접 평가</td><td class="sg-wrapc">말하기 평가 → 말하기 과업. actually performing the target task</td></tr>
+<tr><td>Indirect test 간접 평가</td><td class="sg-wrapc">간접적 수단, 방법으로 측정 / 말하기 평가 → 문법 평가. task that is related in some way</td></tr>
+<tr><td>Discrete-point test 분리 평가</td><td class="sg-wrapc">한 번에 한 기능, 한 가지 요소만 분리·측정 separately. language consists of different components</td></tr>
+<tr><td>Integrative test 통합 평가</td><td class="sg-wrapc">다양한 범위의 여러 요소를 동시에 평가. <b class="sg-k">cloze test</b> - 공란에 알맞은 단어 삽입 능력 측정. 어휘·문법·담화·독해 기능 및 전략 요구. use several skills at the same time</td></tr>
+</table></div>
+
+<h3>수행 평가 (Performance-based assessment)</h3>
+<ul>
+<li>개념: 학습자의 학습 과제 수행 과정 및 결과 관찰, 전문적으로 판단. alternative assessment, authentic assessment, 직접 평가. how well learner can perform on a practical real-world task</li>
+</ul>
+<div class="sg-tbl"><table>
+<tr><th>평가</th><th>내용</th></tr>
+<tr><td>Observation 관찰평가</td><td class="sg-wrapc">태도, 참여도, 수행능력 등 관찰·기록 → 평가 의식 X, 학습 중단·간섭 X. 학생의 수행 변화에 주목하여 장기간에 걸쳐 체계적으로 관찰 결과 기록. 자연스럽게 평가 → 평가 의식 X. <b class="sg-k">Anecdotal report</b> 일화식 기록 = 사전에 관찰 항목 정할 X 개방형 방식 / <b class="sg-k">teacher's checklist</b> 교사 점검표 = 사전에 관찰 항목 정함</td></tr>
+<tr><td>Self-assessment 자기평가</td><td class="sg-wrapc">학생 스스로 자신의 학습 회고, 평가 → 동기부여, 자율성, 책임감↑. other-regulated 타율적 → self-regulated 자율적 존재. 교사가 미리 정해놓은 항목에 대해 서술, 체크리스트. subjective 주관적, 신뢰도↓</td></tr>
+<tr><td>Peer-assessment 학생 상호 평가</td><td class="sg-wrapc">학생들이 상대방을 서로 평가, composition class 작문 수업에서 자주 사용</td></tr>
+<tr><td>Interview 인터뷰</td><td class="sg-wrapc">의사소통 능력 측정, Interviewer / Interviewee. 측정 기준 미리 만들기</td></tr>
+<tr><td>Portfolio 포트폴리오</td><td class="sg-wrapc">일정 기간에 걸쳐 학습, 성취하는 것들의 기록·자료 모음집. reflect learning aims, engage students in the process of reflecting on the individual items. 작문, 독서 일지, 오디오·비디오 테이프 결과물, 학생의 진보와 관련된 논평<br>+ 학생 주도적 수집 → 반성적 사고(conference), 책임감, 학습 자율성. 일정 기간 → 결과뿐만 아니라 노력, 발전 과정 보여줌. 평가에 대한 주인 의식, 동기화, 성취감, 참여 의식. 학생 이해↑, 개별 학생별로 학습지도. 학부모 상담의 기본 면담 자료 → 학생들의 언어 능력 발전 과정 설명하는 수단<br>- 타당도↑, 신뢰도↓ (정량적 평가가 아니므로 평가자 주관 개입)</td></tr>
+</table></div>
+
+<h3>기타 어려운 단어 모음</h3>
+<div class="sg-tbl"><table>
+<tr><th>단어</th><th>뜻</th></tr>
+<tr><td>ellipsis</td><td>생략</td></tr><tr><td>convergent</td><td>수렴하는</td></tr><tr><td>divergent</td><td>발산하는</td></tr>
+<tr><td>overt</td><td>공공연한, 명시적인</td></tr><tr><td>utilitarian</td><td>실용적</td></tr><tr><td>nonsalient</td><td>비돌출적</td></tr>
+<tr><td>saliency</td><td>돌출, 특징</td></tr><tr><td>in tandem</td><td>~와 동시에</td></tr><tr><td>informant</td><td>정보원, 정보 제공자</td></tr>
+<tr><td>unobtrusive</td><td>불필요한 관심을 끌지 않는</td></tr><tr><td>sensitive period</td><td>민감기 (cf. critical period: 결정적 시기)</td></tr>
+<tr><td>desuggest</td><td>학습에 대한 부정적 생각의 제거</td></tr><tr><td>internalization</td><td>내면화 (듣기를 통한 언어의 내면화)</td></tr>
+<tr><td>dictogloss</td><td>받아쓰기(dictation)와 주석(gloss)이 합성된 개념</td></tr>
+<tr><td>information transfer activity</td><td>정보 전이 활동</td></tr>
+<tr><td>critical incident technique</td><td>결정적 사건 기법 (문화 지도 시 사용). 특정한 갈등 상황을 부여하여 문화 간 대화 능력 함양</td></tr>
+</table></div>
+</section>
+
+<footer>원본 자료를 암기용으로 재구성했습니다.</footer></main>
   </div>
 
   <!-- [3-1] 문제&답에서 복습 항목 불러오기 모달 -->
@@ -8849,32 +10046,36 @@ const REST_GIF_SRC = "data:image/gif;base64,R0lGODdhcgEsAdUAAAAAAAoLCg8RDxQUFBob
 </script>
 <script>
 (function(){
-  var C=document.getElementById('socialContainer');
-  var tab=document.getElementById('btnModeSocial');
-  var tabs=['btnModePlanner','btnModeDiary','btnModeReview','btnModeNotes'];
-  var conts=['plannerContainer','diaryContainer','reviewContainer','notesContainer'];
-  tab.addEventListener('click',function(){
-    var p=document.getElementById('btnModePlanner'); if(p) p.click();
-    conts.forEach(function(id){var e=document.getElementById(id); if(e) e.style.display='none'});
-    tabs.forEach(function(id){var e=document.getElementById(id); if(e) e.classList.remove('active')});
-    tab.classList.add('active'); C.style.display='block';
+  var modes=[['btnModeSocial','socialContainer'],['btnModeMusic','musicContainer'],['btnModeEnglish','englishContainer']];
+  var baseTabs=['btnModePlanner','btnModeDiary','btnModeReview','btnModeNotes'];
+  var baseConts=['plannerContainer','diaryContainer','reviewContainer','notesContainer'];
+  function $(id){return document.getElementById(id)}
+  function hideAll(){modes.forEach(function(m){var c=$(m[1]),t=$(m[0]); if(c) c.style.display='none'; if(t) t.classList.remove('active')})}
+  modes.forEach(function(m){
+    var tab=$(m[0]),C=$(m[1]); if(!tab||!C) return;
+    tab.addEventListener('click',function(){
+      var p=$('btnModePlanner'); if(p) p.click();
+      baseConts.forEach(function(id){var e=$(id); if(e) e.style.display='none'});
+      baseTabs.forEach(function(id){var e=$(id); if(e) e.classList.remove('active')});
+      hideAll(); tab.classList.add('active'); C.style.display='block'; window.scrollTo({top:0});
+    });
+    var q=C.querySelector('[data-r="quiz"]'),r=C.querySelector('[data-r="reveal"]'),h=C.querySelector('[data-r="hint"]');
+    function set(on){
+      C.classList.toggle('sg-quiz',on);
+      q.setAttribute('aria-pressed',on?'true':'false');
+      q.textContent=on?'핵심어 보이기':'핵심어 가리기';
+      r.hidden=!on;
+      C.querySelectorAll('.sg-k.sg-on').forEach(function(e){e.classList.remove('sg-on')});
+      h.textContent=on?'칸을 누르면 하나씩 열립니다. 먼저 떠올려 본 뒤 확인하세요.':'핵심어를 가리고 떠올려 보세요. 칸을 누르면 하나씩 열립니다.';
+    }
+    q.addEventListener('click',function(){set(!C.classList.contains('sg-quiz'))});
+    r.addEventListener('click',function(){C.querySelectorAll('.sg-k').forEach(function(e){e.classList.add('sg-on')})});
+    C.addEventListener('click',function(e){
+      var k=e.target.closest('.sg-k'); if(k&&C.classList.contains('sg-quiz')) k.classList.toggle('sg-on');
+      var a=e.target.closest('a[data-sg]'); if(a){e.preventDefault();var t=$(a.getAttribute('href').slice(1)); if(t) t.scrollIntoView({behavior:'smooth',block:'start'})}
+    });
   });
-  tabs.forEach(function(id){var e=document.getElementById(id); if(e) e.addEventListener('click',function(){C.style.display='none';tab.classList.remove('active')},true)});
-  var q=document.getElementById('sgQuizBtn'),r=document.getElementById('sgRevealBtn'),h=document.getElementById('sgHint');
-  function set(on){
-    C.classList.toggle('sg-quiz',on);
-    q.setAttribute('aria-pressed',on?'true':'false');
-    q.textContent=on?'핵심어 보이기':'핵심어 가리기';
-    r.hidden=!on;
-    C.querySelectorAll('.sg-k.sg-on').forEach(function(e){e.classList.remove('sg-on')});
-    h.textContent=on?'칸을 누르면 하나씩 열립니다. 먼저 떠올려 본 뒤 확인하세요.':'핵심어를 가리고 떠올려 보세요. 칸을 누르면 하나씩 열립니다.';
-  }
-  q.addEventListener('click',function(){set(!C.classList.contains('sg-quiz'))});
-  r.addEventListener('click',function(){C.querySelectorAll('.sg-k').forEach(function(e){e.classList.add('sg-on')})});
-  C.addEventListener('click',function(e){
-    var k=e.target.closest('.sg-k'); if(k&&C.classList.contains('sg-quiz')) k.classList.toggle('sg-on');
-    var a=e.target.closest('a[data-sg]'); if(a){e.preventDefault();var t=document.getElementById(a.getAttribute('href').slice(1)); if(t) t.scrollIntoView({behavior:'smooth',block:'start'})}
-  });
+  baseTabs.forEach(function(id){var e=$(id); if(e) e.addEventListener('click',hideAll,true)});
 })();
 </script>
 </body>
