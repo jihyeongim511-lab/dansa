@@ -10094,7 +10094,8 @@ function act(C,a,d){
   }else if(a==='delsec'){
     sec=el&&el.closest('section');if(!sec||!M.contains(sec))return alert('지울 단원 안을 먼저 눌러 주세요.');
     if(confirm('이 단원 전체를 지울까요?')){sec.remove();save(C)}
-  }else if(a==='reset'){
+  }else if(a==='imp')window.sgImport(C);
+  else if(a==='reset'){
     if(confirm('직접 추가·수정한 내용이 모두 사라지고 처음 상태로 돌아가요. 계속할까요?')){M.innerHTML=C._orig;try{localStorage.removeItem(EK+C.id)}catch(e){}addNav(C)}
   }else if(a==='delnb'){
     if(confirm('이 암기장을 통째로 삭제할까요? 되돌릴 수 없어요.')){
@@ -10127,7 +10128,7 @@ function bindQuiz(C){
   C.addEventListener('click',function(e){var k=e.target.closest('.sg-k');if(k&&C.classList.contains('sg-quiz'))k.classList.toggle('sg-on')});
 }
 function init(C){
-  var M=C.querySelector('main'),sv=get(EK+C.id),d=document.createElement('div'),T=[['img','📷 그림'],['mark','🖍 핵심어'],['table','▦ 표'],['row','＋ 행'],['delrow','－ 행'],['sec','＋ 단원'],['delsec','－ 단원']];
+  var M=C.querySelector('main'),sv=get(EK+C.id),d=document.createElement('div'),T=[['img','📷 그림'],['mark','🖍 핵심어'],['table','▦ 표'],['row','＋ 행'],['delrow','－ 행'],['sec','＋ 단원'],['delsec','－ 단원'],['imp','📥 붙여넣기']];
   C._orig=M.innerHTML;if(sv)M.innerHTML=sv;
   d.className='sg-edit-bar';
   d.innerHTML='<button class="sg-btn" data-e="toggle">✏️ 편집</button><span class="sg-tools" hidden>'+T.map(function(t){return'<button class="sg-btn" data-e="'+t[0]+'">'+t[1]+'</button>'}).join('')+
@@ -10166,6 +10167,53 @@ addBtn.onclick=function(){var n=prompt('새 암기장 이름을 입력하세요'
 document.addEventListener('click',function(e){var t=e.target.closest('.mode-nav .nav-tab');if(!t||t.dataset.custom||t.id==='btnAddNb')return;
   document.querySelectorAll('.sg-root[data-custom]').forEach(function(c){c.style.display='none'});
   document.querySelectorAll('.nav-tab[data-custom]').forEach(function(b){b.classList.remove('active')})},true);
+})();
+</script>
+<script>
+/* 암기장 붙여넣기 가져오기: # 단원 / ## 소제목 / - 목록 / | 표 | / **핵심어** / > 팁 */
+(function(){
+function E(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function I(s){return E(s).replace(/\*\*(.+?)\*\*/g,'<b class="sg-k">$1</b>')}
+function cell(s){return s.split(/\s*;;\s*/).map(function(x){return'<div class="sg-ln">'+I(x)+'</div>'}).join('')}
+function conv(txt,n){
+  var h='',open=0,ul=0,tb=0,k=0;
+  function cl(){if(ul){h+='</ul>';ul=0}if(tb){h+='</table></div>';tb=0}}
+  function sec(t){cl();if(open)h+='</section>';open=1;n++;h+='<section id="u'+Date.now()+(k++)+'"><h2><span class="sg-n">'+(n<10?'0':'')+n+'</span>'+I(t)+'</h2>'}
+  txt.replace(/\r/g,'').split('\n').forEach(function(l){
+    var t=l.trim(),m;if(!t){cl();return}
+    if(m=t.match(/^# (.+)/)){sec(m[1]);return}
+    if(!open)sec('가져온 내용');
+    if(m=t.match(/^## (.+)/)){cl();h+='<h3>'+I(m[1])+'</h3>'}
+    else if(m=t.match(/^### (.+)/)){cl();h+='<h4>'+I(m[1])+'</h4>'}
+    else if(m=t.match(/^> (.+)/)){cl();h+='<div class="sg-tip">'+I(m[1])+'</div>'}
+    else if(m=t.match(/^[-•] (.+)/)){if(tb){cl()}if(!ul){h+='<ul class="sg-items">';ul=1}h+='<li>'+I(m[1])+'</li>'}
+    else if(t[0]==='|'){
+      var c=t.replace(/^\||\|$/g,'').split('|').map(function(x){return x.trim()});
+      if(c.every(function(x){return/^:?-{2,}:?$/.test(x)}))return;
+      if(ul){cl()}
+      if(!tb){h+='<div class="sg-tbl"><table><tr>'+c.map(function(x){return'<th>'+I(x)+'</th>'}).join('')+'</tr>';tb=1}
+      else h+='<tr>'+c.map(function(x,i){return i?'<td class="sg-wrapc">'+cell(x)+'</td>':'<td>'+I(x)+'</td>'}).join('')+'</tr>';
+    }else{cl();h+='<p>'+I(t)+'</p>'}
+  });
+  cl();if(open)h+='</section>';return h;
+}
+window.sgImport=function(C){
+  var o=document.createElement('div');
+  o.style.cssText='position:fixed;inset:0;background:rgba(22,32,43,.65);z-index:500;display:flex;align-items:center;justify-content:center;padding:16px';
+  o.innerHTML='<div style="width:min(720px,100%);max-height:90vh;background:#fff;border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px;box-shadow:0 12px 40px rgba(0,0,0,.3)"><b style="font-size:16px">📥 붙여넣기로 암기장에 추가</b><div style="font-size:12px;color:#5d6482">정리해 둔 글을 아래에 붙여넣고 <b>추가</b>를 누르면, 이 암기장의 맨 아래에 예쁜 단원으로 들어갑니다.</div><textarea style="flex:1;min-height:320px;border:1px solid #d9dce8;border-radius:8px;padding:10px;font:13px/1.6 inherit;resize:vertical" placeholder="여기에 붙여넣기 (Ctrl+V)"></textarea><div style="display:flex;gap:8px;justify-content:flex-end"><button data-x="no" style="padding:7px 14px;border:1px solid #d9dce8;background:#fff;border-radius:8px">취소</button><button data-x="ok" style="padding:7px 16px;border:0;background:#3447b8;color:#fff;border-radius:8px;font-weight:700">추가</button></div></div>';
+  document.body.appendChild(o);var ta=o.querySelector('textarea');ta.focus();
+  o.addEventListener('click',function(e){
+    var x=e.target.closest('button');if(e.target===o||(x&&x.dataset.x==='no'))return o.remove();
+    if(x&&x.dataset.x==='ok'){
+      if(!ta.value.trim())return;
+      var M=C.querySelector('main'),t=document.createElement('template'),f=M.querySelector('footer'),first;
+      t.innerHTML=conv(ta.value,M.querySelectorAll('section').length);first=t.content.firstElementChild;
+      f?f.before(t.content):M.appendChild(t.content);
+      M.dispatchEvent(new Event('input',{bubbles:true}));o.remove();
+      if(first)first.scrollIntoView({behavior:'smooth'});
+    }
+  });
+};
 })();
 </script>
 </body>
