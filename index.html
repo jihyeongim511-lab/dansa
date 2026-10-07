@@ -10103,18 +10103,45 @@ function outdentLi(li){var pl=li.parentElement,gl=pl.parentElement;if(!gl||gl.ta
     gl.after(li);if(!pl.children.length)pl.remove()});return true}
 function fixP(M){keepSel(function(){M.querySelectorAll('p > ul,p > ol').forEach(function(l){var p=l.parentElement;
   if(p.children.length===1&&p.textContent===l.textContent)p.replaceWith(l)})})}
-function listCmd(tag){document.execCommand(tag==='OL'?'insertOrderedList':'insertUnorderedList');fixP(document.activeElement&&document.activeElement.closest&&document.activeElement.closest('main')||document)}
+function listCmd(tag){
+  var s=getSelection(),L=-1,BL='li,p,div,td,th';
+  if(s.rangeCount&&s.isCollapsed){var n=s.anchorNode,el=n.nodeType===1?n:n.parentElement,b=el&&el.closest(BL);
+    if(b){var r0=document.createRange();r0.selectNodeContents(b);r0.setEnd(s.anchorNode,s.anchorOffset);L=r0.toString().length}}
+  document.execCommand(tag==='OL'?'insertOrderedList':'insertUnorderedList');
+  fixP(document.activeElement&&document.activeElement.closest&&document.activeElement.closest('main')||document);
+  /* 변환하면 브라우저가 커서를 줄 맨 앞으로 보내므로, 원래 글자 위치로 되돌림 */
+  if(L>=0){var s2=getSelection();if(s2.rangeCount){var n2=s2.anchorNode,e2=n2.nodeType===1?n2:n2.parentElement,b2=e2&&e2.closest(BL);
+    if(b2){var w=document.createTreeWalker(b2,NodeFilter.SHOW_TEXT),t,acc=0;
+      while((t=w.nextNode())){if(acc+t.length>=L){var r=document.createRange();r.setStart(t,L-acc);r.collapse(true);s2.removeAllRanges();s2.addRange(r);break}acc+=t.length}}}}
+}
 function toggleList(C,tag){var M=C.querySelector('main'),s=getSelection();M.focus();
   if(C._r){s.removeAllRanges();s.addRange(C._r)}
   if(!s.rangeCount||!M.contains(s.anchorNode))return alert('글머리를 만들 줄을 먼저 눌러 주세요.');
   listCmd(tag);save(C)}
+function tip(msg){var t=document.createElement('div');t.textContent=msg;
+  t.style.cssText='position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#1c2340;color:#fff;padding:10px 16px;border-radius:10px;font-size:13px;z-index:99999;max-width:90vw';
+  document.body.appendChild(t);setTimeout(function(){t.remove()},2600)}
 function bindLists(C,M){
-  M.addEventListener('keydown',function(e){
-    if(!C.classList.contains('sg-editing')||e.isComposing||e.ctrlKey||e.altKey||e.metaKey)return;
-    var li;
-    if(e.key==='Tab'&&(li=liAt(M))){e.preventDefault();
-      if(e.shiftKey){if(!outdentLi(li))listCmd(li.parentElement.tagName)}else indentLi(li);
+  function tabAct(shift){
+    var li=liAt(M);
+    if(li){
+      if(shift){if(!outdentLi(li))listCmd(li.parentElement.tagName)}
+      else if(!indentLi(li))tip('바로 위에 항목이 있어야 들여쓸 수 있어요.');
       save(C);return}
+    /* 글머리가 아닌 줄에서 Tab → 글머리로 만들기 (Shift+Tab은 아무 일 없음) */
+    var s=getSelection(),n=s.anchorNode,el=n&&(n.nodeType===1?n:n.parentElement);
+    if(shift||!el||!M.contains(el)||el.closest('h2,h3,h4'))return;
+    listCmd('UL');save(C)}
+  M.addEventListener('keydown',function(e){
+    if(!C.classList.contains('sg-editing')||e.ctrlKey||e.altKey||e.metaKey)return;
+    if(e.key==='Tab'||e.code==='Tab'){
+      var s0=getSelection();if(!s0.rangeCount||!M.contains(s0.anchorNode))return;
+      e.preventDefault();var sh=e.shiftKey;
+      if(e.isComposing||e.keyCode===229){ /* 한글 입력 중: 글자가 확정된 뒤에 처리 */
+        var done=0,h=function(){go()},go=function(){if(done)return;done=1;M.removeEventListener('compositionend',h);setTimeout(function(){tabAct(sh)},0)};
+        M.addEventListener('compositionend',h);setTimeout(go,150);return}
+      tabAct(sh);return}
+    if(e.isComposing)return;
     if(e.key===' '&&!e.shiftKey){
       var s=getSelection();if(!s.rangeCount||!s.isCollapsed)return;
       var n=s.anchorNode,el=n&&(n.nodeType===1?n:n.parentElement),b=el&&el.closest('p,div,td,th');
