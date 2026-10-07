@@ -154,7 +154,7 @@
   .notes-page:empty:before{content:attr(data-ph);color:#9AA79A}
   .notes-page ul, .notes-page ol{padding-left:24px;margin:6px 0}
   .notes-page table{border-collapse:collapse;margin:8px 0}
-  .notes-page table td, .notes-page table th{border:1px solid var(--rule);padding:6px 8px;min-width:40px}
+  .notes-page table td, .notes-page table th{border:1px solid var(--rule);padding:6px 8px;min-width:40px;vertical-align:middle}
   .notes-page table td.active-cell, .notes-page table th.active-cell{outline:2px solid var(--jade);outline-offset:-2px}
   .notes-page img{max-width:100%;border-radius:6px;margin:4px 0}
   .notes-page details.note-toggle{border:none;border-radius:0;padding:0;margin:1px 0;background:transparent}
@@ -1075,7 +1075,7 @@
 .sg-root .sg-card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin-block:10px}
 .sg-root .sg-tbl{overflow-x:auto;margin-block:10px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
 .sg-root table{border-collapse:collapse;width:100%;min-width:520px;font-size:.9em}
-.sg-root th,.sg-root td{padding:8px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+.sg-root th,.sg-root td{padding:8px 12px;text-align:left;vertical-align:middle;border-bottom:1px solid var(--line)}
 .sg-root tr:last-child td{border-bottom:0}
 .sg-root th{background:var(--accent-soft);font-weight:700;white-space:nowrap}
 .sg-root td:first-child{white-space:nowrap;font-weight:700}
@@ -10334,7 +10334,7 @@ function toWord(C){
     '<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->'+
     '<style>@page{size:21cm 29.7cm;margin:2cm}body{font-family:"맑은 고딕","Malgun Gothic",sans-serif;font-size:10.5pt;color:#1c2340;line-height:1.5}'+
     'h1{font-size:20pt;margin:0 0 10pt}h2{font-size:15pt;color:#3447b8;border-bottom:1.5pt solid #3447b8;margin:20pt 0 8pt}h3{font-size:12pt;margin:12pt 0 4pt}h4{font-size:11pt;margin:8pt 0 3pt}'+
-    'table{border-collapse:collapse;width:100%;margin:6pt 0}th,td{border:1pt solid #b9bfd6;padding:4pt 6pt;vertical-align:top}th{background:#e4e8fb;text-align:left}p,li{margin:3pt 0}</style></head><body>'+
+    'table{border-collapse:collapse;width:100%;margin:6pt 0}th,td{border:1pt solid #b9bfd6;padding:4pt 6pt;vertical-align:middle}th{background:#e4e8fb;text-align:left}p,li{margin:3pt 0}</style></head><body>'+
     '<h1>'+esc(t)+'</h1>'+M.innerHTML+'</body></html>';
   download(new Blob(['\ufeff'+html],{type:'application/msword'}),fname(t)+'.doc');
   toast('워드 파일(.doc)로 저장했어요. 워드에서 열어 .docx로 다시 저장할 수 있어요.');
