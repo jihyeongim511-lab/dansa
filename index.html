@@ -1155,6 +1155,11 @@
 .sg-root.sg-editing img.sg-img{cursor:zoom-in;outline:1px dashed var(--accent)}
 .sg-root[data-custom] .sg-h1[contenteditable=true]{outline:1px dashed #d9a400}
 </style>
+<style>
+.nav-tabs.tab-reorder>[id]:not(#btnReorderTabs):not(#btnAddNb){outline:2px dashed #d9a400;outline-offset:2px;cursor:grab}
+.tab-mv{font-style:normal;font-size:11px;margin-left:4px;padding:0 5px;border-radius:5px;background:rgba(217,164,0,.25);color:inherit;cursor:pointer;user-select:none}
+.tab-mv:hover{background:#d9a400;color:#fff}
+</style>
 </head>
 <body>
 <div id="root">
@@ -10214,6 +10219,49 @@ window.sgImport=function(C){
     }
   });
 };
+})();
+</script>
+<script>
+/* 상단 탭 순서 바꾸기 (◀ ▶ 버튼 또는 끌어놓기, 자동 저장) */
+(function(){
+var K='tab-order-v1',box=document.querySelector('.mode-nav .nav-tabs');if(!box)return;
+var addBtn=document.getElementById('btnAddNb'),rb=document.createElement('button');
+rb.className='btn small ghost';rb.id='btnReorderTabs';rb.textContent='⇄ 탭 순서';rb.title='상단 탭의 순서를 바꿉니다';box.appendChild(rb);
+function mov(){return[].filter.call(box.children,function(e){return e.id&&e!==rb&&e!==addBtn})}
+function tail(){if(addBtn)box.appendChild(addBtn);box.appendChild(rb)}
+function save(){try{localStorage.setItem(K,JSON.stringify(mov().map(function(e){return e.id})))}catch(e){}}
+(function apply(){var s=[];try{s=JSON.parse(localStorage.getItem(K)||'[]')}catch(e){}
+  var cur=mov(),by={};cur.forEach(function(e){by[e.id]=e});
+  var ord=s.filter(function(i){return by[i]}).map(function(i){return by[i]});
+  cur.forEach(function(e){if(ord.indexOf(e)<0)ord.push(e)});
+  ord.forEach(function(e){box.appendChild(e)});tail();
+})();
+function on(f){
+  box.classList.toggle('tab-reorder',f);rb.textContent=f?'✅ 순서 완료':'⇄ 탭 순서';
+  mov().forEach(function(e){
+    e.draggable=f;
+    if(f){e.insertAdjacentHTML('beforeend','<i class="tab-mv" data-d="-1">◀</i><i class="tab-mv" data-d="1">▶</i>')}
+    else e.querySelectorAll('.tab-mv').forEach(function(m){m.remove()});
+  });
+  if(!f)save();
+}
+rb.addEventListener('click',function(e){e.stopPropagation();on(!box.classList.contains('tab-reorder'))});
+window.addEventListener('click',function(e){
+  if(!box.classList.contains('tab-reorder')||!box.contains(e.target)||e.target.closest('#btnReorderTabs'))return;
+  e.stopPropagation();e.preventDefault();
+  var m=e.target.closest('.tab-mv');if(!m)return;
+  var el=m.parentElement,d=+m.dataset.d,sib=d<0?el.previousElementSibling:el.nextElementSibling;
+  if(!sib||sib===addBtn||sib===rb)return;
+  d<0?sib.before(el):sib.after(el);save();
+},true);
+var drag=null;
+box.addEventListener('dragstart',function(e){if(box.classList.contains('tab-reorder')){drag=e.target.closest('[id]');e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain',drag.id)}catch(x){}}});
+box.addEventListener('dragover',function(e){if(drag)e.preventDefault()});
+box.addEventListener('drop',function(e){
+  var t=e.target.closest('.nav-tabs > [id]');if(!drag||!t||t===drag||t===rb||t===addBtn){drag=null;return}
+  e.preventDefault();
+  var kids=[].slice.call(box.children);kids.indexOf(drag)<kids.indexOf(t)?t.after(drag):t.before(drag);drag=null;save();
+});
 })();
 </script>
 </body>
