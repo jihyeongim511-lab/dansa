@@ -10052,6 +10052,7 @@ function addNav(C){
     var a=nav.querySelector('a[href="#'+s.id+'"]');
     if(!a){a=document.createElement('a');a.href='#'+s.id;a.setAttribute('data-sg','');nav.appendChild(a);a.textContent=label}
     else if(C.dataset.custom)a.textContent=label;
+    else if(/\d/.test(nt)){var np=nt.replace(/\d+/g,function(x){return String(parseInt(x,10))}).replace(/·/g,'~');a.textContent=a.textContent.replace(/^[\d~·\s]+/,'').replace(/^/,np+' ')}
   });
   nav.querySelectorAll('a').forEach(function(a){if(!C.querySelector(a.getAttribute('href')))a.remove()});
 }
@@ -10098,7 +10099,13 @@ function act(C,a,d){
     sec=t.content.firstChild;var f=M.querySelector('footer');f?f.before(sec):M.appendChild(sec);save(C);sec.scrollIntoView({behavior:'smooth'});
   }else if(a==='delsec'){
     sec=el&&el.closest('section');if(!sec||!M.contains(sec))return alert('지울 단원 안을 먼저 눌러 주세요.');
-    if(confirm('이 단원 전체를 지울까요?')){sec.remove();save(C)}
+    if(confirm('이 단원 전체를 지울까요?')){
+      var dn=sec.querySelector('h2 .sg-n'),k=dn?(dn.textContent.match(/\d+/g)||[]).length:0,nx=[],q=sec.nextElementSibling;
+      while(q){if(q.tagName==='SECTION')nx.push(q);q=q.nextElementSibling}
+      sec.remove();
+      if(k)nx.forEach(function(x){var nn=x.querySelector('h2 .sg-n');if(!nn)return;
+        nn.textContent=nn.textContent.replace(/\d+/g,function(m){var v=Math.max(1,parseInt(m,10)-k)+'';while(v.length<m.length)v='0'+v;return v})});
+      save(C)}
   }else if(a==='imp')window.sgImport(C);
   else if(a==='reset'){
     if(confirm('직접 추가·수정한 내용이 모두 사라지고 처음 상태로 돌아가요. 계속할까요?')){M.innerHTML=C._orig;try{localStorage.removeItem(EK+C.id)}catch(e){}addNav(C)}
