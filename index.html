@@ -1146,6 +1146,8 @@
 .sg-root .sg-edit-bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .sg-root .sg-tools{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .sg-root .sg-tools[hidden]{display:none}
+.sg-root .sg-exp{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.sg-root .sg-exp[hidden]{display:none}
 .sg-root .sg-edit-bar .sg-btn{background:#fff8dc;border-color:#d9a400;color:#6b4e00;padding:4px 10px}
 .sg-root.sg-editing .sg-toggles{display:none}
 .sg-root.sg-editing main{outline:2px dashed #d9a400;outline-offset:6px;border-radius:6px;caret-color:var(--accent)}
@@ -10143,11 +10145,11 @@ function init(C){
   var M=C.querySelector('main'),sv=get(EK+C.id),d=document.createElement('div'),T=[['img','📷 그림'],['mark','🖍 핵심어'],['table','▦ 표'],['row','＋ 행'],['delrow','－ 행'],['sec','＋ 단원'],['delsec','－ 단원'],['imp','📥 붙여넣기']];
   C._orig=M.innerHTML;if(sv)M.innerHTML=sv;
   d.className='sg-edit-bar';
-  d.innerHTML='<button class="sg-btn" data-e="toggle">✏️ 편집</button><span class="sg-tools" hidden>'+T.map(function(t){return'<button class="sg-btn" data-e="'+t[0]+'">'+t[1]+'</button>'}).join('')+
+  d.innerHTML='<button class="sg-btn" data-e="toggle">✏️ 편집</button><button class="sg-btn" data-e="export">📤 내보내기</button><span class="sg-exp" hidden><button class="sg-btn" data-e="x-pdf">📄 PDF</button><button class="sg-btn" data-e="x-doc">📝 워드</button><button class="sg-btn" data-e="x-map">🧠 마인드맵</button></span><span class="sg-tools" hidden>'+T.map(function(t){return'<button class="sg-btn" data-e="'+t[0]+'">'+t[1]+'</button>'}).join('')+
     (C.dataset.custom?'<button class="sg-btn" data-e="delnb">🗑 암기장 삭제</button>':'<button class="sg-btn" data-e="reset">↩ 원본으로</button>')+'</span><input type="file" accept="image/*" hidden>';
   C.querySelector('.sg-toggles').after(d);addNav(C);
   d.addEventListener('mousedown',function(e){if(e.target.closest('button'))e.preventDefault()});
-  d.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var a=b.dataset.e;a==='toggle'?edit(C,!C.classList.contains('sg-editing'),d):act(C,a,d)});
+  d.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var a=b.dataset.e,ex=d.querySelector('.sg-exp');if(a==='toggle')edit(C,!C.classList.contains('sg-editing'),d);else if(a==='export')ex.hidden=!ex.hidden;else if(a.indexOf('x-')===0){ex.hidden=true;window.sgExport(C,a.slice(2))}else act(C,a,d)});
   d.querySelector('input').onchange=function(){var f=this.files[0];this.value='';if(f)addImg(C,f)};
   var t;M.addEventListener('input',function(){clearTimeout(t);t=setTimeout(function(){save(C)},500)});
   M.addEventListener('paste',function(e){var it=[].find.call(e.clipboardData.items,function(i){return i.type.indexOf('image')===0});if(it){e.preventDefault();addImg(C,it.getAsFile())}});
@@ -10179,6 +10181,146 @@ addBtn.onclick=function(){var n=prompt('새 암기장 이름을 입력하세요'
 document.addEventListener('click',function(e){var t=e.target.closest('.mode-nav .nav-tab');if(!t||t.dataset.custom||t.id==='btnAddNb')return;
   document.querySelectorAll('.sg-root[data-custom]').forEach(function(c){c.style.display='none'});
   document.querySelectorAll('.nav-tab[data-custom]').forEach(function(b){b.classList.remove('active')})},true);
+})();
+</script>
+<script>
+/* 암기장 내보내기: PDF(인쇄창 → PDF로 저장) / 워드(.doc) / 마인드맵(PNG) */
+(function(){
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function titleOf(C){var h=C.querySelector('.sg-h1');return(h&&h.textContent.trim())||'암기장'}
+function fname(s){return s.replace(/[\\\/:*?"<>|]/g,' ').replace(/\s+/g,' ').trim()||'암기장'}
+function toast(msg){var t=document.createElement('div');t.textContent=msg;
+  t.style.cssText='position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#1c2340;color:#fff;padding:10px 16px;border-radius:10px;font-size:13px;z-index:99999;box-shadow:0 6px 20px rgba(0,0,0,.25);max-width:90vw';
+  document.body.appendChild(t);setTimeout(function(){t.remove()},3800)}
+function download(blob,name){var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1500)}
+function clean(M){
+  M.removeAttribute('contenteditable');
+  M.querySelectorAll('[contenteditable]').forEach(function(e){e.removeAttribute('contenteditable')});
+  M.querySelectorAll('.sg-closed').forEach(function(e){e.classList.remove('sg-closed')});
+  M.querySelectorAll('.sg-on').forEach(function(e){e.classList.remove('sg-on')});
+  M.querySelectorAll('script,button,input').forEach(function(e){e.remove()});
+}
+function count(C){return C.querySelectorAll('main section').length}
+
+/* ---------- PDF ---------- */
+function toPdf(C){
+  var M=C.querySelector('main').cloneNode(true);clean(M);
+  var css=[].filter.call(document.querySelectorAll('style'),function(s){return s.textContent.indexOf('.sg-root')>-1&&s.textContent.indexOf('qaCollPrintArea')<0})
+    .map(function(s){return s.textContent}).join('\n');
+  var f=document.createElement('iframe');
+  f.style.cssText='position:fixed;left:-9999px;top:0;width:820px;height:600px;border:0';
+  document.body.appendChild(f);
+  var d=f.contentWindow.document,t=titleOf(C);
+  d.open();
+  d.write('<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>'+esc(fname(t))+'</title>'+
+    '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap"><style>'+css+
+    '\n@page{size:A4;margin:12mm}html,body{margin:0;background:#fff}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}'+
+    '.sg-root{background:#fff!important;padding:0!important;min-height:0!important}.sg-root section{break-inside:auto}.sg-root tr,.sg-root .sg-tip,.sg-root img{break-inside:avoid}'+
+    '.sg-root h2,.sg-root h3,.sg-root h4{break-after:avoid}</style></head><body><div class="sg-root"><div class="sg-wrap"><header class="sg-top"><h1 class="sg-h1">'+esc(t)+'</h1></header></div><main class="sg-wrap">'+M.innerHTML+'</main></div></body></html>');
+  d.close();
+  toast('인쇄 창에서 대상(프린터)을 「PDF로 저장」으로 고르세요.');
+  setTimeout(function(){
+    try{f.contentWindow.focus();f.contentWindow.print()}catch(e){alert('PDF 만들기에 실패했어요.')}
+    setTimeout(function(){f.remove()},60000);
+  },900);
+}
+
+/* ---------- 워드 ---------- */
+function toWord(C){
+  var src=C.querySelector('main'),M=src.cloneNode(true);clean(M);
+  /* 그림 크기를 워드가 이해하는 width/height 속성으로 */
+  var oi=src.querySelectorAll('img'),ni=M.querySelectorAll('img');
+  ni.forEach(function(im,i){var o=oi[i],nw=(o&&o.naturalWidth)||600,nh=(o&&o.naturalHeight)||400,p=parseFloat(im.style.width)||0,w=p?Math.round(600*p/100):Math.min(nw,600);
+    im.setAttribute('width',w);im.setAttribute('height',Math.round(w*nh/nw));im.removeAttribute('class');im.removeAttribute('style')});
+  M.querySelectorAll('li[data-n]').forEach(function(li){li.insertBefore(document.createTextNode(li.getAttribute('data-n')+' '),li.firstChild)});
+  M.querySelectorAll('.sg-k').forEach(function(e){e.setAttribute('style','background:#ffe36e;font-weight:bold')});
+  M.querySelectorAll('h2 .sg-n').forEach(function(e){e.setAttribute('style','color:#ffffff;background:#3447b8;font-size:11pt')});
+  M.querySelectorAll('.sg-tip').forEach(function(e){e.setAttribute('style','border-left:3pt solid #d9a400;background:#fff8dc;padding:4pt 8pt;margin:6pt 0')});
+  M.querySelectorAll('.sg-note').forEach(function(e){e.setAttribute('style','color:#5d6482;font-size:9.5pt')});
+  M.querySelectorAll('table').forEach(function(t){t.setAttribute('border','1');t.setAttribute('cellspacing','0');t.setAttribute('cellpadding','5');t.setAttribute('width','100%')});
+  var t=titleOf(C);
+  var html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>'+esc(t)+'</title>'+
+    '<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->'+
+    '<style>@page{size:21cm 29.7cm;margin:2cm}body{font-family:"맑은 고딕","Malgun Gothic",sans-serif;font-size:10.5pt;color:#1c2340;line-height:1.5}'+
+    'h1{font-size:20pt;margin:0 0 10pt}h2{font-size:15pt;color:#3447b8;border-bottom:1.5pt solid #3447b8;margin:20pt 0 8pt}h3{font-size:12pt;margin:12pt 0 4pt}h4{font-size:11pt;margin:8pt 0 3pt}'+
+    'table{border-collapse:collapse;width:100%;margin:6pt 0}th,td{border:1pt solid #b9bfd6;padding:4pt 6pt;vertical-align:top}th{background:#e4e8fb;text-align:left}p,li{margin:3pt 0}</style></head><body>'+
+    '<h1>'+esc(t)+'</h1>'+M.innerHTML+'</body></html>';
+  download(new Blob(['\ufeff'+html],{type:'application/msword'}),fname(t)+'.doc');
+  toast('워드 파일(.doc)로 저장했어요. 워드에서 열어 .docx로 다시 저장할 수 있어요.');
+}
+
+/* ---------- 마인드맵 ---------- */
+var PAL=['#3447b8','#d9534f','#1d7a4d','#c27c0e','#8e44ad','#0e8fa8','#d6336c','#5c7080'];
+function cut(s,n){s=s.replace(/\s+/g,' ').trim();return s.length>n?s.slice(0,n-1)+'…':s}
+function buildTree(C){
+  var root={t:cut(titleOf(C),30),c:[]};
+  C.querySelectorAll('main section').forEach(function(s){
+    var h=s.querySelector('h2');if(!h)return;
+    var n=h.querySelector('.sg-n'),nt=n?n.textContent.trim():'',lab=(nt+' '+h.textContent.replace(nt,'').trim()).trim();
+    var sec={t:cut(lab,30),c:[]},cur=sec,seen={};
+    s.querySelectorAll('h3,.sg-k').forEach(function(e){
+      if(e.tagName==='H3'){var tx=e.textContent.trim();if(!tx)return;cur={t:cut(tx,26),c:[]};sec.c.push(cur);return}
+      if(e.closest('h3'))return;
+      var k=e.textContent.replace(/\s+/g,' ').trim();if(!k||seen[k]||cur.c.length>=8)return;
+      seen[k]=1;cur.c.push({t:cut(k,22),c:[]});
+    });
+    root.c.push(sec);
+  });
+  return root;
+}
+function mindSvg(root){
+  var FF="'Malgun Gothic','Apple SD Gothic Neo','Noto Sans KR',sans-serif",
+      ST=[{f:19,w:'700',h:44},{f:15,w:'700',h:34},{f:13.5,w:'600',h:30},{f:12.5,w:'400',h:26}],
+      ctx=document.createElement('canvas').getContext('2d'),ROW=32,GAP=64,M=30,maxw=[0,0,0,0];
+  function meas(n,l){ctx.font=ST[l].w+' '+ST[l].f+'px '+FF;n.l=l;n.w=Math.ceil(ctx.measureText(n.t).width)+24;n.h=ST[l].h;
+    if(n.w>maxw[l])maxw[l]=n.w;n.c.forEach(function(c){meas(c,l+1)})}
+  meas(root,0);
+  var cy=0;
+  function lay(n,col){n.col=col;
+    if(!n.c.length){n.y=cy+ROW/2;cy+=ROW;return}
+    n.c.forEach(function(c,i){lay(c,col);if(i<n.c.length-1)cy+=(n.l===0?16:n.l===1?6:0)});
+    n.y=(n.c[0].y+n.c[n.c.length-1].y)/2}
+  /* 가지(1단계)마다 색을 정하고, 아래로 색을 물려줌 */
+  root.c.forEach(function(s,i){var col=PAL[i%PAL.length];lay(s,col);cy+=14});
+  root.y=root.c.length?(root.c[0].y+root.c[root.c.length-1].y)/2:ROW/2;
+  var xs=[M];for(var i=1;i<4;i++)xs[i]=xs[i-1]+maxw[i-1]+GAP;
+  var W=xs[3]+maxw[3]+M,H=Math.max(cy,ROW)+M*2,out=[],txt=[];
+  function draw(n,p){var x=xs[n.l],y=n.y+M;
+    if(p){var x1=xs[p.l]+p.w,y1=p.y+M,mx=(x1+x)/2;
+      out.push('<path d="M'+x1+' '+y1+' C'+mx+' '+y1+' '+mx+' '+y+' '+x+' '+y+'" fill="none" stroke="'+n.col+'" stroke-width="'+(n.l===1?3:n.l===2?2:1.4)+'" stroke-linecap="round" opacity=".85"/>')}
+    n.c.forEach(function(c){draw(c,n)});
+    var fill,stroke,color;
+    if(n.l===0){fill='#1c2340';stroke='#1c2340';color='#fff'}
+    else if(n.l===1){fill=n.col;stroke=n.col;color='#fff'}
+    else if(n.l===2){fill='#fff';stroke=n.col;color='#1c2340'}
+    else{fill='#fff8d6';stroke='#e3c94a';color='#1c2340'}
+    txt.push('<rect x="'+x+'" y="'+(y-n.h/2)+'" width="'+n.w+'" height="'+n.h+'" rx="'+(n.h/2.6)+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="'+(n.l===2?1.6:1)+'"/>'+
+      '<text x="'+(x+12)+'" y="'+y+'" dy=".35em" font-size="'+ST[n.l].f+'" font-weight="'+ST[n.l].w+'" fill="'+color+'">'+esc(n.t)+'</text>')}
+  /* 색 물려주기 */
+  (function paint(n,col){n.col=n.col||col;n.c.forEach(function(c){paint(c,n.col)})})(root,'#1c2340');
+  root.c.forEach(function(s){(function p(n){n.c.forEach(function(c){c.col=s.col;p(c)})})(s)});
+  draw(root,null);
+  return {W:W,H:H,svg:'<svg xmlns="http://www.w3.org/2000/svg" width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" font-family="'+FF.replace(/'/g,'&apos;')+'"><rect width="100%" height="100%" fill="#ffffff"/>'+out.join('')+txt.join('')+'</svg>'};
+}
+function toMap(C){
+  var r=buildTree(C),m=mindSvg(r),t=titleOf(C);
+  var blob=new Blob([m.svg],{type:'image/svg+xml;charset=utf-8'}),url=URL.createObjectURL(blob),img=new Image();
+  img.onload=function(){
+    var sc=Math.min(2,14000/m.W,14000/m.H),cv=document.createElement('canvas');cv.width=Math.round(m.W*sc);cv.height=Math.round(m.H*sc);
+    var x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,cv.width,cv.height);x.drawImage(img,0,0,cv.width,cv.height);
+    URL.revokeObjectURL(url);
+    cv.toBlob(function(b){if(b){download(b,fname(t)+' 마인드맵.png');toast('마인드맵 그림(PNG)으로 저장했어요.')}else{download(blob,fname(t)+' 마인드맵.svg')}},'image/png');
+  };
+  img.onerror=function(){download(blob,fname(t)+' 마인드맵.svg');toast('그림 변환이 안 되어 SVG로 저장했어요.')};
+  img.src=url;
+}
+
+window.sgExport=function(C,type){
+  if(!count(C))return alert('내보낼 단원이 없어요. 먼저 단원을 추가해 주세요.');
+  try{if(type==='pdf')toPdf(C);else if(type==='doc')toWord(C);else if(type==='map')toMap(C)}
+  catch(e){console.error(e);alert('내보내기에 실패했어요. 잠시 후 다시 시도해 주세요.')}
+};
 })();
 </script>
 <script>
