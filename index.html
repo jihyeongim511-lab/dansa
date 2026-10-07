@@ -10057,6 +10057,7 @@ function addNav(C){
     else if(/\d/.test(nt)){var np=nt.replace(/\d+/g,function(x){return String(parseInt(x,10))}).replace(/·/g,'~');a.textContent=a.textContent.replace(/^[\d~·\s]+/,'').replace(/^/,np+' ')}
   });
   nav.querySelectorAll('a').forEach(function(a){if(!C.querySelector(a.getAttribute('href')))a.remove()});
+  C.querySelectorAll('main section').forEach(function(s){var a=nav.querySelector('a[href="#'+s.id+'"]');if(a)nav.appendChild(a)});
 }
 function relabel(M){M.querySelectorAll('table').forEach(function(t){if(t.querySelector('[rowspan]'))return;
   var hs=[].map.call(t.rows[0]?t.rows[0].cells:[],function(c){return c.textContent.trim()});
@@ -10080,6 +10081,11 @@ function mark(C){
   var n=s.anchorNode,e=n.nodeType===1?n:n.parentElement,k=e&&e.closest('.sg-k');
   if(k)k.replaceWith.apply(k,k.childNodes);else document.execCommand('insertHTML',false,'<b class="sg-k">'+esc(s.toString())+'</b>');
   save(C);
+}
+function renumSecs(M,start){
+  var cur=start;
+  M.querySelectorAll('section').forEach(function(x){var nn=x.querySelector('h2 .sg-n');if(!nn)return;
+    nn.textContent=nn.textContent.replace(/\d+/g,function(m){var v=String(cur++);while(v.length<m.length)v='0'+v;return v})});
 }
 function act(C,a,d){
   var M=C.querySelector('main'),el=curEl(C),tr=el&&el.closest('tr'),sec;
@@ -10108,6 +10114,14 @@ function act(C,a,d){
       if(k)nx.forEach(function(x){var nn=x.querySelector('h2 .sg-n');if(!nn)return;
         nn.textContent=nn.textContent.replace(/\d+/g,function(m){var v=Math.max(1,parseInt(m,10)-k)+'';while(v.length<m.length)v='0'+v;return v})});
       save(C)}
+  }else if(a==='secup'||a==='secdown'){
+    sec=el&&el.closest('section');if(!sec||!M.contains(sec))return alert('옮길 단원 안을 먼저 눌러 주세요.');
+    var nb=a==='secup'?sec.previousElementSibling:sec.nextElementSibling;
+    while(nb&&nb.tagName!=='SECTION')nb=a==='secup'?nb.previousElementSibling:nb.nextElementSibling;
+    if(!nb)return alert(a==='secup'?'이미 맨 위 단원이에요.':'이미 맨 아래 단원이에요.');
+    var f0=M.querySelector('section .sg-n'),st=f0?parseInt((f0.textContent.match(/\d+/)||[1])[0],10):1;
+    a==='secup'?nb.before(sec):nb.after(sec);
+    renumSecs(M,st);save(C);sec.scrollIntoView({behavior:'smooth',block:'center'});
   }else if(a==='imp')window.sgImport(C);
   else if(a==='reset'){
     if(confirm('직접 추가·수정한 내용이 모두 사라지고 처음 상태로 돌아가요. 계속할까요?')){M.innerHTML=C._orig;try{localStorage.removeItem(EK+C.id)}catch(e){}addNav(C)}
@@ -10142,7 +10156,7 @@ function bindQuiz(C){
   C.addEventListener('click',function(e){var k=e.target.closest('.sg-k');if(k&&C.classList.contains('sg-quiz'))k.classList.toggle('sg-on')});
 }
 function init(C){
-  var M=C.querySelector('main'),sv=get(EK+C.id),d=document.createElement('div'),T=[['img','📷 그림'],['mark','🖍 핵심어'],['table','▦ 표'],['row','＋ 행'],['delrow','－ 행'],['sec','＋ 단원'],['delsec','－ 단원'],['imp','📥 붙여넣기']];
+  var M=C.querySelector('main'),sv=get(EK+C.id),d=document.createElement('div'),T=[['img','📷 그림'],['mark','🖍 핵심어'],['table','▦ 표'],['row','＋ 행'],['delrow','－ 행'],['sec','＋ 단원'],['delsec','－ 단원'],['secup','▲ 단원'],['secdown','▼ 단원'],['imp','📥 붙여넣기']];
   C._orig=M.innerHTML;if(sv)M.innerHTML=sv;
   d.className='sg-edit-bar';
   d.innerHTML='<button class="sg-btn" data-e="toggle">✏️ 편집</button><button class="sg-btn" data-e="export">📤 내보내기</button><span class="sg-exp" hidden><button class="sg-btn" data-e="x-pdf">📄 PDF</button><button class="sg-btn" data-e="x-doc">📝 워드</button><button class="sg-btn" data-e="x-map">🧠 마인드맵</button></span><span class="sg-tools" hidden>'+T.map(function(t){return'<button class="sg-btn" data-e="'+t[0]+'">'+t[1]+'</button>'}).join('')+
