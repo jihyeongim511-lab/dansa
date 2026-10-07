@@ -1065,6 +1065,10 @@
 .sg-root p{margin:6px 0}
 .sg-root ul{margin:6px 0;padding-left:1.2em}
 .sg-root li{margin:2px 0}
+.sg-root ul{list-style:disc}.sg-root ul ul{list-style:circle}.sg-root ul ul ul{list-style:square}
+.sg-root ol{padding-left:1.6em;margin:6px 0}.sg-root ol ol{list-style:lower-alpha}.sg-root ol ol ol{list-style:lower-roman}
+.sg-root li > ul,.sg-root li > ol{margin:2px 0}
+.sg-root li::marker{color:var(--accent)}
 .sg-root .sg-k{background:var(--hl);color:var(--hl-fg);padding:0 3px;border-radius:3px;font-weight:500;font-style:normal;transition:color .15s,background .15s}
 .sg-root.sg-quiz .sg-k:not(.sg-on){color:transparent;background:var(--accent-soft);cursor:pointer;user-select:none;box-shadow:inset 0 0 0 1px var(--line)}
 .sg-root.sg-quiz .sg-k.sg-on{cursor:pointer}
@@ -1117,11 +1121,11 @@
 .sg-root .sg-ln{margin:4px 0}
 .sg-root .sg-ln+.sg-ln,.sg-root .sg-ln+.sg-items,.sg-root .sg-ln+.sg-num,.sg-root .sg-num+.sg-ln,.sg-root .sg-items+.sg-ln{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}
 .sg-root ul.sg-items{list-style:none;margin:2px 0;padding:0}
-.sg-root ul.sg-items li{position:relative;padding-left:1.1em;margin:4px 0}
-.sg-root ul.sg-items li::before{content:"";position:absolute;left:.15em;top:.78em;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.sg-root ul.sg-items > li{position:relative;padding-left:1.1em;margin:4px 0}
+.sg-root ul.sg-items > li::before{content:"";position:absolute;left:.15em;top:.78em;width:6px;height:6px;border-radius:50%;background:var(--accent)}
 .sg-root ol.sg-num{list-style:none;margin:2px 0;padding:0}
-.sg-root ol.sg-num li{position:relative;padding-left:1.9em;margin:6px 0}
-.sg-root ol.sg-num li::before{content:attr(data-n);position:absolute;left:0;top:0;color:var(--accent);font-weight:800;font-size:1.05em}
+.sg-root ol.sg-num > li{position:relative;padding-left:1.9em;margin:6px 0}
+.sg-root ol.sg-num > li::before{content:attr(data-n);position:absolute;left:0;top:0;color:var(--accent);font-weight:800;font-size:1.05em}
 .sg-root td .sg-flow{margin:6px 0;gap:4px}
 .sg-root td .sg-flow span{font-size:.86em;padding:2px 8px;background:var(--accent-soft);border-color:transparent}
 .sg-root .sg-tip{background:#fff8dc;border-left-color:#d9a400}
@@ -10087,10 +10091,53 @@ function renumSecs(M,start){
   M.querySelectorAll('section').forEach(function(x){var nn=x.querySelector('h2 .sg-n');if(!nn)return;
     nn.textContent=nn.textContent.replace(/\d+/g,function(m){var v=String(cur++);while(v.length<m.length)v='0'+v;return v})});
 }
+function liAt(M){var s=getSelection(),n=s.anchorNode,e=n&&(n.nodeType===1?n:n.parentElement),li=e&&e.closest('li');return li&&M.contains(li)?li:null}
+function keepSel(fn){var s=getSelection(),r=s.rangeCount?s.getRangeAt(0):null,a=r&&[r.startContainer,r.startOffset,r.endContainer,r.endOffset];fn();
+  if(a){try{var n=document.createRange();n.setStart(a[0],a[1]);n.setEnd(a[2],a[3]);s.removeAllRanges();s.addRange(n)}catch(e){}}}
+function subList(li,tag){var l=[].filter.call(li.children,function(c){return c.tagName==='UL'||c.tagName==='OL'})[0];if(!l){l=document.createElement(tag);li.appendChild(l)}return l}
+function indentLi(li){var p=li.previousElementSibling;if(!p||p.tagName!=='LI')return false;
+  keepSel(function(){subList(p,li.parentElement.tagName).appendChild(li)});return true}
+function outdentLi(li){var pl=li.parentElement,gl=pl.parentElement;if(!gl||gl.tagName!=='LI')return false;
+  keepSel(function(){var nx=[];for(var q=li.nextElementSibling;q;q=q.nextElementSibling)nx.push(q);
+    if(nx.length){var sl=subList(li,pl.tagName);nx.forEach(function(x){sl.appendChild(x)})}
+    gl.after(li);if(!pl.children.length)pl.remove()});return true}
+function fixP(M){keepSel(function(){M.querySelectorAll('p > ul,p > ol').forEach(function(l){var p=l.parentElement;
+  if(p.children.length===1&&p.textContent===l.textContent)p.replaceWith(l)})})}
+function listCmd(tag){document.execCommand(tag==='OL'?'insertOrderedList':'insertUnorderedList');fixP(document.activeElement&&document.activeElement.closest&&document.activeElement.closest('main')||document)}
+function toggleList(C,tag){var M=C.querySelector('main'),s=getSelection();M.focus();
+  if(C._r){s.removeAllRanges();s.addRange(C._r)}
+  if(!s.rangeCount||!M.contains(s.anchorNode))return alert('글머리를 만들 줄을 먼저 눌러 주세요.');
+  listCmd(tag);save(C)}
+function bindLists(C,M){
+  M.addEventListener('keydown',function(e){
+    if(!C.classList.contains('sg-editing')||e.isComposing||e.ctrlKey||e.altKey||e.metaKey)return;
+    var li;
+    if(e.key==='Tab'&&(li=liAt(M))){e.preventDefault();
+      if(e.shiftKey){if(!outdentLi(li))listCmd(li.parentElement.tagName)}else indentLi(li);
+      save(C);return}
+    if(e.key===' '&&!e.shiftKey){
+      var s=getSelection();if(!s.rangeCount||!s.isCollapsed)return;
+      var n=s.anchorNode,el=n&&(n.nodeType===1?n:n.parentElement),b=el&&el.closest('p,div,td,th');
+      if(!b||!M.contains(b)||b.closest('li')||b.closest('h2,h3,h4'))return;
+      var r=document.createRange();r.selectNodeContents(b);r.setEnd(s.anchorNode,s.anchorOffset);
+      var t=r.toString(),ord=/^\d{1,2}[.)]$/.test(t);
+      if(!(ord||t==='-'||t==='*'||t==='•'))return;
+      e.preventDefault();r.deleteContents();s.removeAllRanges();s.addRange(r);
+      if(!b.textContent&&!b.querySelector('br'))b.appendChild(document.createElement('br'));
+      listCmd(ord?'OL':'UL');save(C)}
+  });
+}
 function act(C,a,d){
   var M=C.querySelector('main'),el=curEl(C),tr=el&&el.closest('tr'),sec;
   if(a==='img')d.querySelector('input').click();
   else if(a==='mark')mark(C);
+  else if(a==='ul'||a==='ol')toggleList(C,a.toUpperCase());
+  else if(a==='indent'||a==='outdent'){
+    var li=el&&el.closest('li');if(!li||!M.contains(li))return alert('글머리(•) 안의 줄을 먼저 눌러 주세요. 글머리가 없으면 「• 글머리」로 먼저 만들어 보세요.');
+    if(a==='indent'){if(!indentLi(li))return alert('바로 위에 항목이 있어야 들여쓸 수 있어요.')}
+    else if(!outdentLi(li))toggleList(C,li.parentElement.tagName);
+    save(C);
+  }
   else if(a==='row'||a==='delrow'){
     if(!tr||!M.contains(tr))return alert('표 안의 칸을 먼저 눌러 주세요.');
     if(a==='row'){var c=tr.cloneNode(true);c.querySelectorAll('td').forEach(function(td){td.removeAttribute('rowspan');td.innerHTML=td.classList.contains('sg-wrapc')?'<div class="sg-ln"><br></div>':'<br>'});tr.after(c)}
@@ -10156,7 +10203,7 @@ function bindQuiz(C){
   C.addEventListener('click',function(e){var k=e.target.closest('.sg-k');if(k&&C.classList.contains('sg-quiz'))k.classList.toggle('sg-on')});
 }
 function init(C){
-  var M=C.querySelector('main'),sv=get(EK+C.id),d=document.createElement('div'),T=[['img','📷 그림'],['mark','🖍 핵심어'],['table','▦ 표'],['row','＋ 행'],['delrow','－ 행'],['sec','＋ 단원'],['delsec','－ 단원'],['secup','▲ 단원'],['secdown','▼ 단원'],['imp','📥 붙여넣기']];
+  var M=C.querySelector('main'),sv=get(EK+C.id),d=document.createElement('div'),T=[['img','📷 그림'],['mark','🖍 핵심어'],['ul','• 글머리'],['ol','1. 번호'],['indent','→ 들여쓰기'],['outdent','← 내어쓰기'],['table','▦ 표'],['row','＋ 행'],['delrow','－ 행'],['sec','＋ 단원'],['delsec','－ 단원'],['secup','▲ 단원'],['secdown','▼ 단원'],['imp','📥 붙여넣기']];
   C._orig=M.innerHTML;if(sv)M.innerHTML=sv;
   d.className='sg-edit-bar';
   d.innerHTML='<button class="sg-btn" data-e="toggle">✏️ 편집</button><button class="sg-btn" data-e="export">📤 내보내기</button><span class="sg-exp" hidden><button class="sg-btn" data-e="x-pdf">📄 PDF</button><button class="sg-btn" data-e="x-doc">📝 워드</button><button class="sg-btn" data-e="x-map">🧠 마인드맵</button></span><span class="sg-tools" hidden>'+T.map(function(t){return'<button class="sg-btn" data-e="'+t[0]+'">'+t[1]+'</button>'}).join('')+
@@ -10165,6 +10212,7 @@ function init(C){
   d.addEventListener('mousedown',function(e){if(e.target.closest('button'))e.preventDefault()});
   d.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var a=b.dataset.e,ex=d.querySelector('.sg-exp');if(a==='toggle')edit(C,!C.classList.contains('sg-editing'),d);else if(a==='export')ex.hidden=!ex.hidden;else if(a.indexOf('x-')===0){ex.hidden=true;window.sgExport(C,a.slice(2))}else act(C,a,d)});
   d.querySelector('input').onchange=function(){var f=this.files[0];this.value='';if(f)addImg(C,f)};
+  bindLists(C,M);
   var t;M.addEventListener('input',function(){clearTimeout(t);t=setTimeout(function(){save(C)},500)});
   M.addEventListener('paste',function(e){var it=[].find.call(e.clipboardData.items,function(i){return i.type.indexOf('image')===0});if(it){e.preventDefault();addImg(C,it.getAsFile())}});
   C.addEventListener('click',function(e){var im=e.target.closest('img.sg-img');if(im&&C.classList.contains('sg-editing')){var w=im.style.width;im.style.width=w===''?'60%':w==='60%'?'30%':'';save(C)}});
@@ -10248,6 +10296,7 @@ function toWord(C){
   ni.forEach(function(im,i){var o=oi[i],nw=(o&&o.naturalWidth)||600,nh=(o&&o.naturalHeight)||400,p=parseFloat(im.style.width)||0,w=p?Math.round(600*p/100):Math.min(nw,600);
     im.setAttribute('width',w);im.setAttribute('height',Math.round(w*nh/nw));im.removeAttribute('class');im.removeAttribute('style')});
   M.querySelectorAll('li[data-n]').forEach(function(li){li.insertBefore(document.createTextNode(li.getAttribute('data-n')+' '),li.firstChild)});
+  M.querySelectorAll('ol.sg-num').forEach(function(o){o.setAttribute('style','list-style-type:none;margin-left:0;padding-left:0')});
   M.querySelectorAll('.sg-k').forEach(function(e){e.setAttribute('style','background:#ffe36e;font-weight:bold')});
   M.querySelectorAll('h2 .sg-n').forEach(function(e){e.setAttribute('style','color:#ffffff;background:#3447b8;font-size:11pt')});
   M.querySelectorAll('.sg-tip').forEach(function(e){e.setAttribute('style','border-left:3pt solid #d9a400;background:#fff8dc;padding:4pt 8pt;margin:6pt 0')});
